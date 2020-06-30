@@ -1,99 +1,16 @@
-﻿  <#
-  Usage examples:
-  
-  #Update Westcoat Active directory password:
-  Create-Credential -WestCoast -AD -PasswordUpdate
-
-  Use XMA AAD password:
-  #>
-  function Create-Credential {
-  [CmdletBinding()]
-   Param (
-    [Parameter(ParameterSetName='WestCoast ParamSet 1')] # Parameter set for WestCoast
-    [Switch]
-    $WestCoast,
-    [Parameter(ParameterSetName='XMA ParamSet 2')] # Parameter set for XMA
-    [Switch]
-    $XMA,
-    [Parameter(Mandatory = $false)]
-    [Switch]
-    $PasswordUpdate, # if this switch is used, the function is in "Update" mode (this is to save / update passwords)
-    [switch]
-    $AD,    # AD credentials
-    [switch]
-    $AAD,  # O365 / AAD credentials
-    [string]
-    $CredFolder = "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-  )
-
-    # Westcoast
-    if ($WestCoast.IsPresent){
-    $domain = "WC"
-    $AD_Admin = "svc.adchanges@westcoast.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@westcoastltd365.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-      if ($AD.IsPresent){
-        # If specified, update AD password for Westcoast
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
-          }
-        # Use AD password for Westcoast
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
-        # Create the AD credential for Westcoast
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
-      }
-      elseif ($AAD.IsPresent) {
-        # If specified, update the AAD password for Westcoast
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
-          }
-        # Use AAD password for Westcoast
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
-        # Create the AAD credential for Westcoast
-        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password 
-      }
-    }
-    # XMA
-    elseif ($XMA.IsPresent) {
-    $domain = "XMA"
-    $AD_Admin = "svc.adchanges@xma.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@xmalimited.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-      if ($AD.IsPresent){
-        # If specified, update AD password for XMA
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
-          }
-        # Use AD password for XMA
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
-        # Create AD credential for XMA
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
-      }
-      elseif ($AAD.IsPresent) {
-        # If specified, update AAD password for XMA
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
-          }
-        # Use AAD password for XMA
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
-        # Create AAD credential for XMA
-        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password # this is the AAD credential
-      }
-    } 
-    # Incorrect domain selection
-    else {
-      Write-Host "Correct domain was not selected, exiting";
-      Break
-    }
-  }
-
+﻿function Variable-Cleanup {
+  Get-Variable |
+  Where-Object { $startupVariables -notcontains $_.Name } |
+  ForEach-Object {
+    try { Remove-Variable -Name "$($_.Name)" -Force -Scope "global" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue }
+    catch {}
+	}
+}
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUAEhdziQ+hHF+ZAgVtgW+BsHt
-# sMygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUTXPzlXjEXs0MCKQvF2daEjW3
+# UbCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -160,11 +77,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUBmjRR1ssTslA/L8FdleFUaFMvLkwDQYJKoZI
-# hvcNAQEBBQAEggEA7/+zFg+kmTV0i8D8oTPs5fzVX33pXgZWPxCzZNKwEQMRtu7o
-# o2MsIELq1qXtL6xqAggxvdw/7MMBPU2P7lbC5YYtb6RtGxI5pDpsZO/m/pbjkNXE
-# dtMf7SW3tLVaLj1kBUqmtdAQZB7dXvxNXEtMpocUbrsDA91tVTwO3Ko1Qeww/zCa
-# 6MyaFhVwKZZ2dtqqEJ+rAQ0xVxBxwW0Zc7vRtSrl/JCw4+QXhlY4NnfOfqNg/eU1
-# 732epHvvJUIXOJpKIfCq7Y8tzCo/Nm+Rg+p+I4FzFd3rAod7+HdYo8lIP3rbRJ3g
-# R7wFAkgUrxCxaT+8N316t7xGc6KqyJ1f3D8Kyg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUBnpIpVfIHWCfFOFEwKPgbiBU7SkwDQYJKoZI
+# hvcNAQEBBQAEggEAZJh5dCA/vtjTHrHZgoat8Qg/x/v6PIjyWpzx8hjQrawQ4PRc
+# uuEm8NLBwznOavrBZtgG4cr6EyBPPm5qEHAkYkUJOG4wGXmilmx+QbmY+G+5j7yZ
+# tP8WQTb/stJv7VZI2uVz4V6/XGSgrGOV6TQgO72SVsWMBFxRe7AdgZckRIYzOSru
+# s4ybG0u2CWCjrfz1SvUAg4qpA019JQHdXu2KZRuhmrgN3KDIz9sjwhzQzcxQmMNf
+# DqHpcl7JorDaO4K3vbfyE5I8nqKShWZH9qLsyZV272TyFteql5PC4XYLViyxosIj
+# 884fBtDttbGVmlNrscTRWEoMfEUNlVgxaSimIQ==
 # SIG # End signature block

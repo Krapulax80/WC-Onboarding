@@ -1,99 +1,49 @@
-﻿  <#
-  Usage examples:
-  
-  #Update Westcoat Active directory password:
-  Create-Credential -WestCoast -AD -PasswordUpdate
+    function Get-AADSync {
+        # START
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Starting AAD syncronisation."
+        $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
 
-  Use XMA AAD password:
-  #>
-  function Create-Credential {
-  [CmdletBinding()]
-   Param (
-    [Parameter(ParameterSetName='WestCoast ParamSet 1')] # Parameter set for WestCoast
-    [Switch]
-    $WestCoast,
-    [Parameter(ParameterSetName='XMA ParamSet 2')] # Parameter set for XMA
-    [Switch]
-    $XMA,
-    [Parameter(Mandatory = $false)]
-    [Switch]
-    $PasswordUpdate, # if this switch is used, the function is in "Update" mode (this is to save / update passwords)
-    [switch]
-    $AD,    # AD credentials
-    [switch]
-    $AAD,  # O365 / AAD credentials
-    [string]
-    $CredFolder = "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-  )
 
-    # Westcoast
-    if ($WestCoast.IsPresent){
-    $domain = "WC"
-    $AD_Admin = "svc.adchanges@westcoast.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@westcoastltd365.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-      if ($AD.IsPresent){
-        # If specified, update AD password for Westcoast
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
-          }
-        # Use AD password for Westcoast
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
-        # Create the AD credential for Westcoast
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
-      }
-      elseif ($AAD.IsPresent) {
-        # If specified, update the AAD password for Westcoast
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
-          }
-        # Use AAD password for Westcoast
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
-        # Create the AAD credential for Westcoast
-        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password 
-      }
+        #Reusable sync function
+        # (only changes)
+        function DeltaSync {
+                [void](Invoke-Command -ComputerName $AADSyncServer  -SessionOption $pso -ScriptBlock {
+                Import-Module "C:\Program Files\Microsoft Azure AD Sync\Bin\ADSync\ADSync.psd1" #Import the AAD Sync module
+                Start-ADSyncSyncCycle -PolicyType Delta #Start Delta - chagnes only - sync
+                } -ErrorAction Stop)
+        }
+
+        #Attempt counter
+        $count = 0
+
+        # Attempts.
+        do{
+            try{
+                DeltaSync
+                $success = $true
+                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Green "[$timer] - Syncing AD to AAD"
+            }
+            catch{
+                # Each failure (usually fail is the result of an ongoing sync) increases the coutner.
+                $attempt = ($count+1)
+                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Red "[$timer] - Sync attempt [$attempt] failed. Next attempt in 30 seconds"
+                $success = $false
+                Start-sleep -Seconds 30
+            }
+            $count++
+
+            # The sync will finish if either of these conditions met:
+            # - succesfull sync
+            # - 5 failures (no point trying at that time, as that means there are major sync issues)
+            }until($count -eq 5 -or $success)
+                # After 5 failed sync attempt the script quits. This should not happen!
+                if(-not($success)){exit}
     }
-    # XMA
-    elseif ($XMA.IsPresent) {
-    $domain = "XMA"
-    $AD_Admin = "svc.adchanges@xma.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@xmalimited.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-      if ($AD.IsPresent){
-        # If specified, update AD password for XMA
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
-          }
-        # Use AD password for XMA
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
-        # Create AD credential for XMA
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
-      }
-      elseif ($AAD.IsPresent) {
-        # If specified, update AAD password for XMA
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
-          }
-        # Use AAD password for XMA
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
-        # Create AAD credential for XMA
-        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password # this is the AAD credential
-      }
-    } 
-    # Incorrect domain selection
-    else {
-      Write-Host "Correct domain was not selected, exiting";
-      Break
-    }
-  }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUAEhdziQ+hHF+ZAgVtgW+BsHt
-# sMygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzqArcIDxPWYtA37X9/5qxdbM
+# ji6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -160,11 +110,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUBmjRR1ssTslA/L8FdleFUaFMvLkwDQYJKoZI
-# hvcNAQEBBQAEggEA7/+zFg+kmTV0i8D8oTPs5fzVX33pXgZWPxCzZNKwEQMRtu7o
-# o2MsIELq1qXtL6xqAggxvdw/7MMBPU2P7lbC5YYtb6RtGxI5pDpsZO/m/pbjkNXE
-# dtMf7SW3tLVaLj1kBUqmtdAQZB7dXvxNXEtMpocUbrsDA91tVTwO3Ko1Qeww/zCa
-# 6MyaFhVwKZZ2dtqqEJ+rAQ0xVxBxwW0Zc7vRtSrl/JCw4+QXhlY4NnfOfqNg/eU1
-# 732epHvvJUIXOJpKIfCq7Y8tzCo/Nm+Rg+p+I4FzFd3rAod7+HdYo8lIP3rbRJ3g
-# R7wFAkgUrxCxaT+8N316t7xGc6KqyJ1f3D8Kyg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUKeUaeA0gNbP+sLwQzIWG+OSg3EwwDQYJKoZI
+# hvcNAQEBBQAEggEAePR7PCUzm/v5JsHwxpTgjnoNKP/yYZa/aQ9Kwkpzx0EoqQAY
+# rQqn6fmmUmGWPvPVE04huYXw/GnlDIfVKxh5Heh3PmeuCLIYGPypyv0PaL9j2ehn
+# dvnOtQ6DECpG441d9pRUcnOi0N8pDxUbPPkaSOOkb2swD03x1puoKsJAknOygV7j
+# cQXCzJxVyF8bXZEqUHk4k5HY18cKDtAiimiS8jQzD/3IhjbuCNexWOD6HBdtPQEU
+# vZe1ZrjIRQMdkQdHh2zYzZtMbYf+yGzBpLY7zeyPVvidLLhPmDllwEFkOJT7xTwr
+# V18Xai06gE9m4GXAHUkLgCmzsEXtaPFXDZzPPA==
 # SIG # End signature block

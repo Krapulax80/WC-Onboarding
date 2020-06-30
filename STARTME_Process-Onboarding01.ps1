@@ -1,99 +1,92 @@
-﻿  <#
-  Usage examples:
-  
-  #Update Westcoat Active directory password:
-  Create-Credential -WestCoast -AD -PasswordUpdate
+# This is the script wrapper that should be called for the execution.
 
-  Use XMA AAD password:
-  #>
-  function Create-Credential {
-  [CmdletBinding()]
-   Param (
-    [Parameter(ParameterSetName='WestCoast ParamSet 1')] # Parameter set for WestCoast
-    [Switch]
-    $WestCoast,
-    [Parameter(ParameterSetName='XMA ParamSet 2')] # Parameter set for XMA
-    [Switch]
-    $XMA,
-    [Parameter(Mandatory = $false)]
-    [Switch]
-    $PasswordUpdate, # if this switch is used, the function is in "Update" mode (this is to save / update passwords)
-    [switch]
-    $AD,    # AD credentials
-    [switch]
-    $AAD,  # O365 / AAD credentials
-    [string]
-    $CredFolder = "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-  )
+## SET UP THE ENVIRONMENT
+  # Collect work folders (names)
+    $FunctionFolder   = "Functions"
+    $InputFolder      = "Input"
+    $OutputFolder     = "Output"
+    $LogFolder        = "Logs"; #$LogFolder = "$global:CurrentPath\$LogFolder"
+  # Establish script location
+    $CurrentPath = $null
+    $global:CurrentPath = Split-Path -parent $PSCommandPath
+    Set-Location $global:CurrentPath
+    # Import input files to work on
+      $Inputfiles = Get-ChildItem .\$InputFolder | Where-Object {$_.Name -like "*.csv"}
+    # Import functions to work with
+      $functions = Get-ChildItem .\$FunctionFolder
+      foreach ($f in $functions)
+        {
+        #Write-Host -ForegroundColor Cyan "Importing function $f"
+          . .\$FunctionFolder\$f
+        }
+    # Transcript START
+      $TranscriptFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+#      Start-Transcript -Path $TranscriptFile
 
-    # Westcoast
-    if ($WestCoast.IsPresent){
-    $domain = "WC"
-    $AD_Admin = "svc.adchanges@westcoast.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@westcoastltd365.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-      if ($AD.IsPresent){
-        # If specified, update AD password for Westcoast
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
-          }
-        # Use AD password for Westcoast
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
-        # Create the AD credential for Westcoast
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
-      }
-      elseif ($AAD.IsPresent) {
-        # If specified, update the AAD password for Westcoast
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
-          }
-        # Use AAD password for Westcoast
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
-        # Create the AAD credential for Westcoast
-        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password 
-      }
+## ONBOARDING PROCESS -
+  # Announce start of the process
+  Write-Host #separator line
+   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 PROCESS STARTED." -BackgroundColor Black
+
+  # Process each (.csv) files in the input folder.
+  foreach ($I in $Inputfiles){
+  $CSVImport = Import-CSV $($I.Fullname)
+
+    # Process each line of the CSV
+    foreach ($Line in $CSVImport){
+
+      # Construct variables from the line contents
+      $Domain = $Line.Domain
+      $FirstName = $Line.FirstName
+      $LastName = $Line.LastName
+      $EmployeeID = $Line.EmployeeID
+      $TemplateName = $Line.TemplateName
+
+      # Run against each line
+        # Pipe, if the workdomain is WestCoast
+        if ($Domain -match "WestCoast"){
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
+        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
+        }
+        # Pipe, if the workdomain is XMA
+        elseif ($Domain -match "XMA"){
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]"
+        -ForegroundColor Green
+        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
+        }
+        # Pipe, if the domain is not within the expected values
+        else {
+        # # Manual feedback
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is invalid. Valid options are 'WESTCOAST and XMA'. " -ForegroundColor Red
+        }
     }
-    # XMA
-    elseif ($XMA.IsPresent) {
-    $domain = "XMA"
-    $AD_Admin = "svc.adchanges@xma.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@xmalimited.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-      if ($AD.IsPresent){
-        # If specified, update AD password for XMA
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
-          }
-        # Use AD password for XMA
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
-        # Create AD credential for XMA
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
-      }
-      elseif ($AAD.IsPresent) {
-        # If specified, update AAD password for XMA
-          if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
-          }
-        # Use AAD password for XMA
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
-        # Create AAD credential for XMA
-        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password # this is the AAD credential
-      }
-    } 
-    # Incorrect domain selection
-    else {
-      Write-Host "Correct domain was not selected, exiting";
-      Break
-    }
-  }
+
+  # Define the report file
+  $CSVExport01 = ".\" + $OutputFolder + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
+
+  # Send a report after each progressed file via email
+  Write-Host # separator line
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Generating report of the script run"
+  #Send-ProcessReport
+
+  # Save the report into a CSV as well, for archiving purposes.
+  $CSVImport | Export-csv -Path $CSVExport01 -NoTypeInformation -Force # first add in the original import
+
+  # Finally, discard the processed original input file
+  #Remove-Item -Path $($I.Fullname) -Force #-Whatif
+
+  # Transcript STOP
+  #Stop-Transcript
+
+  # And cleanup the variables
+  Variable-Cleanup
+}
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUAEhdziQ+hHF+ZAgVtgW+BsHt
-# sMygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUF69cROrLQNsLaBiCOt66KNbP
+# FiigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -160,11 +153,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUBmjRR1ssTslA/L8FdleFUaFMvLkwDQYJKoZI
-# hvcNAQEBBQAEggEA7/+zFg+kmTV0i8D8oTPs5fzVX33pXgZWPxCzZNKwEQMRtu7o
-# o2MsIELq1qXtL6xqAggxvdw/7MMBPU2P7lbC5YYtb6RtGxI5pDpsZO/m/pbjkNXE
-# dtMf7SW3tLVaLj1kBUqmtdAQZB7dXvxNXEtMpocUbrsDA91tVTwO3Ko1Qeww/zCa
-# 6MyaFhVwKZZ2dtqqEJ+rAQ0xVxBxwW0Zc7vRtSrl/JCw4+QXhlY4NnfOfqNg/eU1
-# 732epHvvJUIXOJpKIfCq7Y8tzCo/Nm+Rg+p+I4FzFd3rAod7+HdYo8lIP3rbRJ3g
-# R7wFAkgUrxCxaT+8N316t7xGc6KqyJ1f3D8Kyg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOUdQClzID4sMJ8X2/b00DzOla0cwDQYJKoZI
+# hvcNAQEBBQAEggEAkAheiFgPl2y3snZ42jTIITQud6/rGZ6PoEYJUh/npf9wyn2S
+# xBD4XYIwYdsElgVLzdhwX7ck7N/IzUDDcB4laV/PCIiQRI7XcxT95ay0jp5Q1o8o
+# puwkSnEouIgBKJbMz9RonY6ocJtbxPe3/JenLQkPmUETabD0+EoV6IGwvk10CDGd
+# ZZaFOqmDZ+FVyzl1gYYVSTTUIE5Yqgy6CRklQpqiDwcGUXNJfh0ffPmCuQrLq5Dh
+# qgL/YnsoNVW41G34W4bgKbYFFgEGMLOvcxSnOdjHMeR0W0Krgp8wWPxAJxm5uZ93
+# HYGVeqTA/sEEAkuO1Q8v7hjtaeK6YW9qSbdwnw==
 # SIG # End signature block
