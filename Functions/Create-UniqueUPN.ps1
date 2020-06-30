@@ -1,67 +1,27 @@
-function Process-OnBoarding01 {
-  [CmdletBinding()]
-	param(## Domain selector
-    [Parameter(Mandatory=$true , ParameterSetName="WestCoast")] [switch]$Westcoast,
-		[Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
-		[Parameter(Mandatory=$true)] [string]$FirstName,
-    [Parameter(Mandatory=$true)] [string]$LastName,
-    [Parameter(Mandatory=$true)] [string]$EmployeeID,
-    [Parameter(Mandatory=$true)] [string]$TemplateName
+function Create-UniqueUPN {
+    [CmdletBinding()]
+  param (
+      [Parameter(Mandatory=$true)] [string] $NewUserPrincipalName
   )
 
-  # Pipe, if the workdomain is WESTCOAST
-  if ($Westcoast.IsPresent){
-    # Credentials for WC
-    Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    # Variables for WC
-    $SystemDomain = "westcoast.co.uk"
-    $DomainNetBIOS = "WESTCOASTLTD"
-    $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "mail" + "." + $SystemDomain
-    $EOTargetDomain = "westcoastltd365.mail.onmicrosoft.com"
-    $PeopleFileServer = "BNWFS05"; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = "BNWFS05"; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
-    $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
-    # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # Pipe, if the workdomain is XMA
-  elseif ($XMA.IsPresent){
-    # Credentials for XMA
-    Create-Credential -XMA -AD
-    Create-Credential -XMA -AAD
-    # Variables for XMA
-    $SystemDomain = "xma.co.uk"
-    $DomainNetBIOS = "XMA"
-    $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "xmaexchcas" + "." + $SystemDomain
-    $EOTargetDomain = "xmalimited.mail.onmicrosoft.com"
-    $PeopleFileServer = ""; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
-    # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # Pipe, if the workdomain is invalid
-  else {
-    Write-Host -ForeGroundColor Red "Bad domain."; Break
-  }
+  $x = 0
+  do{
+    $x++
+    #Construct  new UPN
+    $NewUserPrincipalName = $NewUserPrincipalName -replace "@","$($x)@"
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New UPN is generated: [$NewUserPrincipalName]" -Verbose
 
-    # Active Directory
-    Process-StarterADObject -TemplateName $TemplateName
+  } until (!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - [$NewUserPrincipalName] is an unique UPN. Continuing." -Verbose
+
+  #Output
+  $global:NewUserPrincipalName = $NewUserPrincipalName
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU5yZJaY0trerua7piOQWH/4kK
-# 32ygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYR2UkphChxQYRoaone5beTop
+# /TGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -128,11 +88,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOl3CIZyDY1CmxxZIaOwpxd6o1XQwDQYJKoZI
-# hvcNAQEBBQAEggEAlLIO+ojKI4jRSxT3WUV+qPPYkkFbdImtNnbGGjAP0Z78yNGV
-# f0oBY+6OPL4q4AplGQRbXIowWpX2EysqccEsLB+OwcjAhiWBv8wkcNy1S1YUmh8W
-# JASVxCx8jhS8zjlgLGntm5gNq/l5S4E2bg8wXCvqQtC+PgJGXifYaWOgrmM0Gb57
-# RyXg6nhAmRAIuPf2rUHuKoGYRNo2zaefCxC5j7xagHLd63TGb3F+MCpcIuIR24Jf
-# I/XE4osvolssZEvE49P9Cc+EYDF84RhIz/pdKseMVdmDAZrCtz1GWdc1EJF2ZHw1
-# 44soqen+ncsq5v19chYkHqqQw6IQWdrNnFGAUQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUbbWp8pgxhxm1fpZYf6lzg/dq4iswDQYJKoZI
+# hvcNAQEBBQAEggEAQx8KnsrFFr+jVFxCg+S4er/PFFFVmtach2oEBl300rMFQZUO
+# orJoX0dhC1zWY6ytxP+OFb3rYI8DPRCH6bvx3wf8aXCpTQxHptx+nbgmLcT17du3
+# 2hAcvtmlZXrIZz720fGbHnnu+cNS0szy/M0JGHrT5EDMjkvS0MW8EjKsVvjiuDVD
+# yUI0VK9rsLWDpTUFRo1ztt5SDBoh0FlNZDWp2nSuZXM0DyUkyfiQXsJusWcpFBuV
+# wLuuzxcVWix+GqE7HbcGd6jonyYFbEm7BX4UWrZZUdUi2hlcLsjVX7xEZC+HtI1+
+# Jeh9Gb2I6i1Yi2gvcQXSl6eRJv2bxSlaAQNDhA==
 # SIG # End signature block

@@ -1,67 +1,37 @@
-function Process-OnBoarding01 {
+function Create-UniqueSAMName {
   [CmdletBinding()]
-	param(## Domain selector
-    [Parameter(Mandatory=$true , ParameterSetName="WestCoast")] [switch]$Westcoast,
-		[Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
-		[Parameter(Mandatory=$true)] [string]$FirstName,
-    [Parameter(Mandatory=$true)] [string]$LastName,
-    [Parameter(Mandatory=$true)] [string]$EmployeeID,
-    [Parameter(Mandatory=$true)] [string]$TemplateName
+  param (
+      [Parameter(Mandatory=$true)] [string] $NewSAMAccountName
   )
 
-  # Pipe, if the workdomain is WESTCOAST
-  if ($Westcoast.IsPresent){
-    # Credentials for WC
-    Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    # Variables for WC
-    $SystemDomain = "westcoast.co.uk"
-    $DomainNetBIOS = "WESTCOASTLTD"
-    $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "mail" + "." + $SystemDomain
-    $EOTargetDomain = "westcoastltd365.mail.onmicrosoft.com"
-    $PeopleFileServer = "BNWFS05"; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = "BNWFS05"; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
-    $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
-    # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # Pipe, if the workdomain is XMA
-  elseif ($XMA.IsPresent){
-    # Credentials for XMA
-    Create-Credential -XMA -AD
-    Create-Credential -XMA -AAD
-    # Variables for XMA
-    $SystemDomain = "xma.co.uk"
-    $DomainNetBIOS = "XMA"
-    $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "xmaexchcas" + "." + $SystemDomain
-    $EOTargetDomain = "xmalimited.mail.onmicrosoft.com"
-    $PeopleFileServer = ""; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
-    # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # Pipe, if the workdomain is invalid
-  else {
-    Write-Host -ForeGroundColor Red "Bad domain."; Break
-  }
+  $x = 1
 
-    # Active Directory
-    Process-StarterADObject -TemplateName $TemplateName
+  do{
+    #Truncate, so that the length stays under 20 characters
+    if ( ($NewSAMAccountName.Length + (($x.ToString()).Length) ) -gt 20){
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New SAM [$NewSAMAccountName] is too long, truncating..." -Verbose
+      $NewSAMAccountName = $NewSAMAccountName.substring(0,(20-(($x.ToString()).Length)))
+    }
+
+    $NewSAMAccountName = $NewSAMAccountName  + $x
+
+    $NewSAMAccountName
+
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New SAM is generated: [$NewSAMAccountName]" -Verbose
+
+    $x++
+
+  } until (!(Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Server $DC -Credential $AD_Credential -Properties * -ErrorAction SilentlyContinue ))
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - [$NewSAMAccountName] is an unique SAM. Continuing." -Verbose
+
+  #Output
+  $global:NewSAMAccountName = $NewSAMAccountName
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU5yZJaY0trerua7piOQWH/4kK
-# 32ygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1MsBr/Q3JKAxh6J9CLxAg4Th
+# s5ygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -128,11 +98,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOl3CIZyDY1CmxxZIaOwpxd6o1XQwDQYJKoZI
-# hvcNAQEBBQAEggEAlLIO+ojKI4jRSxT3WUV+qPPYkkFbdImtNnbGGjAP0Z78yNGV
-# f0oBY+6OPL4q4AplGQRbXIowWpX2EysqccEsLB+OwcjAhiWBv8wkcNy1S1YUmh8W
-# JASVxCx8jhS8zjlgLGntm5gNq/l5S4E2bg8wXCvqQtC+PgJGXifYaWOgrmM0Gb57
-# RyXg6nhAmRAIuPf2rUHuKoGYRNo2zaefCxC5j7xagHLd63TGb3F+MCpcIuIR24Jf
-# I/XE4osvolssZEvE49P9Cc+EYDF84RhIz/pdKseMVdmDAZrCtz1GWdc1EJF2ZHw1
-# 44soqen+ncsq5v19chYkHqqQw6IQWdrNnFGAUQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU+PGBDls516kki1E3Hmzk5rnhjfIwDQYJKoZI
+# hvcNAQEBBQAEggEAeobal7+/eHv6Hfk77oreZ5KynY1Hpz9zNoRJOAa5sBtmzd77
+# 6zpoiNQdoAKLEsVhMbDfknawKWN6JgNT1bWB/yv9OkQZb/1NaIJeZW/OaCIfkpCt
+# HdcyBPo9qPqn5LFq/wM8kJCTksbCEZA2doJLeQjMhOLzmiJTwqF1nZHzKrvpJ8VN
+# Saju1bQvexFMMRoqLzgqCkHEW8kFkKRwOguosNK19nYwEDdFxn9nSf9ZwUi23J2i
+# OOTz8wKih9qLFlWeC6iP2V8bh1dY1ZmgXwp7q3GCmMy0SID7Q+XnVJkDsCHnXb9j
+# AWdNsO32/RC2Qpj2ipEI3gtRrH4ycw8qcI0X1Q==
 # SIG # End signature block

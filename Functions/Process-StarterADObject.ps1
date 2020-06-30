@@ -1,22 +1,98 @@
 ﻿function Process-StarterADObject {
   [CmdletBinding()]
   param (
-      [Parameter(Mandatory=$true)] [string] $UserSAMAccount
+      #[Parameter(Mandatory=$true)] [string] $NewSAMAccountName,
+      [Parameter(Mandatory=$true)] [string] $TemplateName
   )
 
-  # Check if the SAM account already exists.
-    #If the user does not exist (this is what we expect)
-    if(!(Get-ADUser -Filter {SAMAccountName -eq $UserSAMAccount } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$UserSAMAccount] is unique." -ForeGroundColor Green
+  # USER parameters
+
+    # Capitalise first and last name
+		$TextInfo = (Get-Culture).TextInfo
+		$FirstName = $TextInfo.ToTitleCase($FirstName)
+    $LastName = $TextInfo.ToTitleCase($LastName)
+
+		# Template account declaration
+		if (Get-ADUser $TemplateName) {
+			$TemplateUser = Get-ADUser $TemplateName -Properties *
+    } else { Write-Host -ForegroundColor Red "User $TemplateName not found." }
+
+    # Generate names
+		$UserDomain = ($TemplateUser.UserPrincipalName).Split("\@")[1]
+    $NewUserPrincipalName = $FirstName + "." + $LastName + "@" + $UserDomain
+    $NewSAMAccountName = $FirstName + "." +  $LastName
+  		if ($NewSAMAccountName.Length -gt 20) { # Truncate pre-2000 name to 20 characters, if longer, to prevent errors
+      $NewSAMAccountName = $NewSAMAccountName.substring(0,20)
+      }
+
+		# Template accounts OU declaration
+    $TemplateAccountOU = ($TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),",'' } }).path
+
+		# Create new password for the new starter
+		Add-Type -AssemblyName System.Web
+    $NewPassword = [System.Web.Security.Membership]::GeneratePassword(12,4)
+
+		#UserDomain is from the template's UPN now
+		$UsageLocation = $TemplateUser.extensionAttribute6 # Country code
+
+  # Check if the SAM account already exists. If it does, the script adds numbers to the end of the
+    if(!(Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique." -ForegroundColor Green
     } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$UserSAMAccount] is NOT unique." -ForeGroundColor Red
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Red
+      Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
+      $NewSAMAccountName = $global:NewSAMAccountName
     }
+    # TODO: Report the SAM Name
+
+    $NewDisplayName = $NewSAMAccountName -replace "\."," "
+
+  # Check if the UPN already exists.
+    if(!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique." -ForegroundColor Green
+   } else {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Red
+      Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
+      $NewUserPrincipalName = $global:NewUserPrincipalName
+    }
+    #TODO: Report the User Principal Name
+
+  # Create the AD object
+      $params = @{
+      'SamAccountName'         = $NewSAMAccountName;
+      'Instance'               = $TemplateUser.DistinguishedName;
+      'DisplayName'            = $NewDisplayName;
+      'GivenName'              = $FirstName;
+      'Path'                   = $StarterOU;
+      'SurName'                = $LastName;
+      #'PasswordNeverExpires' = $password_never_expires;
+      #'CannotChangePassword' = $cannot_change_password;
+      'Description'            = "NEW STARTER - Created by " + ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) + " at " + (Get-Date -Format G); # description entry to help identify, who set the account up
+      'Enabled'                = $true;
+      'UserPrincipalName'      = $NewUserPrincipalName;
+      'AccountPassword'        = (ConvertTo-SecureString -AsPlainText $NewPassword -Force);
+      'ChangePasswordAtLogon'  = $true;
+      'Title'                  = $TemplateUser.title; # Job title. This is taken from the $TemplateUser
+      'Department'             = $TemplateUser.Department; # Department. This is taken from the $TemplateUser
+      'Company'                = $TemplateUser.Company; # Company. This is taken from the $TemplateUser
+      'Office'                 = $TemplateUser.Office; # Office. This is taken from the $TemplateUser
+      }
+
+      $params
+      #Write-Host -fore Yellow "Creating [$NewUserPrincipalName] / [$NewSAMAccountName] in [$domain]"
+      New-ADUser -Name $NewDisplayName @params -Server $DC -Credential $AD_Credential -Verbose -Whatif
+      if ($TemplateUser.Manager)
+      {
+         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager
+      }
+
+
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzQRG+yDwe5D4MtH7e7XJldK6
-# E1qgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU6xLBauGaSCVXWtPaW8Ir2VQd
+# ueqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -83,11 +159,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUJqY5+vvYoCN/TCONL7hrWq9xbbcwDQYJKoZI
-# hvcNAQEBBQAEggEAWGOftqSkIeqVEdnxylCgV/CQRCCaT9wOTQ9A148MT45VhNFJ
-# uX75yDo0qUAmfHI3Q9dSHgWfIl0rPcPI9Ln+d6PmgZ6YqIXc4N3KY0UfSLWIcNhv
-# I8/p5YYmMAsNXYLZaHgdrVDIMfubvHhhtpgo86K14ist3xGCxzZgRphXfi1XhlBp
-# gLWbJzvLIRnnqVs/f4bF5HLSJcMr/Xkl6grp+FXIy/xXEPsa9Yz668DT37M5iR/N
-# 6mpPh8stKOX5cJTc6PrO0+gA6hea1a4dn1/JR4eEiiq0qlmGi5d5MF3kt5iNEb8W
-# 4n7nJdvb0pnGNnGhenPUvTpKDL71WVtxfRlJqA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/yvJ14nTwLll7S4KIFeTc9RM7IwwDQYJKoZI
+# hvcNAQEBBQAEggEAv5db8XlEo39QdRlSYt4fh5lN29QibhUN2b9v5fozNctmyMmo
+# TCsnOlfAZC13D8lQo2GPlj7ybxudizKSn7wmgJqAeydfQQC3fKqHYElo8K+XmYhO
+# 8vuoxnj+hopgIUc7mLWnTZfwB6417Pnxhkdq/yepkZnv6hInYQulHuDkeTXKJBiu
+# f4PHpC+6mgg7IyDfvcobdKFgz1i7Ywc8e6XeMegsi0LxTuoryittALucEv0bA9lC
+# i8uIA5i7ykclvDD0g8zq+nk00um05VC0UANmgb13c6n0ACyX9MS46jun+9Aw8Ia8
+# gJX3lL7iE5WfEJVElVjc+Vt5Rv2rmN4czKDMBw==
 # SIG # End signature block

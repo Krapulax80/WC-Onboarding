@@ -43,6 +43,7 @@
       $TemplateName = $Line.TemplateName
 
       # Run against each line
+      # TODO: report, if the domain is correct
         # Pipe, if the workdomain is WestCoast
         if ($Domain -match "WestCoast"){
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
@@ -50,8 +51,7 @@
         }
         # Pipe, if the workdomain is XMA
         elseif ($Domain -match "XMA"){
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]"
-        -ForegroundColor Green
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
         Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
         }
         # Pipe, if the domain is not within the expected values
@@ -85,8 +85,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUF69cROrLQNsLaBiCOt66KNbP
-# FiigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnsbMoeX7DKqKJHXhbXoKChXp
+# d76gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -153,11 +153,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOUdQClzID4sMJ8X2/b00DzOla0cwDQYJKoZI
-# hvcNAQEBBQAEggEAkAheiFgPl2y3snZ42jTIITQud6/rGZ6PoEYJUh/npf9wyn2S
-# xBD4XYIwYdsElgVLzdhwX7ck7N/IzUDDcB4laV/PCIiQRI7XcxT95ay0jp5Q1o8o
-# puwkSnEouIgBKJbMz9RonY6ocJtbxPe3/JenLQkPmUETabD0+EoV6IGwvk10CDGd
-# ZZaFOqmDZ+FVyzl1gYYVSTTUIE5Yqgy6CRklQpqiDwcGUXNJfh0ffPmCuQrLq5Dh
-# qgL/YnsoNVW41G34W4bgKbYFFgEGMLOvcxSnOdjHMeR0W0Krgp8wWPxAJxm5uZ93
-# HYGVeqTA/sEEAkuO1Q8v7hjtaeK6YW9qSbdwnw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCJHfoY/2TFeqYRznkmALeD88+mswDQYJKoZI
+# hvcNAQEBBQAEggEAOMmXyXYUIB4tAvplMF/EE2ypLga1+bZD4buBxtPe/haLQ05G
+# NgC8hP+i734kp2Ad9QhLn0tKLA7UtI56hduaxTOsHSvijzzsZsqtX8xrYyOofebT
+# MJ2lhcfc4Ff9CHgWMyrQNIN8/LTD5KkR1dkeJFfFUQeJNyhuZOfO1qo2XHW+qcBf
+# ty9yhtj5f9hycQjUgW9gtqk+n69XMrom5cdpn+UWn+YPTHJ8HrzzSm6dxBTal0S6
+# dabcos7RmsXKaTNJD6xjq8GEPe4iCzJ7h/zhAyi0bVACcQDROdsLaMbuwPnZk5Ia
+# wyMIrQnrYb/0UPbMSGmnYgb6SL+tRpMh9KhVpw==
 # SIG # End signature block
