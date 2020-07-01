@@ -1,94 +1,27 @@
-# This is the script wrapper that should be called for the execution.
+function Create-UniqueEmployeeID {
+    [CmdletBinding()]
+  param (
+      [Parameter(Mandatory=$true)] [int] $EmployeeID
+  )
 
-## SET UP THE ENVIRONMENT
-  # Collect work folders (names)
-    $FunctionFolder   = "Functions"
-    $InputFolder      = "Input"
-    $OutputFolder     = "Output"
-    $LogFolder        = "Logs"; #$LogFolder = "$global:CurrentPath\$LogFolder"
-  # Establish script location
-    $CurrentPath = $null
-    $global:CurrentPath = Split-Path -parent $PSCommandPath
-    Set-Location $global:CurrentPath
-    # Import input files to work on
-      $Inputfiles = Get-ChildItem .\$InputFolder | Where-Object {$_.Name -like "*.csv"}
-    # Import functions to work with
-      $functions = Get-ChildItem .\$FunctionFolder
-      foreach ($f in $functions)
-        {
-        #Write-Host -ForegroundColor Cyan "Importing function $f"
-          . .\$FunctionFolder\$f
-        }
-    # Transcript START
-      $TranscriptFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
-#      Start-Transcript -Path $TranscriptFile
+  $x = 0
+  do{
+    $x++
+    #Construct  new EmployeeID
+    $EmployeeID = $EmployeeID + $x
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New EmployeeID is generated: [$EmployeeID]" -Verbose
 
-## ONBOARDING PROCESS -
-  # Announce start of the process
-  Write-Host #separator line
-   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 PROCESS STARTED." -BackgroundColor Black
+  } until (!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - [$EmployeeID] is a unique EmployeeID. Continuing." -Verbose
 
-  # Process each (.csv) files in the input folder.
-  foreach ($I in $Inputfiles){
-  $CSVImport = Import-CSV $($I.Fullname)
-
-    # Process each line of the CSV
-    foreach ($Line in $CSVImport){
-
-      # Construct variables from the line contents
-      $Domain                         = $Line.Domain
-      $FirstName                      = $Line.FirstName
-      $LastName                       = $Line.LastName
-      $EmployeeID                     = $Line.EmployeeID
-      $TemplateName                   = $Line.TemplateName
-      $HolidayEntitlement             = $Line.HolidayEntitlement
-      $EmployeeStartDate              = $Line.StartDate
-
-      # Run against each line
-      # TODO: report, if the domain is correct
-        # Pipe, if the workdomain is WestCoast
-        if ($Domain -match "WestCoast"){
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
-        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
-        }
-        # Pipe, if the workdomain is XMA
-        elseif ($Domain -match "XMA"){
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
-        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
-        }
-        # Pipe, if the domain is not within the expected values
-        else {
-        # # Manual feedback
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is invalid. Valid options are 'WESTCOAST and XMA'. " -ForegroundColor Red
-        }
-    }
-
-  # Define the report file
-  $CSVExport01 = ".\" + $OutputFolder + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
-
-  # Send a report after each progressed file via email
-  Write-Host # separator line
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Generating report of the script run"
-  #Send-ProcessReport
-
-  # Save the report into a CSV as well, for archiving purposes.
-  $CSVImport | Export-csv -Path $CSVExport01 -NoTypeInformation -Force # first add in the original import
-
-  # Finally, discard the processed original input file
-  #Remove-Item -Path $($I.Fullname) -Force #-Whatif
-
-  # Transcript STOP
-  #Stop-Transcript
-
-  # And cleanup the variables
-  Variable-Cleanup
+  #Output
+  $global:EmployeeID = $EmployeeID
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEtxfNnXFs/zzopV8/GpsNEm8
-# 58qgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmPgKbeu/5sRstjc3N4Oqf6Vz
+# y36gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -155,11 +88,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU8hJuN9606nI5n98++sdVQ0FJG+4wDQYJKoZI
-# hvcNAQEBBQAEggEAGfrGUjtGdugOzqCMoyBbhw6vEd0fhCwKP9azeyxNGx6MPUvI
-# /vioD8wh3vJ+ch6upEOkYcaa1d6lzgQphm1yPspMsEXT17ASqBIecJlwxKb2vpX2
-# jlQmTawngY4osWFxe0M5NCVyD7KfGswnpdRLnWChlYe3cT5CziyeXPpY+s7h3ToT
-# dCQYj5MeLrAZnesQ5idrNEsb8h1n1lrUeXjkRXt+Qj/OH6OxLzNhrG8SeNaZPEoZ
-# 4qC84IVXqUyQ81dDJ0TmZao+Lq3brhNboHWwi2Gfg2iCR10g4R88lFb1kMIqDEBT
-# UqiOlqNLzJa5D7+065Xm+CmiRkyVxv+nebb2VA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUmQ2bchM5DEv8obRFYCTSLeYPY+wwDQYJKoZI
+# hvcNAQEBBQAEggEAJoHOSBXrBIP3mv2KDGhnqJG72VeizpbP2GLnNP8gMvEhIUTY
+# CzhO5o+r8QsaYnjf83wL0F3B3gdYqzhL6s1zohS75xUkZqiOx09K+BlMpj3p3D8o
+# GTnkeveByz9n3G3sp10l+oGogveV6b3IwebQhgsHOoiqaLicxQ0IclMofQuVvdop
+# eMvPo5v/lwYjIT+J9HvohHqSHfXuEfW/xjeJEHR7n0ie9uibAB+dUuKgxQvDCSOw
+# Sn5a7gjJW5VxhWjPPQN4RtkRl6qeJQ42cukGslbWdEsiAnCMNyXk80eHp09+ULv0
+# L38Re0YU0JdfBH5NdyppZgyz2T3oEvTmKBYXrg==
 # SIG # End signature block

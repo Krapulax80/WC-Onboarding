@@ -2,7 +2,8 @@
   [CmdletBinding()]
   param (
       #[Parameter(Mandatory=$true)] [string] $NewSAMAccountName,
-      [Parameter(Mandatory=$true)] [string] $TemplateName
+      [Parameter(Mandatory=$true)] [string] $TemplateName,
+      [Parameter(Mandatory=$false)] [switch] $NoJBA
   )
 
   # USER parameters
@@ -13,8 +14,8 @@
     $LastName = $TextInfo.ToTitleCase($LastName)
 
 		# Template account declaration
-		if (Get-ADUser $TemplateName) {
-			$TemplateUser = Get-ADUser $TemplateName -Properties *
+		if (Get-ADUser -Filter {SAMAccountName -eq $TemplateName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) {
+			$TemplateUser = Get-ADUser $TemplateName -Properties * -Server $DC -Credential $AD_Credential
     } else { Write-Host -ForegroundColor Red "User $TemplateName not found." }
 
     # Generate names
@@ -36,7 +37,7 @@
 		$UsageLocation = $TemplateUser.extensionAttribute6 # Country code
 
   # Check if the SAM account already exists. If it does, the script adds numbers to the end of the
-    if(!(Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
+    if(! (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ){
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique." -ForegroundColor Green
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Red
@@ -55,7 +56,16 @@
       Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
       $NewUserPrincipalName = $global:NewUserPrincipalName
     }
-    #TODO: Report the User Principal Name
+    #TODO: Report the UPN
+
+  # Check if Employee ID already exists
+    if(!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique." -ForegroundColor Green
+    } else {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Red
+      Create-UniqueEmployeeID -EmployeeID $EmployeeID
+      $EmployeeID = $global:EmployeeID
+    }
 
   # Create the AD object
       $params = @{
@@ -78,21 +88,75 @@
       'Office'                 = $TemplateUser.Office; # Office. This is taken from the $TemplateUser
       }
 
-      $params
-      #Write-Host -fore Yellow "Creating [$NewUserPrincipalName] / [$NewSAMAccountName] in [$domain]"
-      New-ADUser -Name $NewDisplayName @params -Server $DC -Credential $AD_Credential -Verbose -Whatif
-      if ($TemplateUser.Manager)
-      {
-         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager
-      }
+      #Create the new user
+      New-ADUser -Name $NewDisplayName @params -Server $DC -Credential $AD_Credential -Verbose #-Whatif
+      #TODO: Add reporting of success/failure/error
 
+      #Wait for the new user to appear in AD
+      do {
+        $Userfound = (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] - Configuring account [$NewSAMAccountName] - please wait." -Verbose
+        Start-Sleep -Seconds 15
+      } until ($Userfound)
+ 
+
+      #If the template has a manager, assign it to the new account
+      if ($TemplateUser.Manager)
+      { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]" -Verbose
+         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential -Verbose
+      }
+      #TODO: Add reporting of success[manager added]/failure/error
+
+      #Assign JBA Access (unless specifically denied, this will be a yes)
+      if ($NoJBA.IsPresent) {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Deny JBA access for [$NewSAMAccountName]" -ForegroundColor Red
+        Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute10 = 0} -Server $DC -Credential $AD_Credential -Verbose
+      } else {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Adding JBA access to [$NewSAMAccountName]" -Verbose
+        Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute10 = 1} -Server $DC -Credential $AD_Credential -Verbose
+      }
+      #TODO: Add reporting of success[manager added]/failure/error
+
+      #Assign Employee ID
+      try {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting EmployeeID [$EmployeeID] on [$NewSAMAccountName]" -Verbose
+        Set-ADUser -Identity $NewSAMAccountName -EmployeeID $EmployeeID -Server $DC -Credential $AD_Credential -Verbose
+      }
+      catch {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to set EmployeeID on [$NewSAMAccountName]" -ForegroundColor Red
+      }
+      #TODO: Add reporting of success[manager added]/failure/error
+
+      #Holiday entitlement
+      if ($HolidayEntitlement){
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting Holiday Entitlement  [$HolidayEntitlement days] on [$NewSAMAccountName]" -Verbose
+          		if ($HolidayEntitlement -gt 0){
+              Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute15 = $HolidayEntitlement } -Server $DC -Credential $AD_Credential -Verbose
+              }
+      } else {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Holiday Entitlement is undefined for [$NewSAMAccountName]" -ForegroundColor Red
+      }
+      #TODO: Add reporting of success[holiday added]/failure/error
+
+      #Start date
+      if ($EmployeeStartDate){
+        if ($EmployeeStartDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting Start Date  [$EmployeeStartDate] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute13 = $EmployeeStartDate } -Server $DC -Credential $AD_Credential -Verbose
+        } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Start date is incorrect - [$EmployeeStartDate]. Please ensujre it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
+        }
+      } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Start date is not defined." -ForegroundColor Yellow
+      }
+      #TODO: Add reporting of success[start date added]/failure/error
 
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU6xLBauGaSCVXWtPaW8Ir2VQd
-# ueqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUbpoQ1zKB88vU4BrcpPAIe6GY
+# aN+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -159,11 +223,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/yvJ14nTwLll7S4KIFeTc9RM7IwwDQYJKoZI
-# hvcNAQEBBQAEggEAv5db8XlEo39QdRlSYt4fh5lN29QibhUN2b9v5fozNctmyMmo
-# TCsnOlfAZC13D8lQo2GPlj7ybxudizKSn7wmgJqAeydfQQC3fKqHYElo8K+XmYhO
-# 8vuoxnj+hopgIUc7mLWnTZfwB6417Pnxhkdq/yepkZnv6hInYQulHuDkeTXKJBiu
-# f4PHpC+6mgg7IyDfvcobdKFgz1i7Ywc8e6XeMegsi0LxTuoryittALucEv0bA9lC
-# i8uIA5i7ykclvDD0g8zq+nk00um05VC0UANmgb13c6n0ACyX9MS46jun+9Aw8Ia8
-# gJX3lL7iE5WfEJVElVjc+Vt5Rv2rmN4czKDMBw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU3jaarXzJ0yopPdMLNCfO5n281E4wDQYJKoZI
+# hvcNAQEBBQAEggEAQmE7UK7IcMt0Phv9xIi7vIdq0pj6fX9M0G42Yv5dtLu9cgoq
+# /xwDdPbSBSOwgXwhVEHAQ44MyW2uKw207IFNtSQ9qqlZADzY8T/A+rV490y5jG6B
+# VVjDetTwajNUTphVauBalPHFLvTDli+O5aHtR2Ys4tr8Ylm9YikFfvXXpABOE8x4
+# l+t+lDNYugaGBYjY262ALdcokbGK18jC/6emYInBY7/0X1/PxfPvQ7PCDxpxsjul
+# NJ8U0TiCHDfBhARiljtRMZt2RBIb6Z8Xjaesn6Z1Q7WjgJkItYG0h/5VexzrvihA
+# L8zjsKi/fIE1Lb/s8Wi5YzOLUFEzxFCgM1jj3g==
 # SIG # End signature block
