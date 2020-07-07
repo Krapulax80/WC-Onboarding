@@ -1,71 +1,23 @@
-function Process-OnBoarding01 {
-  [CmdletBinding()]
-	param(## Domain selector
-    [Parameter(Mandatory=$true , ParameterSetName="WestCoast")] [switch]$Westcoast,
-		[Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
-		[Parameter(Mandatory=$true)] [string]$FirstName,
-    [Parameter(Mandatory=$true)] [string]$LastName,
-    [Parameter(Mandatory=$true)] [string]$EmployeeID,
-    [Parameter(Mandatory=$true)] [string]$TemplateName
+function global:Create-UniqueSMTP {
+    [CmdletBinding()]
+  param (
+      [Parameter(Mandatory=$true)] [string] $SMTP
   )
 
-  # Pipe, if the workdomain is WESTCOAST
-  if ($Westcoast.IsPresent){
-    # Credentials for WC
-    Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    # Variables for WC
-    $SystemDomain = "westcoast.co.uk"
-    $DomainNetBIOS = "WESTCOASTLTD"
-    $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "mail" + "." + $SystemDomain
-    $EOTargetDomain = "westcoastltd365.mail.onmicrosoft.com"
-    $PeopleFileServer = "BNWFS05"; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = "BNWFS05"; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
-    $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
-    # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-    #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property InfrastructureMaster).InfrastructureMaster
-  }
-  # Pipe, if the workdomain is XMA
-  elseif ($XMA.IsPresent){
-    # Credentials for XMA
-    Create-Credential -XMA -AD
-    Create-Credential -XMA -AAD
-    # Variables for XMA
-    $SystemDomain = "xma.co.uk"
-    $DomainNetBIOS = "XMA"
-    $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "xmaexchcas" + "." + $SystemDomain
-    $EOTargetDomain = "xmalimited.mail.onmicrosoft.com"
-    $PeopleFileServer = ""; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
-    # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # Pipe, if the workdomain is invalid
-  else {
-    Write-Host -ForeGroundColor Red "Bad domain."; Break
-  }
-
-    # Active Directory
-    Process-StarterADObject -TemplateName $TemplateName
-
-    # Exchange
-    Process-StarterMailbox
+  		$x = 1
+		do {
+			$x += 1 # start from 2, then increase
+			$secondarySMTP = $global:secondarySMTP = $null # zeroize the SMTP
+			$secondarySMTP = "SMTP:" + $FirstName + $LastName.substring(0,1) + $x + "@" + $UserDomain #add the number into the secndary SMTP
+		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value." -Verbose
+    $global:secondarySMTP = $secondarySMTP 
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUs9q8WGM9WNTEwhzop+ZGszGz
-# qMegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUithm1I0jYXy1usQT1kWxyqAh
+# pxagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -132,11 +84,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU948d2aVj/y7vp+BnJBWHNH7xuTkwDQYJKoZI
-# hvcNAQEBBQAEggEACvq+ATdLqCG6WGwEg2rKUj4H4Ys9+6IK+MZD+tOHdR4LwMVG
-# rj9fdP8WfdZfobbuUTwT3zzqARdkRKDprbbgRXsGioYieXNFSXdbtlq4rT0EJhA6
-# BEj0GUs0Sw54O6zoRz3hGT16csVu6eSnOleXJUhz1Gxh3ebcScfaVcmm5BdI/uVv
-# PNjJu4nlR2DJLGfWRFMOu2Ttrx1t3f9csyzFEma5e1U3OPmwyvvF7a7MjaOxpPXV
-# Z94ezE51uqtr79r1GAqhZZz8BL2ndvaXvg39xe/i9GyS2msZmIqEuLLZbxqMifV6
-# SdlSK7CHV/tJra6NEpabOOqzzQjfLu1yej7eGg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUqd8Fi8a3LMcDI4pJ+kS3/mjemR4wDQYJKoZI
+# hvcNAQEBBQAEggEAPfqajmEss3v9SHAMmZ6pD1YdKydv5maLw3uUDOO338twY4gc
+# OT7gUUpwGSwdh9FdJw9UHz14S9F3AgZHB9gbeZz03d1fHAN5JtrLHoakZPJQKtax
+# D50olC3q+ilAyMn/FQOEdyFnXGeAdBQYd8x/WFOsdt6hGAk78MNHLmq4ty18aiLW
+# +CK9oC3+boZ0+pjJQsMZ790ktaGNARLb2CL1TDHrdlXrl0ZVeTBgIlMHMehYAIFT
+# SB7XZWW8GDGotLzCtgVQwkMxJf0S9olRUA4gLOWLlyyH9nevv2mFQFm3bCV3cqV2
+# QACDlmT4+6gOFQrfQg/bz6EW+YVaDGQOzWEqJg==
 # SIG # End signature block

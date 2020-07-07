@@ -1,4 +1,4 @@
-﻿function Process-StarterADObject {
+﻿function global:Process-StarterADObject {
   [CmdletBinding()]
   param (
       #[Parameter(Mandatory=$true)] [string] $NewSAMAccountName,
@@ -15,28 +15,28 @@
 
 		# Template account declaration
 		if (Get-ADUser -Filter {SAMAccountName -eq $TemplateName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) {
-			$TemplateUser = Get-ADUser $TemplateName -Properties * -Server $DC -Credential $AD_Credential
+			$global:TemplateUser = Get-ADUser $TemplateName -Properties * -Server $DC -Credential $AD_Credential
     } else { Write-Host -ForegroundColor Red "User $TemplateName not found." }
 
     # Generate names
-		$UserDomain = ($TemplateUser.UserPrincipalName).Split("\@")[1]
-    $NewUserPrincipalName = $FirstName + "." + $LastName + "@" + $UserDomain
+		$global:UserDomain = ($global:TemplateUser.UserPrincipalName).Split("\@")[1]
+    $NewUserPrincipalName = $FirstName + "." + $LastName + "@" + $global:UserDomain
     $NewSAMAccountName = $FirstName + "." +  $LastName
   		if ($NewSAMAccountName.Length -gt 20) { # Truncate pre-2000 name to 20 characters, if longer, to prevent errors
       $NewSAMAccountName = $NewSAMAccountName.substring(0,20)
       }
 
 		# Template accounts OU declaration
-    $TemplateAccountOU = ($TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),",'' } }).path
+    $TemplateAccountOU = ($global:TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),",'' } }).path
 
 		# Create new password for the new starter
 		Add-Type -AssemblyName System.Web
     $NewPassword = [System.Web.Security.Membership]::GeneratePassword(12,4)
 
-		#UserDomain is from the template's UPN now
-		$UsageLocation = $TemplateUser.extensionAttribute6 # Country code
+		# UserDomain is from the template's UPN now
+		$UsageLocation = $global:TemplateUser.extensionAttribute6 # Country code
 
-  # Check if the SAM account already exists. If it does, the script adds numbers to the end of the
+  # Check if the SAM account already exists. If it does, create a unique one
     if(! (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ){
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique." -ForegroundColor Green
     } else {
@@ -48,7 +48,7 @@
 
     $NewDisplayName = $NewSAMAccountName -replace "\."," "
 
-  # Check if the UPN already exists.
+  # Check if the UPN already exists. If it does, create a unique one
     if(!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique." -ForegroundColor Green
    } else {
@@ -58,7 +58,7 @@
     }
     #TODO: Report the UPN
 
-  # Check if Employee ID already exists
+  # Check if Employee ID already exists. If it does, create a unique one
     if(!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique." -ForegroundColor Green
     } else {
@@ -70,7 +70,7 @@
   # Create the AD object
       $params = @{
       'SamAccountName'         = $NewSAMAccountName;
-      'Instance'               = $TemplateUser.DistinguishedName;
+      'Instance'               = $global:TemplateUser.DistinguishedName;
       'DisplayName'            = $NewDisplayName;
       'GivenName'              = $FirstName;
       'Path'                   = $StarterOU;
@@ -82,10 +82,10 @@
       'UserPrincipalName'      = $NewUserPrincipalName;
       'AccountPassword'        = (ConvertTo-SecureString -AsPlainText $NewPassword -Force);
       'ChangePasswordAtLogon'  = $true;
-      'Title'                  = $TemplateUser.title; # Job title. This is taken from the $TemplateUser
-      'Department'             = $TemplateUser.Department; # Department. This is taken from the $TemplateUser
-      'Company'                = $TemplateUser.Company; # Company. This is taken from the $TemplateUser
-      'Office'                 = $TemplateUser.Office; # Office. This is taken from the $TemplateUser
+      'Title'                  = $global:TemplateUser.title; # Job title. This is taken from the $global:TemplateUser
+      'Department'             = $global:TemplateUser.Department; # Department. This is taken from the $global:TemplateUser
+      'Company'                = $global:TemplateUser.Company; # Company. This is taken from the $global:TemplateUser
+      'Office'                 = $global:TemplateUser.Office; # Office. This is taken from the $global:TemplateUser
       }
 
       #Create the new user
@@ -101,9 +101,9 @@
  
 
       #If the template has a manager, assign it to the new account
-      if ($TemplateUser.Manager)
-      { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]" -Verbose
-         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential -Verbose
+      if ($global:TemplateUser.Manager)
+      { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($global:TemplateUser.Manager)]" -Verbose
+         Set-ADUser -Identity $NewSAMAccountName -Manager $global:TemplateUser.Manager -Server $DC -Credential $AD_Credential -Verbose
       }
       #TODO: Add reporting of success[manager added]/failure/error
 
@@ -145,7 +145,7 @@
       if ($EmployeeStartDate){
         if ($EmployeeStartDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting Start Date  [$EmployeeStartDate] on [$NewSAMAccountName]" -Verbose
-          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute13 = $EmployeeStartDate } -Server $DC -Credential $AD_Credential -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute13 = $EmployeeStartDate } -Server $DC -Credential $AD_Credential
         } else {
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Start date is incorrect - [$EmployeeStartDate]. Please ensujre it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
         }
@@ -178,29 +178,31 @@
 
       #Group membership (from template)
       try {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -Verbose
-        $TemplateUser.Memberof | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential}
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Adding [$NewSAMAccountName] to the groups of [$($global:TemplateUser.SAMAccountName)] " -Verbose
+        $global:TemplateUser.Memberof | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential}
       }
       catch {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to adding [$NewSAMAccountName] to the groups of [$($global:TemplateUser.SAMAccountName)] " -ForegroundColor Red
       }
       #TODO: Add reporting of group cloning added]/failure/error
 
             #OU move (same as template)
       try {
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -Verbose
-        Get-ADUser $NewSAMAccountName | Move-ADObject -TargetPath $TemplateAccountOU -Server $DC -Credential $AD_Credential
+        Get-ADUser $NewSAMAccountName -Server $DC -Credential $AD_Credential | Move-ADObject -TargetPath $TemplateAccountOU -Server $DC -Credential $AD_Credential
       }
       catch {
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to move [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -ForegroundColor Red
       }
       #TODO: Add reporting of group cloning added]/failure/error
+
+      $global:NewUserPrincipalName = $NewUserPrincipalName
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpDRrPWAOU8Zs6Q2uqv+nqFll
-# WjOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfzo8DN2LdK+B+SKhnBgToW+S
+# V9WgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -267,11 +269,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDwAmvzDKvWUhFKdepWy7OInlaO0wDQYJKoZI
-# hvcNAQEBBQAEggEAxYICoWPgw8eckdZs+kKfIBxeXWx9FGLMTKSqHFRTF3lqIN3a
-# BcCOrVtu07c6yNJks5qPj15ScwmAMj6fDEyxnW5JOeF14gMSsB19ohEvgF6VSz3/
-# xPtAC/XmcyH8W2W8MtSI4hxQ49PkTZtJEdFNUK6DmBJrBgWIp9dQYZMzYFO6AsZC
-# AN0DkqyyWeB7U2codEZJNqNrUf1bHPI8JVE8J4q56xVbZtdNq6zDxG/NLm7yadk2
-# sMKKzLHDs+xIuoJl5Q9eB2VBb2aQECVt+nx3Okimjep5ejVKpwKSnTmyRCQvXk3C
-# PX9IZansyzHr3sJ9Q9Zbeqh+HVS1Un29LRPDvw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU7u0+u/a5a4XB3RFkSeWGmcB5+mswDQYJKoZI
+# hvcNAQEBBQAEggEA0rySwpjw08oVMWaZfMwFb2SYfMyXm95GfoAY0SfKoM9WtAt7
+# qgXzbou1SQBIbzTNLqmLgDTJUxdr/rxI+gOx85ngVexWZj8cQ3Jcq1PKZXWfOTUL
+# /PQCwqym8VzwmxYdPD9iST6f4kD80fJuP49rwo8WCrjeFW4UWq72ThlIKuuaM/Xp
+# 9ydZjL7mghJHmJYPVz3O74vunAUsyUea9N3Vh/G4rKDzQXDez5h2qE3xJD98PgyY
+# VM5KRK/O9kxLy5JQpe4XGmxXct9Y6sArmtHawZnJ9bDOoTz4W7ffyTlNIhJ9ddDi
+# DtiyF8U0phD7XOM+aq08Zw2LZUG891cO0zslCA==
 # SIG # End signature block

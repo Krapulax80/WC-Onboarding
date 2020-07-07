@@ -83,7 +83,7 @@ $error.Clear()
   # Transcript STOP
   #Stop-Transcript
   if ($Error ) {$Error | Out-File $ErrorFile}
-  else {Write-Log "[INFO] NO ERRORS DURING SCRIPT RUN"| Out-File $ErrorFile} # also send errors to a file
+  else { "[INFO] NO ERRORS DURING SCRIPT RUN"| Out-File $ErrorFile} # also send errors to a file
    
 
   # And cleanup the variables
@@ -93,8 +93,8 @@ $error.Clear()
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZIAw7GI1FPAz4bLdc4mB/JOA
-# 4mSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUK0MwCXlMc5A+j+pQADUTOzmz
+# MmugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -161,11 +161,11 @@ $error.Clear()
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUkm5em6XnQqJDmNwfBMis6Go7nkowDQYJKoZI
-# hvcNAQEBBQAEggEAc+w+lzu25xEhLtASWO6GS3tsyib3DbYHKRupohrhSquRWaUf
-# trGS4Rjs0JUgIx55XPVvg8talkEwn4kweZD/MaOAJFyQXWLE8HTmyVXP12Ur0ZYU
-# mkg2huQEb2+zkH6EFKGYIz2Os6KXRUna28J6tY3H/HahJylZ4YWmCBSuAmHImVJZ
-# OUsvg6HQOHMQdpr7ykGZFA1XrrqrIpq7IcOJFtT01sVjzTyaGEqSc5gUvdSVbL91
-# 5yEpFu7xumHVtvaV/jvxYUQRc4m30jLnJL2Rcrx5zJ+WMjUiaRs6c/TnKUmUy97m
-# g9+8naD3uZjvnd23ZTtYFHPxawGji7vJ+cMBGA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUIhvRV5Y3mKmhPCU6Aq/loi8k/xswDQYJKoZI
+# hvcNAQEBBQAEggEAOUGx7mngw/LWgd81E5l/c0QAkO/s+ID/PUvt5FnL7b65VMfv
+# 4LymHtYtzinEw8+nO6cLRar1/bvQmkxBRf83VJ89uqt/aUS1lXwxzvklIJXvfUTt
+# e9xiyz6TOdQcEUxl8xn26uKL96hAuhwV3mtxPENV08dah4fzQCQfo268ofNud6/X
+# PgEVrd+p7Qgw/Ij8qXUu/s8Bgk3+43gaWJWXAksSN3USb9ehc0rL89tW1DzcjRyL
+# uEh41mlf3eLf9g8pEtK4ewO8gxrViaf+CkslyH8bLMrX1rZAgtTCdn5aC9sbymmS
+# LQERZeutDZhqz9wHw0eX3uNQLWxlTltUaqW4Ag==
 # SIG # End signature block
