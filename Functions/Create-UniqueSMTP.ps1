@@ -6,9 +6,9 @@ function global:Create-UniqueSMTP {
 
   		$x = 1
 		do {
-			$x += 1 # start from 2, then increase
 			$secondarySMTP = $global:secondarySMTP = $null # zeroize the SMTP
-			$secondarySMTP = "SMTP:" + $FirstName + $LastName.substring(0,1) + $x + "@" + $UserDomain #add the number into the secndary SMTP
+      $secondarySMTP = "SMTP:" + $FirstName + $LastName.substring(0,1) + $x + "@" + $UserDomain #add the number into the secndary SMTP
+      $x++
 		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value." -Verbose
     $global:secondarySMTP = $secondarySMTP 
@@ -16,8 +16,8 @@ function global:Create-UniqueSMTP {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUithm1I0jYXy1usQT1kWxyqAh
-# pxagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUi/WMzyLmsRni2qgnvylxLX+w
+# 6QGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -84,11 +84,11 @@ function global:Create-UniqueSMTP {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUqd8Fi8a3LMcDI4pJ+kS3/mjemR4wDQYJKoZI
-# hvcNAQEBBQAEggEAPfqajmEss3v9SHAMmZ6pD1YdKydv5maLw3uUDOO338twY4gc
-# OT7gUUpwGSwdh9FdJw9UHz14S9F3AgZHB9gbeZz03d1fHAN5JtrLHoakZPJQKtax
-# D50olC3q+ilAyMn/FQOEdyFnXGeAdBQYd8x/WFOsdt6hGAk78MNHLmq4ty18aiLW
-# +CK9oC3+boZ0+pjJQsMZ790ktaGNARLb2CL1TDHrdlXrl0ZVeTBgIlMHMehYAIFT
-# SB7XZWW8GDGotLzCtgVQwkMxJf0S9olRUA4gLOWLlyyH9nevv2mFQFm3bCV3cqV2
-# QACDlmT4+6gOFQrfQg/bz6EW+YVaDGQOzWEqJg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUh+Ef6RseInP7mbC39sAbkJCZ/zcwDQYJKoZI
+# hvcNAQEBBQAEggEALa5ipocLHJ/J4fzMlLh3mJ4oZsKnglfgPBA1wHa083GIjgdx
+# es067ijwdxFWuvu3bvDREIP+r+z2FStM+ETEZfG6X1skq5P3OVluR8OQ5tpZIEKb
+# KGxHqsDGXd3lYeBr7VOiW/3LXQexFh7/R7bBSH7/i23s40g0qU8bEgXOnYRggfPw
+# IhEeUxNJmDroWxWi1MqVGRoT4bHm4x4gX+it5imV6oh/C82Q3SOrfv76yd2/UrOv
+# l+XnvaWy4cnY6nfvWJKyXw6dVhXyTG2WrJ5bQ9ArLltPcUSkVpk/i4gBsNNinmf7
+# xeVVBT+82UdZSfLuu6f7nczRzW0xgH5/aDPrUQ==
 # SIG # End signature block

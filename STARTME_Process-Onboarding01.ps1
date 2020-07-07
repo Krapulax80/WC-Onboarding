@@ -53,11 +53,13 @@ $error.Clear()
         if ($Domain -match "WestCoast"){
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
         Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
+        Write-Host
         }
         # Pipe, if the workdomain is XMA
         elseif ($Domain -match "XMA"){
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
         Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
+        Write-Host
         }
         # Pipe, if the domain is not within the expected values
         else {
@@ -93,8 +95,8 @@ $error.Clear()
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUK0MwCXlMc5A+j+pQADUTOzmz
-# MmugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnM6Iem/OBfbhuP1Jo7yIV1iv
+# McSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -161,11 +163,11 @@ $error.Clear()
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUIhvRV5Y3mKmhPCU6Aq/loi8k/xswDQYJKoZI
-# hvcNAQEBBQAEggEAOUGx7mngw/LWgd81E5l/c0QAkO/s+ID/PUvt5FnL7b65VMfv
-# 4LymHtYtzinEw8+nO6cLRar1/bvQmkxBRf83VJ89uqt/aUS1lXwxzvklIJXvfUTt
-# e9xiyz6TOdQcEUxl8xn26uKL96hAuhwV3mtxPENV08dah4fzQCQfo268ofNud6/X
-# PgEVrd+p7Qgw/Ij8qXUu/s8Bgk3+43gaWJWXAksSN3USb9ehc0rL89tW1DzcjRyL
-# uEh41mlf3eLf9g8pEtK4ewO8gxrViaf+CkslyH8bLMrX1rZAgtTCdn5aC9sbymmS
-# LQERZeutDZhqz9wHw0eX3uNQLWxlTltUaqW4Ag==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUxglpXSHLc+EbreOT2fG//tG3qikwDQYJKoZI
+# hvcNAQEBBQAEggEAD0JFqChCIA2XV8Ahnc+vBYhdFMhnAiLMxa556TsZTlWzQFVf
+# J08fQmmreybDPTQtkJxlV8ZAvrDwPkUmXg9zeLFF/g4jsbcP3k+3C885ZIrANf1c
+# rcrIvxoz+aGlZ3TcQco1+BlH9suVIxZjt4mmhh5QVFb2e3XhdfWSoWRdbqw5eaLQ
+# L6pikmdHfMgQp1MU9HJjF9iQEMwlXyWAOJ1zEu4Diqt9+scv87gaFyFViQ5zbqMp
+# KKZfue5txTtmKzCO9rRdjDRWxiTxBCaeEg2oeaicBIsEE6k0LsD+RdzivaZpmUTY
+# 8FqP7DhShUKXUuytzM3GS0JcCDDI6cFTYDjs4Q==
 # SIG # End signature block
