@@ -119,11 +119,14 @@
 
       #Assign Employee ID
       try {
+        if (($EmployeeID.gettype()).Name -notlike "String"){
+          $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
+        }
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting EmployeeID [$EmployeeID] on [$NewSAMAccountName]" -Verbose
         Set-ADUser -Identity $NewSAMAccountName -EmployeeID $EmployeeID -Server $DC -Credential $AD_Credential -Verbose
       }
-      catch {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to set EmployeeID on [$NewSAMAccountName]" -ForegroundColor Red
+       catch {
+         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to set EmployeeID on [$NewSAMAccountName]" -ForegroundColor Red
       }
       #TODO: Add reporting of success[manager added]/failure/error
 
@@ -151,12 +154,53 @@
       }
       #TODO: Add reporting of success[start date added]/failure/error
 
+      #Contract type selection
+      if ($ContractType){
+        if ($ContractType -match "FullTime"){
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 0 } -Server $DC -Credential $AD_Credential -Verbose
+        } elseif ($ContractType -match "PartTime") {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 1 } -Server $DC -Credential $AD_Credential -Verbose
+        } elseif ($ContractType -match "Temp") {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 2 } -Server $DC -Credential $AD_Credential -Verbose          
+        } elseif ($ContractType -match "External") {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 3 } -Server $DC -Credential $AD_Credential -Verbose          
+        } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Contract type incorrect on [$NewSAMAccountName]!" -ForegroundColor Red
+        }
+      } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Contract type undefined on [$NewSAMAccountName]!" -ForegroundColor Red
+      }
+      #TODO: Add reporting of success[start date added]/failure/error
+
+      #Group membership (from template)
+      try {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -Verbose
+        $TemplateUser.Memberof | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential}
+      }
+      catch {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
+      }
+      #TODO: Add reporting of group cloning added]/failure/error
+
+            #OU move (same as template)
+      try {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -Verbose
+        Get-ADUser $NewSAMAccountName | Move-ADObject -TargetPath $TemplateAccountOU -Server $DC -Credential $AD_Credential
+      }
+      catch {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to move [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -ForegroundColor Red
+      }
+      #TODO: Add reporting of group cloning added]/failure/error
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUbpoQ1zKB88vU4BrcpPAIe6GY
-# aN+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpDRrPWAOU8Zs6Q2uqv+nqFll
+# WjOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -223,11 +267,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU3jaarXzJ0yopPdMLNCfO5n281E4wDQYJKoZI
-# hvcNAQEBBQAEggEAQmE7UK7IcMt0Phv9xIi7vIdq0pj6fX9M0G42Yv5dtLu9cgoq
-# /xwDdPbSBSOwgXwhVEHAQ44MyW2uKw207IFNtSQ9qqlZADzY8T/A+rV490y5jG6B
-# VVjDetTwajNUTphVauBalPHFLvTDli+O5aHtR2Ys4tr8Ylm9YikFfvXXpABOE8x4
-# l+t+lDNYugaGBYjY262ALdcokbGK18jC/6emYInBY7/0X1/PxfPvQ7PCDxpxsjul
-# NJ8U0TiCHDfBhARiljtRMZt2RBIb6Z8Xjaesn6Z1Q7WjgJkItYG0h/5VexzrvihA
-# L8zjsKi/fIE1Lb/s8Wi5YzOLUFEzxFCgM1jj3g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDwAmvzDKvWUhFKdepWy7OInlaO0wDQYJKoZI
+# hvcNAQEBBQAEggEAxYICoWPgw8eckdZs+kKfIBxeXWx9FGLMTKSqHFRTF3lqIN3a
+# BcCOrVtu07c6yNJks5qPj15ScwmAMj6fDEyxnW5JOeF14gMSsB19ohEvgF6VSz3/
+# xPtAC/XmcyH8W2W8MtSI4hxQ49PkTZtJEdFNUK6DmBJrBgWIp9dQYZMzYFO6AsZC
+# AN0DkqyyWeB7U2codEZJNqNrUf1bHPI8JVE8J4q56xVbZtdNq6zDxG/NLm7yadk2
+# sMKKzLHDs+xIuoJl5Q9eB2VBb2aQECVt+nx3Okimjep5ejVKpwKSnTmyRCQvXk3C
+# PX9IZansyzHr3sJ9Q9Zbeqh+HVS1Un29LRPDvw==
 # SIG # End signature block

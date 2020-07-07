@@ -1,68 +1,20 @@
-function Process-OnBoarding01 {
-  [CmdletBinding()]
-	param(## Domain selector
-    [Parameter(Mandatory=$true , ParameterSetName="WestCoast")] [switch]$Westcoast,
-		[Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
-		[Parameter(Mandatory=$true)] [string]$FirstName,
-    [Parameter(Mandatory=$true)] [string]$LastName,
-    [Parameter(Mandatory=$true)] [string]$EmployeeID,
-    [Parameter(Mandatory=$true)] [string]$TemplateName
-  )
-
-  # Pipe, if the workdomain is WESTCOAST
-  if ($Westcoast.IsPresent){
-    # Credentials for WC
-    Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    # Variables for WC
-    $SystemDomain = "westcoast.co.uk"
-    $DomainNetBIOS = "WESTCOASTLTD"
-    $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "mail" + "." + $SystemDomain
-    $EOTargetDomain = "westcoastltd365.mail.onmicrosoft.com"
-    $PeopleFileServer = "BNWFS05"; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = "BNWFS05"; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
-    $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
-    # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-    #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property InfrastructureMaster).InfrastructureMaster
-  }
-  # Pipe, if the workdomain is XMA
-  elseif ($XMA.IsPresent){
-    # Credentials for XMA
-    Create-Credential -XMA -AD
-    Create-Credential -XMA -AAD
-    # Variables for XMA
-    $SystemDomain = "xma.co.uk"
-    $DomainNetBIOS = "XMA"
-    $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "xmaexchcas" + "." + $SystemDomain
-    $EOTargetDomain = "xmalimited.mail.onmicrosoft.com"
-    $PeopleFileServer = ""; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
-    # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # Pipe, if the workdomain is invalid
-  else {
-    Write-Host -ForeGroundColor Red "Bad domain."; Break
-  }
-
-    # Active Directory
-    Process-StarterADObject -TemplateName $TemplateName
-}
-
+ function Connect-OnPremExchange {
+	$OpenPSSessions = Get-PSSession
+  # If there is an open session to the on-prem exchange, we do not re-connect.
+	    if ($OpenPSSessions.ComputerName -eq $ExchangeServer -and $OpenPSSessions.Availability -eq 'Available') {
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - On-prem Exhange already connected" -ForegroundColor Green
+	    }
+	    else {
+				$timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - On-prem Exchange not available. Initiating connection" -ForegroundColor Yellow
+		    $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
+		    [void] (Import-PSSession (New-PSSession -SessionOption $pso -ConfigurationName Microsoft.Exchange -ConnectionUri http://$ExchangeServer/PowerShell/ -Authentication Kerberos) -DisableNameChecking -AllowClobber -Credential $AD_Credential)
+	    }
+    }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1klXdAnbi9aW3Vis+0UO2qrG
-# lQugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZ4MCH6ERtoegj5D74Xw3UgRW
+# Lr+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -129,11 +81,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUyikYmxQ7pmfG8Bwj2sEP/9T4pxowDQYJKoZI
-# hvcNAQEBBQAEggEAqhG4iuOPpk3P5IK0wk44ODcHGK4wYsMgCuM4QGcUdVh5Qv6h
-# /OaVPmDsQFsy595JS9W7rNm+EjfutuQdKqML32HMPA7idKy4dOx8LLaObYloWNZK
-# +NBaGkY4qb6F8QS9gPmSto0vHV6z+k2zItpN+dUO7WogAdu7avxkwPaGIAGZuroF
-# 6O1gYTeuJyiXOSzF6+L6G9aF3iuSrsXC4yRXq7PIjqT5dcUJNnJPtrTamlCgMRXK
-# fhTBRYsztosruAABQdZUMDD8bTAlHIeb4Ym8N0LJ0DdRdQLfjroguOcxN0sX5p2x
-# ZDgg1/aog2PEcxxuqc8k0QE1+PvI0bbW7O3fhg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU4qXlHqIbKoX+2UYJwxo3psi4JlEwDQYJKoZI
+# hvcNAQEBBQAEggEAe2og/FSDD2vtU1V9fRHq+Cw0jA8vrh4J3b02mr4mb0o59kz+
+# YVHTPKmGeByrU5+I95DCOiBoRfiGI/ABt0ddVUycI6Q+Y/eR4Cjr1LY3GeNgnRZW
+# TgaxjXZ6brrwHVkJwuwtBClHL8eM065S/TbBqkTYhzdMc83cbrMnPgQyYA2abawv
+# HAyjrUlqj1T6nrt0b1NM2aTxww0xICX2DUS9J2HwJkWh2oPgF+h4UlrHmRLVfyUq
+# cg+RC3AFssxEKxYhJRXN0J89v9eQZtoE4Bl6kQqYG7fPp3FEdyVDDN02ebz4P0Hn
+# Pl45afobrERj2oxJWgm2HxRA8cqR9icMLYsDhQ==
 # SIG # End signature block

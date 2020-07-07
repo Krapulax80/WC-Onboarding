@@ -1,6 +1,7 @@
 # This is the script wrapper that should be called for the execution.
 
 ## SET UP THE ENVIRONMENT
+$error.Clear()
   # Collect work folders (names)
     $FunctionFolder   = "Functions"
     $InputFolder      = "Input"
@@ -21,6 +22,7 @@
         }
     # Transcript START
       $TranscriptFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+      $ErrorFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
 #      Start-Transcript -Path $TranscriptFile
 
 ## ONBOARDING PROCESS -
@@ -43,6 +45,7 @@
       $TemplateName                   = $Line.TemplateName
       $HolidayEntitlement             = $Line.HolidayEntitlement
       $EmployeeStartDate              = $Line.StartDate
+      $ContractType                   = $Line.ContractType
 
       # Run against each line
       # TODO: report, if the domain is correct
@@ -79,6 +82,9 @@
 
   # Transcript STOP
   #Stop-Transcript
+  if ($Error ) {$Error | Out-File $ErrorFile}
+  else {Write-Log "[INFO] NO ERRORS DURING SCRIPT RUN"| Out-File $ErrorFile} # also send errors to a file
+   
 
   # And cleanup the variables
   Variable-Cleanup
@@ -87,8 +93,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEtxfNnXFs/zzopV8/GpsNEm8
-# 58qgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZIAw7GI1FPAz4bLdc4mB/JOA
+# 4mSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -155,11 +161,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU8hJuN9606nI5n98++sdVQ0FJG+4wDQYJKoZI
-# hvcNAQEBBQAEggEAGfrGUjtGdugOzqCMoyBbhw6vEd0fhCwKP9azeyxNGx6MPUvI
-# /vioD8wh3vJ+ch6upEOkYcaa1d6lzgQphm1yPspMsEXT17ASqBIecJlwxKb2vpX2
-# jlQmTawngY4osWFxe0M5NCVyD7KfGswnpdRLnWChlYe3cT5CziyeXPpY+s7h3ToT
-# dCQYj5MeLrAZnesQ5idrNEsb8h1n1lrUeXjkRXt+Qj/OH6OxLzNhrG8SeNaZPEoZ
-# 4qC84IVXqUyQ81dDJ0TmZao+Lq3brhNboHWwi2Gfg2iCR10g4R88lFb1kMIqDEBT
-# UqiOlqNLzJa5D7+065Xm+CmiRkyVxv+nebb2VA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUkm5em6XnQqJDmNwfBMis6Go7nkowDQYJKoZI
+# hvcNAQEBBQAEggEAc+w+lzu25xEhLtASWO6GS3tsyib3DbYHKRupohrhSquRWaUf
+# trGS4Rjs0JUgIx55XPVvg8talkEwn4kweZD/MaOAJFyQXWLE8HTmyVXP12Ur0ZYU
+# mkg2huQEb2+zkH6EFKGYIz2Os6KXRUna28J6tY3H/HahJylZ4YWmCBSuAmHImVJZ
+# OUsvg6HQOHMQdpr7ykGZFA1XrrqrIpq7IcOJFtT01sVjzTyaGEqSc5gUvdSVbL91
+# 5yEpFu7xumHVtvaV/jvxYUQRc4m30jLnJL2Rcrx5zJ+WMjUiaRs6c/TnKUmUy97m
+# g9+8naD3uZjvnd23ZTtYFHPxawGji7vJ+cMBGA==
 # SIG # End signature block

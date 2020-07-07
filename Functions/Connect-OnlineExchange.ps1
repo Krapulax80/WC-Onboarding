@@ -1,68 +1,27 @@
-function Process-OnBoarding01 {
-  [CmdletBinding()]
-	param(## Domain selector
-    [Parameter(Mandatory=$true , ParameterSetName="WestCoast")] [switch]$Westcoast,
-		[Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
-		[Parameter(Mandatory=$true)] [string]$FirstName,
-    [Parameter(Mandatory=$true)] [string]$LastName,
-    [Parameter(Mandatory=$true)] [string]$EmployeeID,
-    [Parameter(Mandatory=$true)] [string]$TemplateName
-  )
+function Connect-OnlineExchange {
+  $OpenPSSessions = Get-PSSession
+  # If there is an open session to Office 365, we do not re-connect.
+	if ($OpenPSSessions.ComputerName -contains 'outlook.office365.com' -and $OpenPSSessions.Availability -eq 'Available') {
 
-  # Pipe, if the workdomain is WESTCOAST
-  if ($Westcoast.IsPresent){
-    # Credentials for WC
-    Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    # Variables for WC
-    $SystemDomain = "westcoast.co.uk"
-    $DomainNetBIOS = "WESTCOASTLTD"
-    $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "mail" + "." + $SystemDomain
-    $EOTargetDomain = "westcoastltd365.mail.onmicrosoft.com"
-    $PeopleFileServer = "BNWFS05"; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = "BNWFS05"; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
-    $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
-    # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-    #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property InfrastructureMaster).InfrastructureMaster
-  }
-  # Pipe, if the workdomain is XMA
-  elseif ($XMA.IsPresent){
-    # Credentials for XMA
-    Create-Credential -XMA -AD
-    Create-Credential -XMA -AAD
-    # Variables for XMA
-    $SystemDomain = "xma.co.uk"
-    $DomainNetBIOS = "XMA"
-    $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "xmaexchcas" + "." + $SystemDomain
-    $EOTargetDomain = "xmalimited.mail.onmicrosoft.com"
-    $PeopleFileServer = ""; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
-    # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # Pipe, if the workdomain is invalid
-  else {
-    Write-Host -ForeGroundColor Red "Bad domain."; Break
-  }
+$timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange Online already available." -Verbose
 
-    # Active Directory
-    Process-StarterADObject -TemplateName $TemplateName
+  }
+  # If there is no open session, then we do connect
+	else {
+    #If the module is not imported, import it
+    If (!(Get-Module -Name ExchangeOnlineManagement)){
+    Import-Module ExchangeOnlineManagement}
+    #Then connect
+    [void] (Connect-ExchangeOnline -Credential $AAD_Credential -ShowProgress $false -ShowBanner:$false)
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Connecting to Exchange Online." -Verbose
+	}
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1klXdAnbi9aW3Vis+0UO2qrG
-# lQugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUBGoYiDNP3ujmh/cPU+hCptZ2
+# 3jugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -129,11 +88,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUyikYmxQ7pmfG8Bwj2sEP/9T4pxowDQYJKoZI
-# hvcNAQEBBQAEggEAqhG4iuOPpk3P5IK0wk44ODcHGK4wYsMgCuM4QGcUdVh5Qv6h
-# /OaVPmDsQFsy595JS9W7rNm+EjfutuQdKqML32HMPA7idKy4dOx8LLaObYloWNZK
-# +NBaGkY4qb6F8QS9gPmSto0vHV6z+k2zItpN+dUO7WogAdu7avxkwPaGIAGZuroF
-# 6O1gYTeuJyiXOSzF6+L6G9aF3iuSrsXC4yRXq7PIjqT5dcUJNnJPtrTamlCgMRXK
-# fhTBRYsztosruAABQdZUMDD8bTAlHIeb4Ym8N0LJ0DdRdQLfjroguOcxN0sX5p2x
-# ZDgg1/aog2PEcxxuqc8k0QE1+PvI0bbW7O3fhg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUY+IvOimDSAmg9CA+I2rMdNtxaTkwDQYJKoZI
+# hvcNAQEBBQAEggEAtr8d/81XORcIWpeaXA/GjmCh4A42e43y/laGMOdhp2skRIne
+# aeyXzrRaKQ93DnCq53uG5BVTAwSNWV5ImqgDFI/pXlSv6/gitGimlcZgsXMzD3v1
+# QEbDtZ5Hi6F2NyxO3tAfcDOM07yjYGrMmzoZcKLhUefEOUhGXK3b1B0/FilWg0dO
+# J81lS1EC9SdMIEgrXNPhOPQV+m+pMXRM26EyZPuzJ77V1jiRhmIvWv89/GuTSXp3
+# r9T9ZNVrFE9JQJ+uT+Kst8ADlBxkhiqiQ59PmdjJG+++tCj0mCBxeWpe2QSLUfdm
+# mZihXO3lY++dPSsos8ENVzUHWQr6Xtcu8t2kQg==
 # SIG # End signature block

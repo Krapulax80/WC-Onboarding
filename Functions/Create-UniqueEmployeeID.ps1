@@ -1,7 +1,7 @@
 function Create-UniqueEmployeeID {
     [CmdletBinding()]
   param (
-      [Parameter(Mandatory=$true)] [int] $EmployeeID
+      [Parameter(Mandatory=$true)] [string] $EmployeeID
   )
 
   $x = 0
@@ -20,8 +20,8 @@ function Create-UniqueEmployeeID {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmPgKbeu/5sRstjc3N4Oqf6Vz
-# y36gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlDn3zpmg7XgRDRZP/7QNgnMP
+# aYOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -88,11 +88,11 @@ function Create-UniqueEmployeeID {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUmQ2bchM5DEv8obRFYCTSLeYPY+wwDQYJKoZI
-# hvcNAQEBBQAEggEAJoHOSBXrBIP3mv2KDGhnqJG72VeizpbP2GLnNP8gMvEhIUTY
-# CzhO5o+r8QsaYnjf83wL0F3B3gdYqzhL6s1zohS75xUkZqiOx09K+BlMpj3p3D8o
-# GTnkeveByz9n3G3sp10l+oGogveV6b3IwebQhgsHOoiqaLicxQ0IclMofQuVvdop
-# eMvPo5v/lwYjIT+J9HvohHqSHfXuEfW/xjeJEHR7n0ie9uibAB+dUuKgxQvDCSOw
-# Sn5a7gjJW5VxhWjPPQN4RtkRl6qeJQ42cukGslbWdEsiAnCMNyXk80eHp09+ULv0
-# L38Re0YU0JdfBH5NdyppZgyz2T3oEvTmKBYXrg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUJHH9alwjhdAzsj7HAiG+m3KobBEwDQYJKoZI
+# hvcNAQEBBQAEggEA2eBCn7v+/cuXVKTlzfgxDUx7U2ny2TaAk0etpglkuPmLl76n
+# 5xoOv/apLYwNTVYN4sqkebSCJhRkKOw7lq2/SivCk+MX2gCXqCoW2hkLh2TYpILP
+# p3hwjS5jSb+XwJ1OUvQx2CLOWgEkJb+p9ZxG9TQl1a5/tDq2sE61sa0aFbs0Rz9z
+# GpOAHK2PSn0zNGOlA9YnAPuPi9yI8q/tPM5A/obtYOIEC8lPt6uTMQKFhh2Y88Sj
+# fj0HhjFze9Fmveam1SksfzepAV3KulINOuT/p4PyxBXFiyLm4fruikziOku+tyjk
+# NnrVhLMdhmeqESLCcr0xah+ZV1s74au7P8hU9A==
 # SIG # End signature block
