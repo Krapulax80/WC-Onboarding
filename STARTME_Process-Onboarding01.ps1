@@ -18,7 +18,9 @@ $error.Clear()
       foreach ($f in $functions)
         {
         #Write-Host -ForegroundColor Cyan "Importing function $f"
+        if ($f -match ".ps1"){
           . .\$FunctionFolder\$f
+        }
         }
     # Transcript START
       $TranscriptFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
@@ -38,6 +40,7 @@ $error.Clear()
     foreach ($Line in $CSVImport){
 
       # Construct variables from the line contents
+      $Domain = $FirstName = $LastName = $EmployeeID = $TemplateName = $HolidayEntitlement = $EmployeeStartDate = $null
       $Domain                         = $Line.Domain
       $FirstName                      = $Line.FirstName
       $LastName                       = $Line.LastName
@@ -95,8 +98,8 @@ $error.Clear()
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnM6Iem/OBfbhuP1Jo7yIV1iv
-# McSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7SzOsA203O7juzvKvO5MhyZ4
+# ys6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -163,11 +166,11 @@ $error.Clear()
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUxglpXSHLc+EbreOT2fG//tG3qikwDQYJKoZI
-# hvcNAQEBBQAEggEAD0JFqChCIA2XV8Ahnc+vBYhdFMhnAiLMxa556TsZTlWzQFVf
-# J08fQmmreybDPTQtkJxlV8ZAvrDwPkUmXg9zeLFF/g4jsbcP3k+3C885ZIrANf1c
-# rcrIvxoz+aGlZ3TcQco1+BlH9suVIxZjt4mmhh5QVFb2e3XhdfWSoWRdbqw5eaLQ
-# L6pikmdHfMgQp1MU9HJjF9iQEMwlXyWAOJ1zEu4Diqt9+scv87gaFyFViQ5zbqMp
-# KKZfue5txTtmKzCO9rRdjDRWxiTxBCaeEg2oeaicBIsEE6k0LsD+RdzivaZpmUTY
-# 8FqP7DhShUKXUuytzM3GS0JcCDDI6cFTYDjs4Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCb1wdUNiXyGn1mmLl1lE3yocIvgwDQYJKoZI
+# hvcNAQEBBQAEggEAgASGyxVAFNBKvo8TlCWyPnI4pzy67OvuLVpTMyLJ8zWfU376
+# S5RMsiv7nQXF1AZjyBC/RQc4TAUMM64al8OiLqR0mt0ESbV9et0Fm0FqYu+lYtMl
+# AtrfTwC3PRqn8T/l5J2uC2LY1sDd1ca8Ca4YOM1NOvGWKh7rVpnYHSgy5o1aLEPQ
+# pZsmp+yp+twBw0x1+noYgiX675+9ulL2DUCMyjrNomvflqIrMJIuwNP8M5mhzWdy
+# YUZzZ0NcrIbJGhHc+T5mqXn7kzMFH3zIJf4bTk4TuOD8aULuasL7ihSDI/ru22OT
+# RwFvmTSsXSyMn5d2c/Qw/YppBht7FuGul1fe6g==
 # SIG # End signature block

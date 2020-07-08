@@ -1,15 +1,16 @@
 function Process-OnBoarding01 {
   [CmdletBinding()]
-	param(## Domain selector
+  param(## Domain selector
     [Parameter(Mandatory=$true , ParameterSetName="WestCoast")] [switch]$Westcoast,
-		[Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
-		[Parameter(Mandatory=$true)] [string]$FirstName,
+    [Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
+    [Parameter(Mandatory=$true)] [string]$FirstName,
     [Parameter(Mandatory=$true)] [string]$LastName,
     [Parameter(Mandatory=$true)] [string]$EmployeeID,
-    [Parameter(Mandatory=$true)] [string]$TemplateName
+    [Parameter(Mandatory=$true)] [string]$TemplateName,
+    [Parameter(Mandatory=$false)] [switch]$NoJBA
   )
 
-  # Pipe, if the workdomain is WESTCOAST
+  # WORK IN WESTCOAST DOMAIN
   if ($Westcoast.IsPresent){
     # Credentials for WC
     Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
@@ -28,10 +29,11 @@ function Process-OnBoarding01 {
     $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
     $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
     # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-    #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property InfrastructureMaster).InfrastructureMaster
+    #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
+    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
   }
-  # Pipe, if the workdomain is XMA
+
+  # WORK IN XMA DOMAIN
   elseif ($XMA.IsPresent){
     # Credentials for XMA
     Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
@@ -49,26 +51,253 @@ function Process-OnBoarding01 {
     $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
     $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
     # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |	Select-Object -ExpandProperty RootDomain |	Get-ADDomain |	Select-Object -Property PDCEmulator).PDCEmulator
+    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
   }
-  # Pipe, if the workdomain is invalid
+
+  # (INVALID WORK DOMAIN DEFINED)
   else {
     Write-Host -ForeGroundColor Red "Bad domain."; Break
   }
 
-    # Active Directory
-    Process-StarterADObject -TemplateName $TemplateName
+  # ACTIVE DIRECTORY
 
-    # Exchange
-    Process-StarterMailbox
+    #region Construct the user parameters
+
+    # Capitalise first and last name of the NEW user account
+    $TextInfo = (Get-Culture).TextInfo
+    $FirstName = $TextInfo.ToTitleCase($FirstName)
+    $LastName = $TextInfo.ToTitleCase($LastName)
+
+    # Collect details of the TEMPLATE  user account
+    if (Get-ADUser -Filter {SAMAccountName -eq $TemplateName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) {
+    $TemplateUser = Get-ADUser $TemplateName -Properties * -Server $DC -Credential $AD_Credential
+    } else { Write-Host -ForegroundColor Red "User $TemplateName not found." }
+
+    # Construct parent OU of the TEMPLATE user account
+    $TemplateAccountOU = ($TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),",'' } }).path
+
+		# Conutry code of the TEMPLATE account
+		$UsageLocation = $TemplateUser.extensionAttribute6 # Country code    
+
+    # Declare the USER DOMAIN
+    $UserDomain = ($TemplateUser.UserPrincipalName).Split("\@")[1]
+      
+    # Generate various names for the NEW user account
+    $NewUserPrincipalName = $FirstName + "." + $LastName + "@" + $UserDomain
+    $NewSAMAccountName = $FirstName + "." +  $LastName
+      if ($NewSAMAccountName.Length -gt 20) { # Truncate pre-2000 name to 20 characters, if longer, to prevent errors
+      $NewSAMAccountName = $NewSAMAccountName.substring(0,20)
+      }
+
+    # Create new password for the NEW user account
+    Add-Type -AssemblyName System.Web
+    $NewPassword = [System.Web.Security.Membership]::GeneratePassword(12,4)
+
+    # Check if the SAM Account Name  already exists. If it does, create a unique one
+    if(! (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ){
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique." -ForegroundColor Green
+    } else {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Red
+      Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
+      $NewSAMAccountName = $global:NewSAMAccountName
+    }
+    # TODO: Report the SAM Name
+
+    # Derivative names created from the SAM Account Name (these should make these guranteed unique, however we will double check this just in case)
+    $NewUserPrincipalName = $NewSAMAccountName + "@" + $UserDomain
+    $NewRemoteRoutingAddress = $NewSAMAccountName  + "@" + $EOTargetDomain
+    $NewDisplayName = $NewSAMAccountName -replace "\."," "
+
+    # Check if the UPN already exists. If it does, create a unique one
+    if(!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique." -ForegroundColor Green
+   } else {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Red
+      Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
+      $NewUserPrincipalName = $global:NewUserPrincipalName
+    }
+    #TODO: Report the UPN
+
+    # Check if Employee ID already exists. If it does, create a unique one
+    if (($EmployeeID.gettype()).Name -notlike "String"){
+        $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
+    }    
+    if(!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique." -ForegroundColor Green
+    } else {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Red
+      Create-UniqueEmployeeID -EmployeeID $EmployeeID
+      $EmployeeID = $global:EmployeeID
+    }
+    #TODO: Report the EmployeeID
+
+    #endregion
+
+    #region Create and configure the NEW USER Account
+    
+    # Define the NEW AD OBJECT
+      $params = @{
+      'SamAccountName'         = $NewSAMAccountName;
+      'Instance'               = $TemplateUser.DistinguishedName;
+      'DisplayName'            = $NewDisplayName;
+      'GivenName'              = $FirstName;
+      'Path'                   = $StarterOU;
+      'SurName'                = $LastName;
+      #'PasswordNeverExpires' = $password_never_expires;
+      #'CannotChangePassword' = $cannot_change_password;
+      'Description'            = "NEW STARTER - Created by " + ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) + " at " + (Get-Date -Format G); # description entry to help identify, who set the account up
+      'Enabled'                = $true;
+      'UserPrincipalName'      = $NewUserPrincipalName;
+      'AccountPassword'        = (ConvertTo-SecureString -AsPlainText $NewPassword -Force);
+      'ChangePasswordAtLogon'  = $true;
+      'Title'                  = $TemplateUser.title; # Job title. This is taken from the $TemplateUser
+      'Department'             = $TemplateUser.Department; # Department. This is taken from the $TemplateUser
+      'Company'                = $TemplateUser.Company; # Company. This is taken from the $TemplateUser
+      'Office'                 = $TemplateUser.Office; # Office. This is taken from the $TemplateUser
+      }
+
+      # Create the NEW USER ACCOUNT
+      New-ADUser -Name $NewDisplayName @params -Server $DC -Credential $AD_Credential -Erroraction Stop -Verbose #-Whatif
+      #TODO: Add reporting of success/failure/error
+
+      # Wait for the NEW USER appear in AD
+      do {
+        $Userfound = (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] - Configuring account [$NewSAMAccountName] - please wait." -Verbose
+        Start-Sleep -Seconds 15
+      } until ($Userfound)
+
+      # Check, if the template had a MANAGER. If yes, assign the new account to this manager
+      if ($TemplateUser.Manager)
+      { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]" -Verbose
+         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential -Verbose
+      }
+      #TODO: Add outcome to manager added
+      
+      # Unless specifically said otherwise, assign JBA ACCESS to the account
+      if ($NoJBA.IsPresent) {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Deny JBA access for [$NewSAMAccountName]" -ForegroundColor Red
+        Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute10 = 0} -Server $DC -Credential $AD_Credential -Verbose
+      } else {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Adding JBA access to [$NewSAMAccountName]" -Verbose
+        Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute10 = 1} -Server $DC -Credential $AD_Credential -Verbose
+      }
+      #TODO: Add outcome to JBA access level
+
+      # Assign EMPLOYEE ID to the new user account
+      try {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting EmployeeID [$EmployeeID] on [$NewSAMAccountName]" -Verbose
+        Set-ADUser -Identity $NewSAMAccountName -EmployeeID $EmployeeID -Server $DC -Credential $AD_Credential -Verbose
+      }
+       catch {
+         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to set EmployeeID on [$NewSAMAccountName]" -ForegroundColor Red
+      }
+      #TODO: Add outcome of setting the EmployeeID
+
+      # Assign HOLIDAY ENTITLEMENT to the new account
+      if ($HolidayEntitlement){
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting Holiday Entitlement  [$HolidayEntitlement days] on [$NewSAMAccountName]" -Verbose
+          		if ($HolidayEntitlement -gt 0){
+              Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute15 = $HolidayEntitlement } -Server $DC -Credential $AD_Credential -Verbose
+              }
+      } else {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Holiday Entitlement is undefined for [$NewSAMAccountName]" -ForegroundColor Red
+      }
+      #TODO: Add outcome of the holiday entitlement
+
+      # Set the START DATE of the account. (This is purely administrative, account can be used ASAP!)
+      if ($EmployeeStartDate){
+        if ($EmployeeStartDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting Start Date  [$EmployeeStartDate] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute13 = $EmployeeStartDate } -Server $DC -Credential $AD_Credential
+        } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Start date is incorrect - [$EmployeeStartDate]. Please ensujre it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
+        }
+      } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Start date is not defined." -ForegroundColor Yellow
+      }
+      #TODO: Add outcome of the addition of the start data
+
+      # Select the releavant CONTRACT TYPE of the new AD user
+      if ($ContractType){
+        if ($ContractType -match "FullTime"){
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 0 } -Server $DC -Credential $AD_Credential -Verbose
+        } elseif ($ContractType -match "PartTime") {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 1 } -Server $DC -Credential $AD_Credential -Verbose
+        } elseif ($ContractType -match "Temp") {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 2 } -Server $DC -Credential $AD_Credential -Verbose          
+        } elseif ($ContractType -match "External") {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 3 } -Server $DC -Credential $AD_Credential -Verbose
+        } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Contract type incorrect on [$NewSAMAccountName]!" -ForegroundColor Red
+        }
+      } else {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Contract type undefined on [$NewSAMAccountName]!" -ForegroundColor Red
+      }
+      #TODO: Add outcome of the contract type setting
+
+      #FIXME: Add expiry / end date 
+
+      # Mirror ALL GROUP MEMBERSHIP of the template account to the new user
+      try {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -Verbose
+        $TemplateUser.Memberof | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential}
+      }
+      catch {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
+      }
+      #TODO: Add outcome of the group addition
+
+      # MOVE the new user account to the same OU as the template account
+      try {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -Verbose
+        Get-ADUser $NewSAMAccountName -Server $DC -Credential $AD_Credential | Move-ADObject -TargetPath $TemplateAccountOU -Server $DC -Credential $AD_Credential
+      }
+      catch {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to move [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -ForegroundColor Red
+      }
+      #TODO: Add outcome of the OU move
+
+      # Gather user report
+      $FreshAccount = Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential
+      Write-Host # separator line
+      If ($FreshAccount.extensionAttribute10 -eq 1) {$JBA = "YES"} elseif ($FreshAccount.extensionAttribute10 -eq 0) { $JBA = "NO"} else {$JBA = "N/A"}
+      If ($FreshAccount.extensionAttribute11 -eq 0) {$Contract = "Full Time"} elseif ($FreshAccount.extensionAttribute11 -eq 1) { $Contract = "Part Time"} elseif ($FreshAccount.extensionAttribute11 -eq 2) {$Contract = "Temp"} elseif ($FreshAccount.extensionAttribute11 -eq 3) {$Contract = "External"} else {$Contract = "N/A"}
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] (SUMMARY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
+      Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)"
+      Write-Host "UserPrincipalName   : $($FreshAccount.UserPrincipalName)"
+      Write-Host "First Name          : $($FreshAccount.GivenName)"
+      Write-Host "Last Name           : $($FreshAccount.SurName)"
+      Write-Host "Template used       : $($TemplateUser.DisplayName)"
+      Write-Host "EmployeeID          : $($FreshAccount.EmployeeID)"
+      Write-Host "Title               : $($FreshAccount.Title)"
+      Write-Host "Department          : $($FreshAccount.Department)"
+      Write-Host "Company             : $($FreshAccount.Company)"
+      Write-Host "Office              : $($FreshAccount.Office)"
+      Write-Host "Manager             : $($FreshAccount.Manager)"
+      Write-Host "Holiday entitlement : $($FreshAccount.extensionAttribute15)"
+      Write-Host "Start Date          : $($FreshAccount.extensionAttribute13)"
+      Write-Host "Contract type       : $Contract"
+      Write-Host "JBA Access          : $JBA"
+      Write-Host "User domain         : $UserDomain"
+
+      $FreshAccount = $null
+    #endregion
+
+  # EXCHANGE
+  #Process-StarterMailbox
 
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU6aLwUaa0FPrgJyu35EpR5B12
-# W3GgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU20YzkRDYUroUN7u9kcsR4Ro5
+# CVygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -135,11 +364,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDNlYBYrSMWcpFQhkqUkfB63E17cwDQYJKoZI
-# hvcNAQEBBQAEggEACMmfsG7GuOk5zZF+kBpxYU3HjQvKCWjIgdFbV4F4OGp1LcUz
-# cJPE5PIHYX0eCFpXuGPDgMvWUEyA+7DV7pnX5UHr0GaSwjzxbtjnI+QPweWsQHCT
-# xdV4QwtOpbZdgYglDTastdYEd7qOottDXi5aVlEPWUJUYeiF7mk4vc8FyxpdohOT
-# TuTABvb63yOKatXz5PqkjZSGQuiUQ8gdalDgWNd2JYYt/YPWSlxu8ZmvRzk7PVft
-# Xzkj+8ppnPm9kK7XOwEyi20P2xWv7xDyDdiX0OMr1hh/u4or0RIIRXgVmvgzwLIF
-# 7BmaRNvqnp7WWSUZjMOBsPlAwm2QQ2jX7CDA8w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU0xOdA5HH1/jDWPswDJ2Ebj6oEVEwDQYJKoZI
+# hvcNAQEBBQAEggEAunzjqVXrYsjJR4pdY1MEemMZyU47OBUQvQDNfWYRVCxATpNr
+# dgpJ5BzpgB/J9guZiF7fBz+cpMNHW5r3hcwe63R4djoNq02+b7J2ZuDlFPtmMZ3N
+# AJGbri1hq1PpwbsusWHmWfMVM7J78RR9kDVlnDmlo9vR22Pgi3iZF2jA+ejNmzxM
+# DluQDxi0IKZ57TIRSqiw0QCNoZdTp8e19L1RhN7yQW1P26QCg/Ie9KDNMB74kP03
+# G4dQN4wcu04DnSS881lg3hRzrVggFNGqowmTiz94mJghxBGqxntMNBHSaA6/yyO3
+# gDC9JRMy9ivpIA3XgpINybUCwjAvS/a+cgWG3w==
 # SIG # End signature block
