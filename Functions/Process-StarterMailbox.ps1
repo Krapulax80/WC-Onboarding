@@ -1,9 +1,11 @@
 function global:Process-StarterMailbox {
 
     # USER parameters
-    $secondarySMTP = "SMTP:" + $FirstName + $LastName.substring(0,1) + "@" + $global:UserDomain
+    $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0,1) + "@" + $global:UserDomain
     $NewSAMAccountName = $global:NewSAMAccountName
     $NewUserPrincipalName = $global:NewUserPrincipalName
+    $UserDomain = $global:UserDomain
+    $TemplateUser = $global:TemplateUser
 
     # Check if the secondary SMTP exists. If it does, create a unique one
     if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
@@ -19,19 +21,57 @@ function global:Process-StarterMailbox {
     $NewRemoteRoutingAddress = $FirstName + "." + $LastName + "@" + $EOTargetDomain
 
     # Set up the new user with the secondary SMTP
-    # try {
+     try {
       $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] " -Verbose
 	    Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP)} -Server $DC -Credential $AD_Credential # this is done in AD
-    # }
-    # catch {
-    #       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
-    # }
+     }
+     catch {
+           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);	Write-Host "[$timer] Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
+     }
+     #TODO: Report success / failure / error
+
+    # For non-UK users set the primary SMTP to their relevant country domain
+    	if ($UserDomain -ne $Systemdomain){
+		$timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Non-UK user detected. Modifying SMTP addresses." -Verbose
+				#Create old (wrong) SMTP and new (correct) SMTP
+		$NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
+		$OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
+		$NewSEcondarySMTP = $OldPrimarySMTP -replace "SMTP:","smtp:"
+
+		#Update primary SMTP if needed
+		#If ( (Get-ADUser $NewSAMAccountName  -Properties ProxyAddresses).ProxyAddresses -cmatch $OldPrimarySMTP){
+		Set-ADUser $NewSAMAccountName -remove @{ProxyAddresses=$OldPrimarySMTP} -Server $DC -Credential $AD_Credential
+		Set-ADUser $NewSAMAccountName -add @{ProxyAddresses=$NewPrimarySMTP} -Server $DC -Credential $AD_Credential
+		Set-ADUser $NewSAMAccountName -add @{ProxyAddresses=$NewSEcondarySMTP} -Server $DC -Credential $AD_Credential
+		#}
+		# Update mail address if needed
+		Set-ADUser -Identity $NewSAMAccountName -Replace @{mail=($NewSAMAccountName + "@" + $UserDomain)} -Server $DC -Credential $AD_Credential
+	}
+     #TODO: Report success / failure / error
+
+     # CREATE THE MAILBOX
+     # If the template user was Office365 user
+     if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match "onmicrosoft.com" ) {
+        Get-PSSession | Remove-PSSession
+        Connect-OnPremExchange
+        [void](Enable-RemoteMailbox -Identity $NewSAMAccountName -RemoteRoutingAddress $NewRemoteRoutingAddress)
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose"[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it." -Verbose
+     } else { 
+    # If the template was on-prem user
+        Get-PSSession | Remove-PSSession
+        Connect-OnPremExchange
+        [void](Enable-Mailbox -Identity $NewSAMAccountName ) # create the mailbox
+        [void](Enable-Mailbox -Identity $NewSAMAccountName -RemoteArchive -ArchiveDomain $EOTargetDomain) # places the archive in the cloud
+        #Feedback
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem mailbox created for [$NewUserPrincipalName]. Archive is in the cloud." -Verbose
+     }
+
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU123hpRhCHkmkmbEmc80vxaxQ
-# Z+WgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU5uT0QjOvs9gPGz54sZMJubVg
+# 4kCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -98,11 +138,11 @@ function global:Process-StarterMailbox {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1Lg2WYSBHBFsVPB1+jOHXyZy9ZQwDQYJKoZI
-# hvcNAQEBBQAEggEAHpoF1G0BMQapt3sqIhUs5hs3RNMkFz4za56z1dzSZubutt9G
-# lDqFaTgffQ52+lvNBmdwbMC7qqQGHW7JBzG3BXvFIX0iY6k/wxnhZENMJz8Dgd0m
-# AYNLjjRdx9d0RweLycqnDxSs0bzJ6Up3LeMKeUPNrf5py+cLrOy9iSUggrnZLuBa
-# 3txOBffitIyvEs+cEcDreuylmdXN2morVHRT1/sEJoeI288Y9sL5JL+r7rrL9NWS
-# eI7BxI5g5SaOIXUuusrZGFfK6U1OZHw7kFF4aG1NdvmBybPoUNMJe4mcwMlK0lQ7
-# DcW0BF5cDmQTFN3qhsU4V3AgD2T69v4nXhTpYg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUfFTejYvMtdM2ZByLhkAeKFr3Y+EwDQYJKoZI
+# hvcNAQEBBQAEggEAtHAe13NFAR+cPfS2dOl8oyAHG7WkZOha2cKqh6eiKByb+9TW
+# xocUdG/A3MKCyBkS0/3sHBvIamT7vFIlgPWWubH31Y0nZjIMm3VitKCBYH9lhG1D
+# hTETlua5HN0XTxOeUJcjs4h/dAPApwCW0+uhCYYn7L1MzLNBhDnIxshu1xM1H9Fm
+# Dw8S3/5arIGcJ3/Bsknm4d/xamvA8tfuTvLgEvsj0eve4uiD9IKwAl0/MsSbhLul
+# Y+unNmfbckAYZ68wvBOmhtk5kIgNWoh1fxQbHSPrae0MSHY6kZoeIIl997eNgenF
+# 0VuoAyBREhb3i9fmyjvCJ8lg+k8C7wsjxG5t2Q==
 # SIG # End signature block

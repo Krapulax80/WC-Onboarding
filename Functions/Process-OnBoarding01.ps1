@@ -14,6 +14,7 @@ function Process-OnBoarding01 {
     # Credentials for WC
     Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
     Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+    Create-Credential -WestCoast -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
     # Variables for WC
     $SystemDomain = "westcoast.co.uk"
     $DomainNetBIOS = "WESTCOASTLTD"
@@ -33,8 +34,9 @@ function Process-OnBoarding01 {
   # Pipe, if the workdomain is XMA
   elseif ($XMA.IsPresent){
     # Credentials for XMA
-    Create-Credential -XMA -AD
-    Create-Credential -XMA -AAD
+    Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+    Create-Credential -XMA -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+    Create-Credential -XMA -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
     # Variables for XMA
     $SystemDomain = "xma.co.uk"
     $DomainNetBIOS = "XMA"
@@ -65,8 +67,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlb18YwBGas9mfL5uiDE/Je6G
-# fRGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU6aLwUaa0FPrgJyu35EpR5B12
+# W3GgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -133,11 +135,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCrc3K+NG80adAF+sLkLX3HL7OvIwDQYJKoZI
-# hvcNAQEBBQAEggEAoTKV3FPGw4gJ7aFon3qTF21xc9Sg9XBAxAAwSL6tCchGVX3a
-# r3EUmiCpfYph9cJqiV01rEAhxyGM+YuXzeeQfJ/CrSViXNCMAxnxmVRN6THq6KZf
-# u78596NbnBmRholZRbGmcbMk2Dxx5EW6ZGMtlM50SnONqtJtbObnCLo4rSEbfNUA
-# IWUoju1HkpGnjEnNKpgnYKMvn9021CoMdVR2W5E14wjVOD3qSMQdMDQCqMtpnXTZ
-# 6RcRbZGv9QdxmAur0QrRV46h18EUW+QkypnUs868KFXd0zXoVxzU3r1MdkZ+7MuY
-# 29+G32HCW4OcthLu6W8Bum9rXupeLDwS3bJUZQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDNlYBYrSMWcpFQhkqUkfB63E17cwDQYJKoZI
+# hvcNAQEBBQAEggEACMmfsG7GuOk5zZF+kBpxYU3HjQvKCWjIgdFbV4F4OGp1LcUz
+# cJPE5PIHYX0eCFpXuGPDgMvWUEyA+7DV7pnX5UHr0GaSwjzxbtjnI+QPweWsQHCT
+# xdV4QwtOpbZdgYglDTastdYEd7qOottDXi5aVlEPWUJUYeiF7mk4vc8FyxpdohOT
+# TuTABvb63yOKatXz5PqkjZSGQuiUQ8gdalDgWNd2JYYt/YPWSlxu8ZmvRzk7PVft
+# Xzkj+8ppnPm9kK7XOwEyi20P2xWv7xDyDdiX0OMr1hh/u4or0RIIRXgVmvgzwLIF
+# 7BmaRNvqnp7WWSUZjMOBsPlAwm2QQ2jX7CDA8w==
 # SIG # End signature block

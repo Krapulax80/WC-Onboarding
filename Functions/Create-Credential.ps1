@@ -19,9 +19,11 @@
     [Switch]
     $PasswordUpdate, # if this switch is used, the function is in "Update" mode (this is to save / update passwords)
     [switch]
-    $AD,    # AD credentials
+    $AD,          # AD credentials
     [switch]
-    $AAD,  # O365 / AAD credentials
+    $AAD,         # O365 / AAD credentials
+    [switch]
+    $Exchange,    # Exchange credentials
     [string]
     $CredFolder = "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
   )
@@ -33,6 +35,8 @@
     $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
     $AAD_Admin = "svc.o365mgr@westcoastltd365.onmicrosoft.com"
     $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
+    $Exchange_Admin = "migration@westcoast.co.uk"
+    $Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
       if ($AD.IsPresent){
         # If specified, update AD password for Westcoast
           if($PasswordUpdate.IsPresent){
@@ -53,6 +57,16 @@
         # Create the AAD credential for Westcoast
         $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password 
       }
+      elseif ($Exchange.IsPresent) {
+        # If specified, update the AAD password for Westcoast
+          if($PasswordUpdate.IsPresent){
+          read-host "Please enter password for [$Exchange_Admin]" -assecurestring | convertfrom-securestring | out-file $Exchange_CredentialFile
+          }
+        # Use AAD password for Westcoast
+        $Exchange_Password = Get-Content $Exchange_CredentialFile| ConvertTo-SecureString 
+        # Create the AAD credential for Westcoast
+        $global:Exchange_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $Exchange_Admin, $Exchange_Password
+      }
     }
     # XMA
     elseif ($XMA.IsPresent) {
@@ -61,6 +75,8 @@
     $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
     $AAD_Admin = "svc.o365mgr@xmalimited.onmicrosoft.com"
     $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
+    $Exchange_Admin = "migration@xma.co.uk"
+    $Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
       if ($AD.IsPresent){
         # If specified, update AD password for XMA
           if($PasswordUpdate.IsPresent){
@@ -81,6 +97,16 @@
         # Create AAD credential for XMA
         $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password # this is the AAD credential
       }
+      elseif ($Exchange.IsPresent) {
+        # If specified, update the AAD password for Westcoast
+          if($PasswordUpdate.IsPresent){
+          read-host "Please enter password for [$Exchange_Admin]" -assecurestring | convertfrom-securestring | out-file $Exchange_CredentialFile
+          }
+        # Use AAD password for Westcoast
+        $Exchange_Password = Get-Content $Exchange_CredentialFile| ConvertTo-SecureString 
+        # Create the AAD credential for Westcoast
+        $global:Exchange_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $Exchange_Admin, $Exchange_Password
+      }      
     } 
     # Incorrect domain selection
     else {
@@ -92,8 +118,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUAEhdziQ+hHF+ZAgVtgW+BsHt
-# sMygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYB1QskuoQEG+XhdB2JQSuBiM
+# YHygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -160,11 +186,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUBmjRR1ssTslA/L8FdleFUaFMvLkwDQYJKoZI
-# hvcNAQEBBQAEggEA7/+zFg+kmTV0i8D8oTPs5fzVX33pXgZWPxCzZNKwEQMRtu7o
-# o2MsIELq1qXtL6xqAggxvdw/7MMBPU2P7lbC5YYtb6RtGxI5pDpsZO/m/pbjkNXE
-# dtMf7SW3tLVaLj1kBUqmtdAQZB7dXvxNXEtMpocUbrsDA91tVTwO3Ko1Qeww/zCa
-# 6MyaFhVwKZZ2dtqqEJ+rAQ0xVxBxwW0Zc7vRtSrl/JCw4+QXhlY4NnfOfqNg/eU1
-# 732epHvvJUIXOJpKIfCq7Y8tzCo/Nm+Rg+p+I4FzFd3rAod7+HdYo8lIP3rbRJ3g
-# R7wFAkgUrxCxaT+8N316t7xGc6KqyJ1f3D8Kyg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCDmq7vTbtpzEt3k8hKs8w9KptWIwDQYJKoZI
+# hvcNAQEBBQAEggEAGqXth/ra9RY0EMWBBGB4ROnuvzHVy6cGlOTOakx22VzsKrzb
+# IQ+iOGNGuImfjimvJz2WXcs+T/jmkOyv+KbUGceP9Jo2vzAG+a5f9YHqtXp31iCR
+# /OU9a/xS9hNIcpZM3H7moDHV9OWTjQ+2Q+pzZRLwuc5+Zl1PVd1GZhj0ohOTfTnv
+# yvC2sdsZym8YAGxPvbjd25b7Q9nXoAFsu1N9DsZCmM/aGnuUH53Vj3DVNNAcfelR
+# Pa+emOwz1lpZsRT1KRPkn7L1p9PQMY7bCVNOGWQylRjQwMUIo+eY+4hVJfEehfWp
+# W3rCUhMAvjgJZshLBKpTdemQC2/Gv5paOspy0w==
 # SIG # End signature block
