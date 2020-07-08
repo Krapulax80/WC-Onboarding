@@ -6,6 +6,7 @@ function global:Process-StarterMailbox {
     $NewUserPrincipalName = $global:NewUserPrincipalName
     $UserDomain = $global:UserDomain
     $TemplateUser = $global:TemplateUser
+    $NewRemoteRoutingAddress = $global:NewRemoteRoutingAddress
 
     # Check if the secondary SMTP exists. If it does, create a unique one
     if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
@@ -16,9 +17,6 @@ function global:Process-StarterMailbox {
       $secondarySMTP = $global:secondarySMTP
     }
       #TODO: Add reporting of success/failure/error    
-
-    # ...declare the connector address for o365 ...
-    $NewRemoteRoutingAddress = $FirstName + "." + $LastName + "@" + $EOTargetDomain
 
     # Set up the new user with the secondary SMTP
      try {
@@ -55,7 +53,7 @@ function global:Process-StarterMailbox {
         Get-PSSession | Remove-PSSession
         Connect-OnPremExchange
         [void](Enable-RemoteMailbox -Identity $NewSAMAccountName -RemoteRoutingAddress $NewRemoteRoutingAddress)
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose"[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it." -Verbose
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it." -Verbose
      } else { 
     # If the template was on-prem user
         Get-PSSession | Remove-PSSession
@@ -70,8 +68,8 @@ function global:Process-StarterMailbox {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU5uT0QjOvs9gPGz54sZMJubVg
-# 4kCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUhUnzUIU+P81eFK02v6a0pQzB
+# Ae+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -138,11 +136,11 @@ function global:Process-StarterMailbox {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUfFTejYvMtdM2ZByLhkAeKFr3Y+EwDQYJKoZI
-# hvcNAQEBBQAEggEAtHAe13NFAR+cPfS2dOl8oyAHG7WkZOha2cKqh6eiKByb+9TW
-# xocUdG/A3MKCyBkS0/3sHBvIamT7vFIlgPWWubH31Y0nZjIMm3VitKCBYH9lhG1D
-# hTETlua5HN0XTxOeUJcjs4h/dAPApwCW0+uhCYYn7L1MzLNBhDnIxshu1xM1H9Fm
-# Dw8S3/5arIGcJ3/Bsknm4d/xamvA8tfuTvLgEvsj0eve4uiD9IKwAl0/MsSbhLul
-# Y+unNmfbckAYZ68wvBOmhtk5kIgNWoh1fxQbHSPrae0MSHY6kZoeIIl997eNgenF
-# 0VuoAyBREhb3i9fmyjvCJ8lg+k8C7wsjxG5t2Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUx+aiID7T1Llnm3/Uee1KDNFpa5MwDQYJKoZI
+# hvcNAQEBBQAEggEAwE3PRdh5aFPnfUoKbkSOJfRIuZG90hiJ0DHI/cFvmooOSNMS
+# McvksvjHF+H8hIfqaFh5cCWe7GDddICKq+f2IPaaKS+o4Q97itvuM3iv8ZrlcEyR
+# vlcbRgEN9DjCmagBMbDAuWxS+AQ9MqDgbYt2KG9V79DI4143AHSD/R3+ZuDuKaIM
+# 8B8z4bodC2nrzHYb10qmxygYW50TKFJS+OI97Jix1crL1b3ayTg7Y5mjhMrbXZQW
+# TI6qJJeq5vJFSxwFmqb0v62i3A0qj8gsfhEsAAbiDs8SUZ4uYS4FFmceAGWiC/NA
+# pukXCHXTEgS15+CRLSWhkI1BTZfzsO/H83obSQ==
 # SIG # End signature block

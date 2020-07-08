@@ -46,6 +46,9 @@
     }
     # TODO: Report the SAM Name
 
+    #Derivatives
+    $NewUserPrincipalName = $NewSAMAccountName + "@" + $global:UserDomain
+    $NewRemoteRoutingAddress = $NewSAMAccountName  + "@" + $EOTargetDomain
     $NewDisplayName = $NewSAMAccountName -replace "\."," "
 
   # Check if the UPN already exists. If it does, create a unique one
@@ -199,12 +202,13 @@
       $global:NewUserPrincipalName = $NewUserPrincipalName
       $global:NewSAMAccountName = $NewSAMAccountName
       $global:TemplateUser = $TemplateUser
+      $global:NewRemoteRoutingAddress = $NewRemoteRoutingAddress
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUNygalcm2J3eBr/1IDQQzsopm
-# Sj+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEHjXe2JuLov1elwV+RY9T+Xi
+# CmegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -271,11 +275,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUkKHw12e5DBOnU9Ns2UXhXz6NlZIwDQYJKoZI
-# hvcNAQEBBQAEggEARaRNy6d6oaRW6pTUYbpx6MyavqpTTxGOiVjeskyFRZFECJbE
-# 0MSqf/bwYRqBlq4iDhNhzz8B6OWXT6xRgxhKU0uLXMlbvkNuQrhQ8gyD7ld5HRmx
-# auE+Q7gVa9sSQY32h0NhEBtq/71PE59S5MScSn4aOEZDa4eXqV/WV2CLLsRnFcfr
-# wYU4vpIMKMnZc7EJUYvX+ogZL5/TPK5u0Rvcr+7oXma7PYAWH4pgkLvUfOvcWeA0
-# /TcGQb5rjRtkWymWrZf4g9WJlzFC2wLa7SM3TyElPDoeJgSC0omuBcBY6zw4KEe2
-# gabLQoaxyFipNALMufMLOzdYfzOdULjvfxOmkQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQyX3rUQvZlatAqqNfj2Qz7bmgawwDQYJKoZI
+# hvcNAQEBBQAEggEAWWm+yGYHnZSnIimI0ViGgAaDUq8rZ0qm7n0hbsoQPhi06YD9
+# xyNZXhHYH4edPXiGxmyU2YMHW40M2RpwuxzRlnmp4ez2375fnNWetKdBY7xHopeY
+# 0qEB/ZIi4JeBp+RS2WnwOLj5ATi3ebV+DpHxYc2mTS7lYjIjGQC7wydQ6ErqRuMO
+# rpMAnGF/DBUe6VED/QBWKqROFFE4GEfSFpV3e5ePskK3nmVKC+cLfIQuytjbQzjq
+# TUtBSSMhsjfEprOPCJxwWjft63R6OIKBlirk9g5Yj5BEToHLQuJQr1FdGpq5GmQb
+# xCTVVdRzscPVEcJywhVJCJlvPKW7GnPuYk/PQg==
 # SIG # End signature block
