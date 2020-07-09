@@ -1,6 +1,6 @@
 ﻿  <#
   Usage examples:
-  
+
   #Update Westcoat Active directory password:
   Create-Credential -WestCoast -AD -PasswordUpdate
 
@@ -32,38 +32,38 @@
     if ($WestCoast.IsPresent){
     $domain = "WC"
     $AD_Admin = "svc.adchanges@westcoast.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
+    $global:AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
     $AAD_Admin = "svc.o365mgr@westcoastltd365.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
+    $global:AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
     $Exchange_Admin = "migration@westcoast.co.uk"
-    $Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
+    $global:Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
       if ($AD.IsPresent){
         # If specified, update AD password for Westcoast
           if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
+          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $global:AD_CredentialFile
           }
         # Use AD password for Westcoast
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
+        $AD_Password = Get-Content $global:AD_CredentialFile | ConvertTo-SecureString
         # Create the AD credential for Westcoast
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
+        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password
       }
       elseif ($AAD.IsPresent) {
         # If specified, update the AAD password for Westcoast
           if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
+          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $global:AAD_CredentialFile
           }
         # Use AAD password for Westcoast
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
+        $AAD_Password = Get-Content $global:AAD_CredentialFile | ConvertTo-SecureString
         # Create the AAD credential for Westcoast
-        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password 
+        $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password
       }
       elseif ($Exchange.IsPresent) {
         # If specified, update the AAD password for Westcoast
           if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$Exchange_Admin]" -assecurestring | convertfrom-securestring | out-file $Exchange_CredentialFile
+          read-host "Please enter password for [$Exchange_Admin]" -assecurestring | convertfrom-securestring | out-file $global:Exchange_CredentialFile
           }
         # Use AAD password for Westcoast
-        $Exchange_Password = Get-Content $Exchange_CredentialFile| ConvertTo-SecureString 
+        $Exchange_Password = Get-Content $global:Exchange_CredentialFile| ConvertTo-SecureString
         # Create the AAD credential for Westcoast
         $global:Exchange_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $Exchange_Admin, $Exchange_Password
       }
@@ -72,42 +72,42 @@
     elseif ($XMA.IsPresent) {
     $domain = "XMA"
     $AD_Admin = "svc.adchanges@xma.co.uk"
-    $AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
+    $global:AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
     $AAD_Admin = "svc.o365mgr@xmalimited.onmicrosoft.com"
-    $AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
+    $global:AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
     $Exchange_Admin = "migration@xma.co.uk"
-    $Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
+    $global:Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
       if ($AD.IsPresent){
         # If specified, update AD password for XMA
           if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $AD_CredentialFile
+          read-host "Please enter password for [$AD_Admin]" -assecurestring | convertfrom-securestring | out-file $global:AD_CredentialFile
           }
         # Use AD password for XMA
-        $AD_Password = Get-Content $AD_CredentialFile | ConvertTo-SecureString
+        $AD_Password = Get-Content $global:AD_CredentialFile | ConvertTo-SecureString
         # Create AD credential for XMA
-        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password 
+        $global:AD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AD_Admin, $AD_Password
       }
       elseif ($AAD.IsPresent) {
         # If specified, update AAD password for XMA
           if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $AAD_CredentialFile
+          read-host "Please enter password for [$AAD_Admin]" -assecurestring | convertfrom-securestring | out-file $global:AAD_CredentialFile
           }
         # Use AAD password for XMA
-        $AAD_Password = Get-Content $AAD_CredentialFile | ConvertTo-SecureString 
+        $AAD_Password = Get-Content $global:AAD_CredentialFile | ConvertTo-SecureString
         # Create AAD credential for XMA
         $global:AAD_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $AAD_Admin, $AAD_Password # this is the AAD credential
       }
       elseif ($Exchange.IsPresent) {
         # If specified, update the AAD password for Westcoast
           if($PasswordUpdate.IsPresent){
-          read-host "Please enter password for [$Exchange_Admin]" -assecurestring | convertfrom-securestring | out-file $Exchange_CredentialFile
+          read-host "Please enter password for [$Exchange_Admin]" -assecurestring | convertfrom-securestring | out-file $global:Exchange_CredentialFile
           }
         # Use AAD password for Westcoast
-        $Exchange_Password = Get-Content $Exchange_CredentialFile| ConvertTo-SecureString 
+        $Exchange_Password = Get-Content $global:Exchange_CredentialFile| ConvertTo-SecureString
         # Create the AAD credential for Westcoast
         $global:Exchange_Credential =  new-object -typename System.Management.Automation.PSCredential -argumentlist $Exchange_Admin, $Exchange_Password
-      }      
-    } 
+      }
+    }
     # Incorrect domain selection
     else {
       Write-Host "Correct domain was not selected, exiting";
@@ -118,8 +118,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYB1QskuoQEG+XhdB2JQSuBiM
-# YHygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtzVUWQJTE7tExNEPsG8ZjlfH
+# 5BmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -186,11 +186,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCDmq7vTbtpzEt3k8hKs8w9KptWIwDQYJKoZI
-# hvcNAQEBBQAEggEAGqXth/ra9RY0EMWBBGB4ROnuvzHVy6cGlOTOakx22VzsKrzb
-# IQ+iOGNGuImfjimvJz2WXcs+T/jmkOyv+KbUGceP9Jo2vzAG+a5f9YHqtXp31iCR
-# /OU9a/xS9hNIcpZM3H7moDHV9OWTjQ+2Q+pzZRLwuc5+Zl1PVd1GZhj0ohOTfTnv
-# yvC2sdsZym8YAGxPvbjd25b7Q9nXoAFsu1N9DsZCmM/aGnuUH53Vj3DVNNAcfelR
-# Pa+emOwz1lpZsRT1KRPkn7L1p9PQMY7bCVNOGWQylRjQwMUIo+eY+4hVJfEehfWp
-# W3rCUhMAvjgJZshLBKpTdemQC2/Gv5paOspy0w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDa1Tnjxqkggk6YrA8RH1vm97PogwDQYJKoZI
+# hvcNAQEBBQAEggEALgLDBovNoaTscZ0sdPVPc+5Ag2k3qOtMTO6vJLy1JtbjDXGA
+# Nkp8gMeZO45mg5uhrd8xG2KYbPDsnQh3r7LO3iqt2xxxqpKy1JHRVipzDY3U3aH7
+# GMWPpzu9fz2EnhCUMhnFnaLmdXbosGHvy109DBND0PaK4X/cI8H6Bu6WtIdOs4LW
+# hBDLJLXcfrzPYRzB1qrei9pJC9zxht7o1W7ow9fgPFh6XXJsqgFRgfJLoYCEzK7x
+# bfNtB8uP782XAipqXhJjX2O54IQ7U3jUtHttxKS5JBRGDF3F2UkwAaNppS0W7hKk
+# Y/LNXduqDYAfBSAuYexE6TQS9rrIka7ihrU+Rg==
 # SIG # End signature block

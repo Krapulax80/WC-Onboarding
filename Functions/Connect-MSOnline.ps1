@@ -1,34 +1,24 @@
-function Connect-OnlineExchange {
+function Connect-MSOnline {
   [CmdletBinding()]
   param (
       [Parameter()]
       [PSCredential]
       $AAD_Credential
   )
-  
-  $OpenPSSessions = Get-PSSession
-  # If there is an open session to Office 365, we do not re-connect.
-	if ($OpenPSSessions.ComputerName -contains 'outlook.office365.com' -and $OpenPSSessions.Availability -eq 'Available') {
-
-$timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange Online already available." -Verbose
-
-  }
-  # If there is no open session, then we do connect
-	else {
-    #If the module is not imported, import it
-    If (!(Get-Module -Name ExchangeOnlineManagement)){
-    Import-Module ExchangeOnlineManagement}
-    #Then connect
-    [void] (Connect-ExchangeOnline -Credential $AAD_Credential -ShowProgress $false -ShowBanner:$false)
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Connecting to Exchange Online." -Verbose
-	}
-}
+	    if (!((Get-MsolDomain -ErrorAction SilentlyContinue).count -le 0)) {
+            $timer = (Get-Date -Format yyy-MM-dd-HH:mm);  Write-Host "[$timer] - MS Online already connected" -ForegroundColor Yellow
+	    }
+	    else {
+          Connect-MsolService -Credential $AAD_Credential>> $null
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - MS Online not available. Initiating connection" -ForegroundColor Yellow
+	    }
+    }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk5ksfi5Pe6Tmjh6xtGnrqzFv
-# /OCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUAPfe/2+i0gEYOhv5t2o/QMvr
+# 7DWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -95,11 +85,11 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUv9l+SDaTdyZHpyPo4l6iMvs2DggwDQYJKoZI
-# hvcNAQEBBQAEggEAsRU6idKTKKnK1fJqZfg/y/8NNDnH7v9n2fHduISKz5E+eFdq
-# urgzW/GAY4VL5nxboynOyxM/uNdTUjC5PlX7rg1W3dQs62Ji9rIM4SNN7B632LhQ
-# pXtql2IPEA41bLx/i6hxG+xzb9V6xRjpK2yorZJL+9xq30VZvHuUmN9yjAzSEJZJ
-# Ao3hNRjZ0m5ExUpEqmKg2IG8UK/vAQmrxZy6KIO7779DCHtu/naH5hDIs6ncOiHq
-# 4I+U+lriRoC6PdRa6Kx8rE57u3eJ2w1L7nMqusu/OKzOuAWXk2dj/dwM70lt7lbS
-# I9JRacg5Dw+sz1IFF7WTH0ZHkRRolzcFGN6a5A==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU+sEKQW83RULGVleDZnUicz8yf6AwDQYJKoZI
+# hvcNAQEBBQAEggEAsvAXKX/ZdMzK+GI8qB5lYTK6lZJSdw0d2Mgu3Xm7Wt8z6Lz6
+# mOgG2TQ6+iiyz0pkCcq+l09plDnpG4sxZqOoAAWbz5OyXzvIzistOFBWm8y4gSqd
+# wxBlMbAktiuT5/Dp5pn6vv4rq5KBOadGkYOl5QRSPwJLsZUV+LJRjnKnTnsyQm83
+# 9N5DB0mbKSh9NY+c8JvGngH/eUUFlObMXpdW6kj9fAx96fo0IDt2BbedBl2cwKl3
+# n0Y3pNdMgj3zxTszh0iFVMJNDE8s7U7REH2+qdzvo8TK/ZUyXSalm6f7oNVFKtno
+# gWgeOqICOb22/+6y5HSMRVu+SsIDUr36W+Ok5g==
 # SIG # End signature block

@@ -1,4 +1,10 @@
  function Connect-OnPremExchange {
+  [CmdletBinding()]
+  param (
+      [Parameter()]
+      [PSCredential]
+      $Exchange_Credential
+  )
 	$OpenPSSessions = Get-PSSession
   # If there is an open session to the on-prem exchange, we do not re-connect.
 	    if ($OpenPSSessions.ComputerName -eq $ExchangeServer -and $OpenPSSessions.Availability -eq 'Available') {
@@ -6,15 +12,15 @@
 	    }
 	    else {
 				$timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - On-prem Exchange not available. Initiating connection" -ForegroundColor Yellow
-		    $pso = New-PSSessionOption -ProxyAccessType NoProxyServer 
-		    [void] (Import-PSSession (New-PSSession -SessionOption $pso -ConfigurationName Microsoft.Exchange -ConnectionUri http://$ExchangeServer/PowerShell/ -Authentication Kerberos -Credential $global:Exchange_Credential) -DisableNameChecking -AllowClobber)
+		    $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
+		    [void] (Import-PSSession (New-PSSession -SessionOption $pso -ConfigurationName Microsoft.Exchange -ConnectionUri http://$ExchangeServer/PowerShell/ -Authentication Kerberos -Credential $Exchange_Credential) -DisableNameChecking -AllowClobber)
 	    }
     }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsTog32nMwUF/iFnagF/0Rwbh
-# E0mgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzze6uzLSdUjY1SMr6iMaacAS
+# VeKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -81,11 +87,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU28cXXu837qzYofgsWqgILUbi0PIwDQYJKoZI
-# hvcNAQEBBQAEggEAy7smbn+gv7G2pTiuYrmLvAt5/RpP6syIKp+m9cy68MsRzdkc
-# kB6snda3A7SRwEUo4LWC261L0sGKJVOPtcxv2hPacV5gX5OJENJQZSZHnVSM+KTL
-# 4150yXeQ8eZ1zwag0lkcCiENV+/tMHb9LulPkzhR4qsPThnTsX1cEwpxcFLYBQCV
-# nGJw+eeMC1ZI01K5AvLhHehcf+RG5RknPDeakoAd0Xw3mB+Lrwqr2dYNh/mo7N+3
-# jpUhmMTSxiHvO1FekSLEq+6gSd7YJqYRc0tA7Ge6gKAyYTnk4rJi4lEnxWrqTJRt
-# q+DfF7AFNDshANoAic2NWBkhZ2NcAV6FTdp08g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1qy1nCRLX6SCMm9KupR/40VTg1AwDQYJKoZI
+# hvcNAQEBBQAEggEAru7xd/sx0lo4luUaQVQ+BVE7R3Oj0hmmxWdujB7b+8kT2udS
+# BsR/i8t0Ji+6RIaTfq5PtuHSAvFUkeFadYAvOj421or1oqdbTxj0rpvsTyUwA3IM
+# wFPwSdBtOGUYIw2A0Gx3p2eIsXF4NPRoKj9QZqHgIjYiWNDL2rioJQI+aqE4w9ov
+# YXoDtOhgMRQDzWzYMz440HSids3PUVbil1/aarGmQv95M+eKn0+nHwamCehJIIji
+# O74WIHRxLQLeI6GFklQo0v5AbDhD/RecPf0YOPOlI3KrdGyE6og1FSJSNauPkI6F
+# xnooZSf7zoXcrmZ0oxuZBiCdqKtb9cswTOZa/w==
 # SIG # End signature block

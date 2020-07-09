@@ -1,4 +1,10 @@
     function Get-AADSync {
+  param (
+      [Parameter()]
+      [PSCredential]
+      $AD_Credential
+  )
+
         # START
         $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Starting AAD syncronisation."
         $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
@@ -7,7 +13,7 @@
         #Reusable sync function
         # (only changes)
         function DeltaSync {
-                [void](Invoke-Command -ComputerName $AADSyncServer  -SessionOption $pso -ScriptBlock {
+                [void](Invoke-Command -ComputerName $AADSyncServer -Credential $AD_Credential  -SessionOption $pso -ScriptBlock {
                 Import-Module "C:\Program Files\Microsoft Azure AD Sync\Bin\ADSync\ADSync.psd1" #Import the AAD Sync module
                 Start-ADSyncSyncCycle -PolicyType Delta #Start Delta - chagnes only - sync
                 } -ErrorAction Stop)
@@ -42,8 +48,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzqArcIDxPWYtA37X9/5qxdbM
-# ji6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUGcVhpCJaVDFRdSBpc706b6b9
+# zX+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -110,11 +116,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUKeUaeA0gNbP+sLwQzIWG+OSg3EwwDQYJKoZI
-# hvcNAQEBBQAEggEAePR7PCUzm/v5JsHwxpTgjnoNKP/yYZa/aQ9Kwkpzx0EoqQAY
-# rQqn6fmmUmGWPvPVE04huYXw/GnlDIfVKxh5Heh3PmeuCLIYGPypyv0PaL9j2ehn
-# dvnOtQ6DECpG441d9pRUcnOi0N8pDxUbPPkaSOOkb2swD03x1puoKsJAknOygV7j
-# cQXCzJxVyF8bXZEqUHk4k5HY18cKDtAiimiS8jQzD/3IhjbuCNexWOD6HBdtPQEU
-# vZe1ZrjIRQMdkQdHh2zYzZtMbYf+yGzBpLY7zeyPVvidLLhPmDllwEFkOJT7xTwr
-# V18Xai06gE9m4GXAHUkLgCmzsEXtaPFXDZzPPA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUPmY4rqHy88AcayGGaHUo0HBI4E8wDQYJKoZI
+# hvcNAQEBBQAEggEAX4yH0LUw5jdMkkZGF1eH7AX77ESlPGZms4/MC0Pxvgv1m2Q9
+# 5hM3ty5/j/dbpeHDgC/ZQBh/EyiLntPEY3sETIdG502vJC1YyGA9+euCjLSWu73S
+# NHj6z3KgBl4MBYUaX6ZLjLdq5TN2yeYL0gBrY39/Lo/1PVTua62aQyPl+/bLCLu/
+# gBCstvGumncPoXSPArN2ReGPv5CofzLvGsnw2vB/NT+kRLR10tig7DjZ2Ts0sW+X
+# NFNajA7eH2pcoddeNqNJNjJCMy59FPS5v+YDPCMyAJYGrkfyvL3M7+zZ0jLVc8sC
+# ny5QmdXhFQZW1ILLlUEnJ+u+tmLbJsmmO/ziYw==
 # SIG # End signature block

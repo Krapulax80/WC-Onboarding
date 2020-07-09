@@ -1,34 +1,69 @@
-function Connect-OnlineExchange {
-  [CmdletBinding()]
-  param (
-      [Parameter()]
-      [PSCredential]
-      $AAD_Credential
-  )
-  
-  $OpenPSSessions = Get-PSSession
-  # If there is an open session to Office 365, we do not re-connect.
-	if ($OpenPSSessions.ComputerName -contains 'outlook.office365.com' -and $OpenPSSessions.Availability -eq 'Available') {
+ function Generate-UserReport {
+     [CmdletBinding()]
+     param (
+         [Parameter(Mandatory=$true)] [string]
+         $NewSAMAccountName,
+         [Parameter(Mandatory=$true)] [string]
+         $Flag,
+         [Parameter(Mandatory=$true)] [string]
+         $DC,
+         [Parameter(Mandatory=$true)] [pscredential]
+         $AD_Credential,
+          [Parameter(Mandatory=$true)] [pscredential]
+         $AAD_Credential
+     )
 
-$timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange Online already available." -Verbose
+    #region USER REPORT
+      # Gather user report
+        $FreshAccount = Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential
+        Write-Host # separator line
+        If ($FreshAccount.extensionAttribute10 -eq 1) {$JBA = "YES"} elseif ($FreshAccount.extensionAttribute10 -eq 0) { $JBA = "NO"} else {$JBA = "N/A"}
+        If ($FreshAccount.extensionAttribute11 -eq 0) {$Contract = "Full Time"} elseif ($FreshAccount.extensionAttribute11 -eq 1) { $Contract = "Part Time"} elseif ($FreshAccount.extensionAttribute11 -eq 2) {$Contract = "Temp"} elseif ($FreshAccount.extensionAttribute11 -eq 3) {$Contract = "External"} else {$Contract = "N/A"}
+      # Gather mailbox report
+        if ($Flag -match "online") {
+          Get-PSSession | Remove-PSSession
+          Connect-OnlineExchange -AAD_Credential $AAD_Credential
+        } elseif ($Flag -match "onprem") {
+          Get-PSSession | Remove-PSSession
+          Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
+        }
+        # do {
+            $FreshMailbox = Get-mailbox $NewSAMAccountName | select *
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Waiting for the mailbox to be available. Retry in 30 second!" -Verbose
+            Start-Sleep 30
+        # }
+        # until ($FreshMailbox)
+      # Display report
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] (SUMMARY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
+        Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)"
+        Write-Host "UserPrincipalName   : $($FreshAccount.UserPrincipalName)"
+        Write-Host "First Name          : $($FreshAccount.GivenName)"
+        Write-Host "Last Name           : $($FreshAccount.SurName)"
+        Write-Host "Template used       : $($TemplateUser.DisplayName)"
+        Write-Host "EmployeeID          : $($FreshAccount.EmployeeID)"
+        Write-Host "Title               : $($FreshAccount.Title)"
+        Write-Host "Department          : $($FreshAccount.Department)"
+        Write-Host "Company             : $($FreshAccount.Company)"
+        Write-Host "Office              : $($FreshAccount.Office)"
+        Write-Host "Manager             : $($FreshAccount.Manager)"
+        Write-Host "Holiday entitlement : $($FreshAccount.extensionAttribute15)"
+        Write-Host "Start Date          : $($FreshAccount.extensionAttribute13)"
+        Write-Host "Contract type       : $Contract"
+        Write-Host "JBA Access          : $JBA"
+        Write-Host "User domain         : $UserDomain"
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
+        Write-Host "Name                : $($FreshMailbox.Name)"
+        Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)"
+        Write-Host "EmailAddresses     : $($FreshMailbox.EmailAddresses)"
+        $FreshAccount = $FreshMailbox = $null
 
-  }
-  # If there is no open session, then we do connect
-	else {
-    #If the module is not imported, import it
-    If (!(Get-Module -Name ExchangeOnlineManagement)){
-    Import-Module ExchangeOnlineManagement}
-    #Then connect
-    [void] (Connect-ExchangeOnline -Credential $AAD_Credential -ShowProgress $false -ShowBanner:$false)
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Connecting to Exchange Online." -Verbose
-	}
-}
+            }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk5ksfi5Pe6Tmjh6xtGnrqzFv
-# /OCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWKanRzPw4V5Zv3ZEVs+Cr3P7
+# +uqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -95,11 +130,11 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUv9l+SDaTdyZHpyPo4l6iMvs2DggwDQYJKoZI
-# hvcNAQEBBQAEggEAsRU6idKTKKnK1fJqZfg/y/8NNDnH7v9n2fHduISKz5E+eFdq
-# urgzW/GAY4VL5nxboynOyxM/uNdTUjC5PlX7rg1W3dQs62Ji9rIM4SNN7B632LhQ
-# pXtql2IPEA41bLx/i6hxG+xzb9V6xRjpK2yorZJL+9xq30VZvHuUmN9yjAzSEJZJ
-# Ao3hNRjZ0m5ExUpEqmKg2IG8UK/vAQmrxZy6KIO7779DCHtu/naH5hDIs6ncOiHq
-# 4I+U+lriRoC6PdRa6Kx8rE57u3eJ2w1L7nMqusu/OKzOuAWXk2dj/dwM70lt7lbS
-# I9JRacg5Dw+sz1IFF7WTH0ZHkRRolzcFGN6a5A==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQr9BhT4khqaEbRDk4S6Z4p1PVSMwDQYJKoZI
+# hvcNAQEBBQAEggEA2O3xOBFEIgbjN98FhVwJZn6/KqE/tH3CsyrWcCTgFZKUsaQB
+# Zwyg0gjOi3zlkGd/6v3RnVarI6eJsRQZZbyZ3PtiAK0Fqzkl5E+uixFysuTrPhYs
+# zciM3CccV/wolcZWb7H/Ym0TwsnD2sCHVzIsRP6fYIMIxrjwupsDEdj174cpbbg4
+# pUfYep8tQ/IcoL4sdSDKck/dA3dmVKsQ5Pa2mvGc0dE0/pGdvEU9oO7mn2c4uFDW
+# JJPzbWg3STPugpS3vSbfAzNDO1FXqx7aCOnwqCC9Fz5ZG9JId9Cn4ta12+FSwvVd
+# JHEb9rv4upfi+mueWndgm4H6aNXMYCmieguAew==
 # SIG # End signature block

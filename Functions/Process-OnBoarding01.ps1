@@ -32,7 +32,6 @@ function Process-OnBoarding01 {
     #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
     $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
   }
-
   # WORK IN XMA DOMAIN
   elseif ($XMA.IsPresent){
     # Credentials for XMA
@@ -53,7 +52,6 @@ function Process-OnBoarding01 {
     # Domain Controller for XMA
     $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
   }
-
   # (INVALID WORK DOMAIN DEFINED)
   else {
     Write-Host -ForeGroundColor Red "Bad domain."; Break
@@ -127,7 +125,7 @@ function Process-OnBoarding01 {
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Red
       Create-UniqueEmployeeID -EmployeeID $EmployeeID
-      $EmployeeID = $global:EmployeeID
+      $EmployeeID = $EmployeeID
     }
     #TODO: Report the EmployeeID
 
@@ -313,14 +311,14 @@ function Process-OnBoarding01 {
     # If the template user was Office365 user
       if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match "onmicrosoft.com" ) {
         Get-PSSession | Remove-PSSession
-        Connect-OnPremExchange
+        Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
         [void](Enable-RemoteMailbox -Identity $NewSAMAccountName -RemoteRoutingAddress $NewRemoteRoutingAddress)
         $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it." -Verbose
         $Flag = "online"
       } else {
     # If the template was on-prem user
         Get-PSSession | Remove-PSSession
-        Connect-OnPremExchange
+        Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
         [void](Enable-Mailbox -Identity $NewSAMAccountName ) # create the mailbox
         [void](Enable-Mailbox -Identity $NewSAMAccountName -RemoteArchive -ArchiveDomain $EOTargetDomain) # places the archive in the cloud
         #Feedback
@@ -330,53 +328,74 @@ function Process-OnBoarding01 {
      #TODO: Report outcome of the mailbox creation / failure / error
     #endregion
 
-    #region USER REPORT
-      # Gather user report
-        $FreshAccount = Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential
-        Write-Host # separator line
-        If ($FreshAccount.extensionAttribute10 -eq 1) {$JBA = "YES"} elseif ($FreshAccount.extensionAttribute10 -eq 0) { $JBA = "NO"} else {$JBA = "N/A"}
-        If ($FreshAccount.extensionAttribute11 -eq 0) {$Contract = "Full Time"} elseif ($FreshAccount.extensionAttribute11 -eq 1) { $Contract = "Part Time"} elseif ($FreshAccount.extensionAttribute11 -eq 2) {$Contract = "Temp"} elseif ($FreshAccount.extensionAttribute11 -eq 3) {$Contract = "External"} else {$Contract = "N/A"}
-      # Gather mailbox report
-        if ($Flag -match "online") {
-          Get-PSSession | Remove-PSSession
-          Connect-OnlineExchange
-        } elseif ($Flag -match "onprem") {
-          Get-PSSession | Remove-PSSession
-          Connect-OnPremExchange
+    Get-AADSync -AD_Credential $AD_Credential
+
+  # MICROSOFT ONLINE SERVICES
+
+      #region CONNECT to MSOnline
+      Connect-MSOnline -AAD_Credential $AAD_Credential
+      #endregion
+
+      #region Gather LICENSE LIST from the template user
+      $licenseassigned = $null = $licenseunasigned
+        #Only do this, if the template has license
+        if (Get-MsolUser -UserPrincipalName $TemplateUser.UserPrincipalName -ErrorAction SilentlyContinue){
+          #Get licenses of the Template account (some are excluded, as they are assigned from AD groups)
+          $LicenseSKUs = ((Get-MsolUser -UserPrincipalName $TemplateUser.UserPrincipalName -ErrorAction SilentlyContinue).Licenses).AccountSkuid #| Where-Object { ($_ -notlike "*ENTERPRISEPACK") -and ($_ -notlike "*ATP_ENTERPRISE") }
         }
-        $FreshMailbox = Get-mailbox $NewSAMAccountName | select *
-      # Display report
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] (SUMMARY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
-        Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)"
-        Write-Host "UserPrincipalName   : $($FreshAccount.UserPrincipalName)"
-        Write-Host "First Name          : $($FreshAccount.GivenName)"
-        Write-Host "Last Name           : $($FreshAccount.SurName)"
-        Write-Host "Template used       : $($TemplateUser.DisplayName)"
-        Write-Host "EmployeeID          : $($FreshAccount.EmployeeID)"
-        Write-Host "Title               : $($FreshAccount.Title)"
-        Write-Host "Department          : $($FreshAccount.Department)"
-        Write-Host "Company             : $($FreshAccount.Company)"
-        Write-Host "Office              : $($FreshAccount.Office)"
-        Write-Host "Manager             : $($FreshAccount.Manager)"
-        Write-Host "Holiday entitlement : $($FreshAccount.extensionAttribute15)"
-        Write-Host "Start Date          : $($FreshAccount.extensionAttribute13)"
-        Write-Host "Contract type       : $Contract"
-        Write-Host "JBA Access          : $JBA"
-        Write-Host "User domain         : $UserDomain"
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
-        Write-Host "Name                : $($FreshMailbox.Name)"
-        Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)"
-        Write-Host "EmailAddresses     : $($FreshMailbox.EmailAddresses)"
-        $FreshAccount = $FreshMailbox = $null
-    #endregion
+      #endregion
+
+      #region Wait for the new account to APPEAR IN MSONLINE (AAD)
+          do {
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Waiting for MS online user account. (next check is in 30 seconds)"
+          Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 30
+          }
+          until(Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue)
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - OK - o365 account present"
+      #endregion
+
+      #region LICENSING the new user
+       # When the user account is present, assign licensed to it to match the template (minus the licenses that come from groups)
+       # Location is always GB
+        Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation
+        # Assign each licenses of the template account to the new user
+        if ($LicenseSKUs){
+         foreach ($LicenseSKU in $LicenseSKUs)
+         #Match the licenses to the licensing groups
+          {
+            try {
+              # First attempt using a group for licensing
+                if ($LicenseSKU -match "ENTERPRISEPACK"){
+                  Add-ADGroupMember "LICENSE-Office_365_E3" -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential -Verbose
+                } elseif ($LicenseSKU -match "DESKLESSPACK"){
+                  Add-ADGroupMember "LICENSE-Office_365_F1" -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential -Verbose
+                } else {
+              # If the license has no group, add it directly
+                  Set-MsolUserLicense -UserPrincipalName $NewUserPrincipalName -AddLicenses $LicenseSKU #-ErrorAction Stop
+                }
+              $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Green "[$timer] - Adding [$LicenseSKU] to[$NewUserPrincipalName] account succeeded"
+              $licenseassigned += " [" +  $LicenseSKU + "] "
+            }
+            catch {
+              $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Red "[$timer] - Adding [$LicenseSKU] to[$NewUserPrincipalName] account failed";
+              $licenseunasigned += " [" +  $LicenseSKU + "] "
+              Continue
+            }
+          }
+        }
+      #endregion
+
+      #region USER REPORT
+      Generate-UserReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential
+      #endregion
 
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9kfRLDgWiGvopbgM7J4hI7JT
-# h+CgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUKDQTdvcmaqDDsCU+enBCq9Uo
+# zNSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -443,11 +462,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5ygre5ePK9ijfD0d68SFW37Y0mkwDQYJKoZI
-# hvcNAQEBBQAEggEAPTqjxSBaA7fot0AO04E525V2VDV9Snmz5rEz7OzqgRxzwr+n
-# pTCPu0F2CiUnWeDZ2H+p928yorrEGhQOBhU5Qqzj0ZiLjXhXKacU61Om5ci0VCBv
-# 6tX/J36YUH9oIhEREDryohqUvIQhrhbsqTW1fr6wcvcnEkuDY08R6I/31t9pJ/zW
-# ZTtwEaADCmB0OW+m1BmgKnfoffevTkJm76W78KOQsvTSc6RloJhT6dg3grusiyOu
-# 0n01F+tXA+hcdcg4rlMX2exK/AF3071v7fVU3oQePsY+0Budf3kZ5jHUwWfxUjal
-# DhtBp2J3BkjG7D5JVClS0OrX5ho0rQVHveSXxw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUKupr3hpDyYPgudAohC6so1Q1Cg8wDQYJKoZI
+# hvcNAQEBBQAEggEAGyAGovTdarAwWsZKlLtlYiNwbUgLek+Y/t1wCEm61vHVL6fB
+# gK390qs/7qcZP0TmHWLXGv00lAYlrGvs/6hul4IT7Z1M7cPZ09Sd+EwNzYqpNtHF
+# oOU6amvquxWi1UUql/Uy04BZ8fm6oIwETJb1RuwVytX716xST7+CpRDl2X7EI7uv
+# Q28nRjwV7EEu19F+JI9gtFzZfBuS+//fiRHJ8SV4o5kM3nlHqo1w4SWknEhFR5Jj
+# wRGGaPcZMmOFT8xz7l4TeaSZFHgDWpau1g+YqqBcEhPKW7sNrJvNitLR52St2asN
+# 1vx3Yz5O/8ji3rISmQlikUZ91Djz98FOf0fCog==
 # SIG # End signature block
