@@ -1,69 +1,31 @@
- function Generate-UserReport {
-     [CmdletBinding()]
-     param (
-         [Parameter(Mandatory=$true)] [string]
-         $NewSAMAccountName,
-         [Parameter(Mandatory=$true)] [string]
-         $Flag,
-         [Parameter(Mandatory=$true)] [string]
-         $DC,
-         [Parameter(Mandatory=$true)] [pscredential]
-         $AD_Credential,
-          [Parameter(Mandatory=$true)] [pscredential]
-         $AAD_Credential
-     )
+function Add-ToTemplatesGroups {
+   [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)] [psobject]
+        $TemplateUser,
+        [Parameter(Mandatory=$true)] [string]
+        $NewSAMAccountName,
+        $DC,
+        [Parameter(Mandatory=$true)] [pscredential]
+        $AD_Credential
+    )
 
-    #region USER REPORT
-      # Gather user report
-        $FreshAccount = Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential
-        Write-Host # separator line
-        If ($FreshAccount.extensionAttribute10 -eq 1) {$JBA = "YES"} elseif ($FreshAccount.extensionAttribute10 -eq 0) { $JBA = "NO"} else {$JBA = "N/A"}
-        If ($FreshAccount.extensionAttribute11 -eq 0) {$Contract = "Full Time"} elseif ($FreshAccount.extensionAttribute11 -eq 1) { $Contract = "Part Time"} elseif ($FreshAccount.extensionAttribute11 -eq 2) {$Contract = "Temp"} elseif ($FreshAccount.extensionAttribute11 -eq 3) {$Contract = "External"} else {$Contract = "N/A"}
-      # Gather mailbox report
-        if ($Flag -match "online") {
-          Get-PSSession | Remove-PSSession
-          Connect-OnlineExchange -AAD_Credential $AAD_Credential
-        } elseif ($Flag -match "onprem") {
-          Get-PSSession | Remove-PSSession
-          Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
-        }
-        # do {
-            $FreshMailbox = Get-mailbox $NewSAMAccountName | select *
-            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Waiting for the mailbox to be available. Retry in 30 second!" -Verbose
-            Start-Sleep 30
-        # }
-        # until ($FreshMailbox)
-      # Display report
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] (SUMMARY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
-        Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)"
-        Write-Host "UserPrincipalName   : $($FreshAccount.UserPrincipalName)"
-        Write-Host "First Name          : $($FreshAccount.GivenName)"
-        Write-Host "Last Name           : $($FreshAccount.SurName)"
-        Write-Host "Template used       : $($TemplateUser.DisplayName)"
-        Write-Host "EmployeeID          : $($FreshAccount.EmployeeID)"
-        Write-Host "Title               : $($FreshAccount.Title)"
-        Write-Host "Department          : $($FreshAccount.Department)"
-        Write-Host "Company             : $($FreshAccount.Company)"
-        Write-Host "Office              : $($FreshAccount.Office)"
-        Write-Host "Manager             : $($FreshAccount.Manager)"
-        Write-Host "Holiday entitlement : $($FreshAccount.extensionAttribute15)"
-        Write-Host "Start Date          : $($FreshAccount.extensionAttribute13)"
-        Write-Host "Contract type       : $Contract"
-        Write-Host "JBA Access          : $JBA"
-        Write-Host "User domain         : $UserDomain"
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
-        Write-Host "Name                : $($FreshMailbox.Name)"
-        Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)"
-        Write-Host "EmailAddresses     : $($FreshMailbox.EmailAddresses)"
-        $FreshAccount = $FreshMailbox = $null
 
-            }
+     try {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -Verbose
+        $TemplateUser.Memberof | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential}
+      }
+      catch {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
+      }
+      #TODO: Add outcome of the group addition
+}
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWKanRzPw4V5Zv3ZEVs+Cr3P7
-# +uqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJOiYADv2/4vC/1lNkerZGf+P
+# cJWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -130,11 +92,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQr9BhT4khqaEbRDk4S6Z4p1PVSMwDQYJKoZI
-# hvcNAQEBBQAEggEA2O3xOBFEIgbjN98FhVwJZn6/KqE/tH3CsyrWcCTgFZKUsaQB
-# Zwyg0gjOi3zlkGd/6v3RnVarI6eJsRQZZbyZ3PtiAK0Fqzkl5E+uixFysuTrPhYs
-# zciM3CccV/wolcZWb7H/Ym0TwsnD2sCHVzIsRP6fYIMIxrjwupsDEdj174cpbbg4
-# pUfYep8tQ/IcoL4sdSDKck/dA3dmVKsQ5Pa2mvGc0dE0/pGdvEU9oO7mn2c4uFDW
-# JJPzbWg3STPugpS3vSbfAzNDO1FXqx7aCOnwqCC9Fz5ZG9JId9Cn4ta12+FSwvVd
-# JHEb9rv4upfi+mueWndgm4H6aNXMYCmieguAew==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUvdW6F3VYCZWyjtdbSqeCzrtrxFowDQYJKoZI
+# hvcNAQEBBQAEggEARnnzeUkAtUhc/FgHAT97Z3+iD0AXmkVFFXew39JnH7YgXUjU
+# RLBfAQW9eAnOWgEGQeqrH1prJUb7P8WB7nlBzlqj5Jhfy7sK0O9fKPVKPBXTfuMe
+# BMJcgp0Fyfvc5bWnKfdSDQ5NUDABHX6+yMnCCC8eW1TCVOJINVqUVnXJLUypYBaR
+# X5CgMVjmS8y9QK1/HU9voQn7M6UhV4GX7HASTa7fJmbdHQv4d6HL18nVp3C2B7Pe
+# fTxLpubaMUFYUZs+INYM8XdQBY4W8bQZ0VynCcH/NFvhHkO6fgQMVYfokg5rwmn1
+# TmWAE7uYHBPAYTh+oiSSoyT9iLRipxWLFvgCiA==
 # SIG # End signature block
