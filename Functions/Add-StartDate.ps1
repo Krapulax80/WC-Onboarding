@@ -11,13 +11,13 @@ param (
 
           if ($EmployeeStartDate){
         if ($EmployeeStartDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Setting Start Date  [$EmployeeStartDate] on [$NewSAMAccountName]" -Verbose
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting Start Date  [$EmployeeStartDate] on [$NewSAMAccountName]" -Verbose
           Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute13 = $EmployeeStartDate } -Server $DC -Credential $AD_Credential
         } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] Start date is incorrect - [$EmployeeStartDate]. Please ensujre it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Start date is incorrect - [$EmployeeStartDate]. Please ensujre it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
         }
       } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] Start date is not defined." -ForegroundColor Yellow
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Start date is not defined." -ForegroundColor Yellow
       }
       #TODO: Add outcome of the addition of the start data
 }
@@ -25,8 +25,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzLY8Ga++YE+79NOGPFJfrMjM
-# fHigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpzCTOhQo/wQSX9Ov6L0YuDVL
+# i4ygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -93,11 +93,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUYRu1EIH5xzUQ3ncmKDjPgSrtiA0wDQYJKoZI
-# hvcNAQEBBQAEggEAp/7WvnH9UeybglJiEGsej+3HfGd8JVxVc+4mSLviVXiB+BZx
-# zDoj6FdlUaxxfNdSV2663OpHWdrsOQL24eK0vCc8KsGo1mBK9IZ9L1rGiQc1n/v2
-# nWc0qmImYByKcxW2u/K9NDmCsGptJvqWjF3PE2lkEU1iFgZv/C60LDc62bhj7FYK
-# fNwbKxlrnuPJy2Xb9lHNzwBLXsEgx1xe4Vs/R5gmiJseQGSnRJv5IjWo8OikXYtB
-# JXHS0I2yjyMDncMzb0Gf/RldWFW/hsyjRIYQhydJNviVoZOmTbOc1i/96qL/6lCe
-# /RLSZBsQi97o0CeXHnoF3XIGdlaerNl2rcOWmA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUEmDeHTnl6rOGGJH0iED9siCi+LYwDQYJKoZI
+# hvcNAQEBBQAEggEAsJhUfEbGyWAAbOub8LGc8NAFX4bPqOHu3t/w8Tn55p4COZZz
+# bWHMWrM3chRI2YlrsJHg8zPd8LI21lWL70s3JprM3nSzKBt6qEATQm1CO+PbVJl2
+# JvSxhmyBr55NGxPijws46WGZK9qFkthe2beplBE/TBjEaFUXzX3ZtETYv9t4akhX
+# KVwV1I/hlaAhnzjUJFbijWemMBPczTQ7xFKQGWxMKghvosg0FztaSkfdIl+560bx
+# 2E4vEkrvA1n0ntEu0UbUgl9YMO+uPfRnk1b6PJtKB6Qee0eOZz+g9v8zwePyqvhc
+# D4LHRUFI0JYyAdPp9PpQTVfIkH3x/KGmQi0QgQ==
 # SIG # End signature block

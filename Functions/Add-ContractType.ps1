@@ -11,22 +11,22 @@ param (
 
 if ($ContractType){
         if ($ContractType -match "FullTime"){
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
           Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 0 } -Server $DC -Credential $AD_Credential -Verbose
         } elseif ($ContractType -match "PartTime") {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
           Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 1 } -Server $DC -Credential $AD_Credential -Verbose
         } elseif ($ContractType -match "Temp") {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
           Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 2 } -Server $DC -Credential $AD_Credential -Verbose
         } elseif ($ContractType -match "External") {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting user contract to  [$ContractType] on [$NewSAMAccountName]" -Verbose
           Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute11 = 3 } -Server $DC -Credential $AD_Credential -Verbose
         } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] Contract type incorrect on [$NewSAMAccountName]!" -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Contract type incorrect on [$NewSAMAccountName]!" -ForegroundColor Red
         }
       } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] Contract type undefined on [$NewSAMAccountName]!" -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Contract type undefined on [$NewSAMAccountName]!" -ForegroundColor Red
       }
       #TODO: Add outcome of the contract type setting
 }
@@ -34,8 +34,8 @@ if ($ContractType){
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUyhJimC0nUL2X+bCumETtSoPr
-# +bKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9AaQDtYfxqyfXTL9NtKy9s7W
+# 5Q2gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -102,11 +102,11 @@ if ($ContractType){
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU+FJDGyqz9EnOiZawwRoXTCNl/fowDQYJKoZI
-# hvcNAQEBBQAEggEAhvqk451+bYf0yUUu7Cw0Ojitj051YMxYicbLgBxpPjl2VgMR
-# zwk/koOgO9TX3GmRhmeeMKm4QVo97QjThML+cfJKj4MSr2LFZM/DWwDjukFWwrs1
-# MN1ljqOgl8Hq07rrJ4V2FOORjzX76WMaf5kFbhbzHjC31A8zCP92tNzuUb2JFTWC
-# TMZs9CyfVHsbKbZZGFhSxBl1DFeX10I/7zoSO+AkmG2gzFpeLauQ+h5aBKjNRFNI
-# 1EJOZQoVqVXdfz7NTaFRg+1792bJ3xwuW4Ax/IgKq/ouHvaaHJw4zgqaiMhMjiHi
-# KU5MlB7yaLZF20a/YrtFVU7PgM22BL3A6rPUTQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUnSZRnI+1kwKgRYJ6QNXvIFRt8sEwDQYJKoZI
+# hvcNAQEBBQAEggEAxud4qwUFZuj/K4FQe4mpbLk6Ve0UJ8wpaY2ZgRFfIjgU614U
+# Gkt35yMtffsIP2D2tFKFJDdHG7Lnpro5fZQ3Wg1J8LMddjJoDkUUSNk75wfMFwzo
+# c0hi8kA6Rlz5kjQFYFr+J32lcxh7o9cY5p9uUeegzz9VjpI2kldYIvOAHDNC9Kr3
+# Vfl9Jx2GEz+PBX//Wd3bQ7iBZCLj8mECne59j3wKHuTiaSZN6NnJqfrlHaFaLwHj
+# OEk+B84fW4gnPg51gcqeQN7pV1C4yaOsODxr48sFk+wi0O404IAsSAzQ1TeYKCkd
+# Vy/LoV2gwDty2bZ7u08K7IHRPw0R0pqdSQT6dQ==
 # SIG # End signature block

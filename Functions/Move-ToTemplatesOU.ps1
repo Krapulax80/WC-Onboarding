@@ -10,11 +10,11 @@ function Move-ToTemplatesOU {
     )
 
 try {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -Verbose
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -Verbose
         Get-ADUser $NewSAMAccountName -Server $DC -Credential $AD_Credential | Move-ADObject -TargetPath $TemplateAccountOU -Server $DC -Credential $AD_Credential
       }
       catch {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] Failed to move [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to move [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -ForegroundColor Red
       }
       #TODO: Add outcome of the OU move
 }
@@ -22,8 +22,8 @@ try {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmTN3t5EfeiqMEBfw5B8cAiNb
-# fHagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7FoJml+M3z4IfO2Jk0cnxPh+
+# haWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -90,11 +90,11 @@ try {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUuBgjBEOTQ9nvKK+hpn38i+HV+ikwDQYJKoZI
-# hvcNAQEBBQAEggEAp03zpnjVJ97awhCu6Imvj8DOGl9v4b0IWfX1FLmLUjnAuQsF
-# B61BSshlI2FQrNRVuuarns1re60ww9RFy/F3dprEglJHjnap3p5+qqgFpXHNo3vm
-# +fkAv0IAd6V0DQKrwDAmaGaRCG3gchEfBzExvCG2W5iYOPUKIiqwbctyNA1ErSjD
-# +iPtTvoTl+IKXWaYVYH1t4CnjBpps5pRtW6As/xPWxIA7C4/MMa8aRMIj7SxST/p
-# pRbAKMsaJao3Tj/6IytkxTZkc22grHO4DJtv7XLqvKhoThJ6pzA71drPN8LwbCPa
-# cwkoJBRH2yOyg52xHISYI4tnmotkFjOTSYhUKg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1QVh58J3rKrrSlC3dlfBHGbWyv8wDQYJKoZI
+# hvcNAQEBBQAEggEAQmRw/H6okXevaCnlp6IvudLxEgTvgIIx6mBFFEcRy3JiOJQI
+# /1x2x8N1x/zEbAta7SfzsYChnJ9VBIqQhTWD6GC3fVHZMTqvLbORVha7s3KOa18c
+# lTr0bDu39qjOs+T0OJnJKwGb8dkmvcz/rc1DoVkIl16g30ugnod40o0TvzcgTtYY
+# fXtdjYTB4t6LCpwMfv7zq8POxzovdLRlrMhWBtrVaLWH5QLLqg2O3GFWwBJ2+Kcd
+# SKLlA2q7xBpC3zC+lxmWirC1rwfWIbt851UMTZvswL8Q8sb+x1SBLbYFSn4+/McB
+# LaR6M+gGALzt6z65Mug7Sldm7DvZ15YWfiIpQQ==
 # SIG # End signature block

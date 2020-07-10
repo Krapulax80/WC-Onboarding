@@ -8,7 +8,7 @@ param (
     $AD_Credential
 )
 
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Starting Active Directory syncronisation."
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting Active Directory syncronisation." -Verbose
     $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
     [void] (Invoke-Command -ComputerName $DC -Credential $AD_Credential  -SessionOption $pso -ScriptBlock {
         & 'C:\Windows\System32\repadmin.exe' /syncall
@@ -18,8 +18,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUdi1Oqern9APYh+e+uI5BSbTV
-# A3ugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUXDXvSOIrUcLEgNMtfuLkgwtk
+# QYSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -86,11 +86,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU7rKqS17WJVf323vGRxWa6NVFECswDQYJKoZI
-# hvcNAQEBBQAEggEAKGxW9DisYRc88TnVgiGXZZsZUiEgNWf9ReUzsJJhccIxNhN3
-# RYkPDtUh1+hVVLkh6vzvbjemNAe0zCD+dfdaJtZJatP0MHTrQTwauLypzVzlxA8p
-# A/XA64+LF1aORYr/ju7YQ8H98heFAQkjGRBcg0IRLufJLEnL4echRUg7uUKr+9du
-# w4l3ew+73r4mFzmWBIiDMhfSsWLsxX5evWjm6zXhzneEwnZecx/Cn8YkHkB4uMio
-# RnkQoEMtv666/1KjInv+L0xyCFgvpZGinxYpLsEqSEnOjUMzI/5no2jRu8AF1jNw
-# jjr9iThM4KnOBpoc47CnEf8zJeroPbFXuMPEIw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOZmm1c3tPott10fXCg4DKIv+Vz4wDQYJKoZI
+# hvcNAQEBBQAEggEAVeu7McPGNim43roKCqS/9vCsxamHNPK1nBXG1QgQlCN+uLVn
+# S4sl/tDg1AC7gcGN+CKHqaKQxbvoXZxztPKyl/rMQZ/9P4kAoLHWu8cLzD/LNZCj
+# LOYtTouD575pbBFnVy4h96863A19QaXUCe1tKUDW5CObx06Y72s7hvQT9RPL/9Aw
+# /aIA0O8EFoRq7RqJipDpMSfZPm1ee9AvKIEsxYjrD1jcNlAwIR79vAs2CI/rUjBV
+# O9NGpjMGem47OroKfwgyVPz75wg8HlvxK+7+Z3uDk9L5d99bbWBq/d8wGJlUms0/
+# KPLO2IfVcP9NS2vyrZbLSSXVFWn4H9hb9EAnVw==
 # SIG # End signature block

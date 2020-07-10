@@ -6,7 +6,7 @@
   )
 
         # START
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Starting AAD syncronisation."
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting AAD syncronisation." -Verbose
         $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
 
 
@@ -27,12 +27,12 @@
             try{
                 DeltaSync
                 $success = $true
-                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Green "[$timer] - Syncing AD to AAD"
+                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Syncing AD to AAD" -Verbose
             }
             catch{
                 # Each failure (usually fail is the result of an ongoing sync) increases the coutner.
                 $attempt = ($count+1)
-                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Red "[$timer] - Sync attempt [$attempt] failed. Next attempt in 30 seconds"
+                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sync attempt [$attempt] failed. Next attempt in 30 seconds" -ForegroundColor Yellow
                 $success = $false
                 Start-sleep -Seconds 30
             }
@@ -48,8 +48,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUGcVhpCJaVDFRdSBpc706b6b9
-# zX+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOFr0r6jD5x0VFXZ1CBXRKsmH
+# c+6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -116,11 +116,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUPmY4rqHy88AcayGGaHUo0HBI4E8wDQYJKoZI
-# hvcNAQEBBQAEggEAX4yH0LUw5jdMkkZGF1eH7AX77ESlPGZms4/MC0Pxvgv1m2Q9
-# 5hM3ty5/j/dbpeHDgC/ZQBh/EyiLntPEY3sETIdG502vJC1YyGA9+euCjLSWu73S
-# NHj6z3KgBl4MBYUaX6ZLjLdq5TN2yeYL0gBrY39/Lo/1PVTua62aQyPl+/bLCLu/
-# gBCstvGumncPoXSPArN2ReGPv5CofzLvGsnw2vB/NT+kRLR10tig7DjZ2Ts0sW+X
-# NFNajA7eH2pcoddeNqNJNjJCMy59FPS5v+YDPCMyAJYGrkfyvL3M7+zZ0jLVc8sC
-# ny5QmdXhFQZW1ILLlUEnJ+u+tmLbJsmmO/ziYw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUjCAJT898h164Cd/4SSs0FraFV/gwDQYJKoZI
+# hvcNAQEBBQAEggEAY1Ytcqns1Ld8glISstr13cPqGYeC0CeQ5CNUO3tSENenik6X
+# Lya6YuZZ9svsxCKL3Dv8jFZiGCDNOyEBf121Rl2g8K/EETlIUare5tKgsKeZebQL
+# U2poY4OoccGq78GLQ3aeBmkS1bc/dfuH2NatUeRBj2mDFHMaMjbCv3ho0+wX/jar
+# ihEikDV6Zn5frwW/r4rNmbbXDOjkheT3v6Nbve9WbC6CHl5UPPMfTtky+joFjJf0
+# zjHWjopvvEV4Ng1cP38oWfBjnlUuBDNic9BMpTo1SW3wRTczFJBGZHbi24hBVT5c
+# Gx0dbBqXCatB7oIApfLjWY2W8h+f/5tpBId8vw==
 # SIG # End signature block

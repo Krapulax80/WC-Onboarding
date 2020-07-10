@@ -1,7 +1,7 @@
 # This is the script wrapper that should be called for the execution.
 
 ## SET UP THE ENVIRONMENT
-$error.Clear()
+  Import-Module PSWriteColor
   # Collect work folders (names)
     $FunctionFolder   = "Functions"
     $InputFolder      = "Input"
@@ -30,7 +30,7 @@ $error.Clear()
 ## ONBOARDING PROCESS -
   # Announce start of the process
   Write-Host #separator line
-   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 PROCESS STARTED." -BackgroundColor Black
+   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 OF THE ONBOARDING PROCESS STARTED." -BackgroundColor Black
 
   # Process each (.csv) files in the input folder.
   foreach ($I in $Inputfiles){
@@ -54,13 +54,13 @@ $error.Clear()
       # TODO: report, if the domain is correct
         # Pipe, if the workdomain is WestCoast
         if ($Domain -match "WestCoast"){
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -Verbose
         Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
         Write-Host
         }
         # Pipe, if the workdomain is XMA
         elseif ($Domain -match "XMA"){
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -ForegroundColor Green
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName]" -Verbose
         Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
         Write-Host
         }
@@ -89,7 +89,7 @@ $error.Clear()
   #Stop-Transcript
   if ($Error ) {$Error | Out-File $ErrorFile}
   else { "[INFO] NO ERRORS DURING SCRIPT RUN"| Out-File $ErrorFile} # also send errors to a file
-   
+
 
   # And cleanup the variables
   Variable-Cleanup
@@ -98,8 +98,8 @@ $error.Clear()
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7SzOsA203O7juzvKvO5MhyZ4
-# ys6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYHf5k9Zy90th4NWh8cPeBws9
+# ZBWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -166,11 +166,11 @@ $error.Clear()
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCb1wdUNiXyGn1mmLl1lE3yocIvgwDQYJKoZI
-# hvcNAQEBBQAEggEAgASGyxVAFNBKvo8TlCWyPnI4pzy67OvuLVpTMyLJ8zWfU376
-# S5RMsiv7nQXF1AZjyBC/RQc4TAUMM64al8OiLqR0mt0ESbV9et0Fm0FqYu+lYtMl
-# AtrfTwC3PRqn8T/l5J2uC2LY1sDd1ca8Ca4YOM1NOvGWKh7rVpnYHSgy5o1aLEPQ
-# pZsmp+yp+twBw0x1+noYgiX675+9ulL2DUCMyjrNomvflqIrMJIuwNP8M5mhzWdy
-# YUZzZ0NcrIbJGhHc+T5mqXn7kzMFH3zIJf4bTk4TuOD8aULuasL7ihSDI/ru22OT
-# RwFvmTSsXSyMn5d2c/Qw/YppBht7FuGul1fe6g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUflzTfVmla+cl4kQIM/NTG114lOcwDQYJKoZI
+# hvcNAQEBBQAEggEASBPqdHZ0xYzDy/MCP/E11JDqwgr0UBvP9+0GF9aWBYP2GvVe
+# kOnnmzk+jx/fsCcBlbI6rgQbi7PhBU23EsEjE3+7pt6F9OnwBMNxK3Bg2PJOr7Zb
+# 2TPBlNEzk3/2KHuKZFTYTJZDq/IaVZEMroNviArEa/xl0VCdZt8qKEMTUXMHIIhS
+# 4v6x/nPRa6bjve0vNzjfbFMZzwfBxcNZIKeX7/xb0BEoLoNLsDMpSoEff6MH1s/9
+# 3m1+wh/8OuaMhqgJkR1k4RfQb7uBVVzJWCUO8CUMzXk69/uOjauhXr8bw5voLM+Y
+# dH2FJpXgFg3H9ad308Ru8PTYWvvSxstND0SO0w==
 # SIG # End signature block

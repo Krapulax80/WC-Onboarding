@@ -20,11 +20,11 @@ param (
               # If the license has no group, add it directly
                   Set-MsolUserLicense -UserPrincipalName $NewUserPrincipalName -AddLicenses $LicenseSKU #-ErrorAction Stop
                 }
-              $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Green "[$timer] - Adding [$LicenseSKU] to[$NewUserPrincipalName] account succeeded"
+                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", "] to user account [", "$NewUserPrincipalName","] account ", "succeeded" -color White,Yellow,White,Yellow,White,Green
               $licenseassigned += " [" +  $LicenseSKU + "] "
             }
             catch {
-              $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Red "[$timer] - Adding [$LicenseSKU] to[$NewUserPrincipalName] account failed";
+              $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", "] to user account [", "$NewUserPrincipalName","] account ", "failed. ","(Do you have enough licenses...?)" -color White,Yellow,White,Yellow,White,Red,White;
               $licenseunasigned += " [" +  $LicenseSKU + "] "
               Continue
             }
@@ -33,8 +33,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPJqYW4gJwHdjJDjIdfaFFbHs
-# e5egggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUUpnTfqzBxWIgcQ0p1aX01TC8
+# Z/6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -101,11 +101,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU2Y+wMOnVgy0G+gj5/g0nz+Lt/U4wDQYJKoZI
-# hvcNAQEBBQAEggEAM5oCwlfFrkHKZXw+C6d3d5HS99YuCNVC1enIph4CiuWUFBzU
-# V+T588dvzeI51ygRFdftxA70Dt+G5wpHueK/FqoLgI5Bn9N01jv4nCjUyLOM7huG
-# c4hI4W7Us34w4NtefinvSPluww6oZPPqjVJXIGSHPsKbr6nIuOffDNYjiawif6Jm
-# ZVzjyM+yod9AKeMgYPqiMv5SVGLyztH9pCDqS/SOKCexLIT1kCi1ErxD61JWDRpj
-# z1IrT5bXLu7fhb5CAPKsV8KG1aEIofXwOAwVxWwl8MyQzaAa2IgJDaJ6ZLiDTQGw
-# 9vkA67sKOB3Y8kuRQl3wa3bFr8690HSVRjvISQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUq+2Ugan3vMSbtkeep/BM8GJNz3MwDQYJKoZI
+# hvcNAQEBBQAEggEANhmZ45p+QpRlpJPZrclTypp9mUaTM4wrIofd+g4VPIsejj1B
+# hrYW4649N7pL8YwlszD5W1Knh4+3PqucTpjsFgDfStcO+N/GAF5yc2W+q8fu2BoH
+# xBbBCPeoeNcVupQ9KNjKP7SXubivd1Io4p41Er75d48wGoGvx56yqBTWZCP6AUo1
+# FE4nwrHVKL1+hEjDV7ZsbXfQJeouUQRnmrZ+B3XK/AmuvqxlkHt3hmmKLlxbpDVX
+# 4JEnUTIj6m58xKIrU1qnopvMdYrZ871LuxSJPuoPxVI0Jsv9y1vXtaGh4HGt04zK
+# d2FAbmV0Am5ptEEzSw+bcGIXAvfkEt0Psri84g==
 # SIG # End signature block

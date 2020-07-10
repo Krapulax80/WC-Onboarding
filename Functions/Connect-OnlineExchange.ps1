@@ -5,7 +5,7 @@ function Connect-OnlineExchange {
       [PSCredential]
       $AAD_Credential
   )
-  
+
   $OpenPSSessions = Get-PSSession
   # If there is an open session to Office 365, we do not re-connect.
 	if ($OpenPSSessions.ComputerName -contains 'outlook.office365.com' -and $OpenPSSessions.Availability -eq 'Available') {
@@ -27,8 +27,8 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk5ksfi5Pe6Tmjh6xtGnrqzFv
-# /OCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUC7P+kPcoj0Fe/IqpljdMRalC
+# XKKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -95,11 +95,11 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUv9l+SDaTdyZHpyPo4l6iMvs2DggwDQYJKoZI
-# hvcNAQEBBQAEggEAsRU6idKTKKnK1fJqZfg/y/8NNDnH7v9n2fHduISKz5E+eFdq
-# urgzW/GAY4VL5nxboynOyxM/uNdTUjC5PlX7rg1W3dQs62Ji9rIM4SNN7B632LhQ
-# pXtql2IPEA41bLx/i6hxG+xzb9V6xRjpK2yorZJL+9xq30VZvHuUmN9yjAzSEJZJ
-# Ao3hNRjZ0m5ExUpEqmKg2IG8UK/vAQmrxZy6KIO7779DCHtu/naH5hDIs6ncOiHq
-# 4I+U+lriRoC6PdRa6Kx8rE57u3eJ2w1L7nMqusu/OKzOuAWXk2dj/dwM70lt7lbS
-# I9JRacg5Dw+sz1IFF7WTH0ZHkRRolzcFGN6a5A==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUc6rX+kReYsIPg4Br0/Z/XmLzTngwDQYJKoZI
+# hvcNAQEBBQAEggEA0alrslLpB3hENfm2WDeliWxaQWSAQHyeincMiVYCDnYX8O/x
+# oVUgvT0pWpv6Embn2XLxYlMDGV0aejLVUZoXZ9spnqh8d3kzwsmm/eyYkYQUe+dY
+# Y7+TwPH+trxH1JooGC2wh8QQf6Z5F1Kb67oN0p17sIu7VvVQEOLK1YmKpi5T+kAU
+# ZdM9JgG0INcK7Qb7REmSP0rpnyEBC4V4hMwXgoo3KUKuHxvI2uF/e8zxxg0CKhex
+# ouPw5U6EZ+N2DpEJauvTMI+iejYRxyIZ2smPVQZC16WTIpJoGzVldcCtnnFxuU6M
+# y/kspujil6W7Hg4QEQ/aPDFdRVhRNxon7WK/EQ==
 # SIG # End signature block

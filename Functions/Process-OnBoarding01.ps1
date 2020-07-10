@@ -10,52 +10,68 @@ function Process-OnBoarding01 {
     [Parameter(Mandatory=$false)] [switch]$NoJBA
   )
 
+      <#
+      # Internal use only: this is only for updating the passwords used for the script
+      Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -WestCoast -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+
+      Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -XMA -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -XMA -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      #>
+
   # WORK IN WESTCOAST DOMAIN
-  if ($Westcoast.IsPresent){
-    # Credentials for WC
-    Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -WestCoast -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    # Variables for WC
-    $SystemDomain = "westcoast.co.uk"
-    $DomainNetBIOS = "WESTCOASTLTD"
-    $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "mail" + "." + $SystemDomain
-    $EOTargetDomain = "westcoastltd365.mail.onmicrosoft.com"
-    $PeopleFileServer = "BNWFS05"; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = "BNWFS05"; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
-    $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
-    # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-    #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
-  }
-  # WORK IN XMA DOMAIN
-  elseif ($XMA.IsPresent){
-    # Credentials for XMA
-    Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -XMA -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    Create-Credential -XMA -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-    # Variables for XMA
-    $SystemDomain = "xma.co.uk"
-    $DomainNetBIOS = "XMA"
-    $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-    $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-    $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
-    $OnpremisesMRSProxyURL = "xmaexchcas" + "." + $SystemDomain
-    $EOTargetDomain = "xmalimited.mail.onmicrosoft.com"
-    $PeopleFileServer = ""; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-    $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-    $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
-    # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
-  }
-  # (INVALID WORK DOMAIN DEFINED)
-  else {
-    Write-Host -ForeGroundColor Red "Bad domain."; Break
-  }
+
+    #region Select work domain
+    if ($Westcoast.IsPresent){
+      # Credentials for WC
+      Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -WestCoast -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      # Variables for WC
+      $SystemDomain = "westcoast.co.uk"
+      $DomainNetBIOS = "WESTCOASTLTD"
+      $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
+      $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
+      $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
+      $OnpremisesMRSProxyURL = "mail" + "." + $SystemDomain
+      $EOTargetDomain = "westcoastltd365.mail.onmicrosoft.com"
+      $PeopleFileServer = "BNWFS05"; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
+      $ProfileFileServer = "BNWFS05"; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
+      $RDSDiskFileServer = "BNWFS04"; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
+      $StarterOU = "OU=Active Employees,OU=USERS,OU=WC2014,DC=westcoast,DC=co,DC=uk"
+      # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
+      #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
+      $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
+      $DFSHost = "BNWITRDS01"; $DFSHost = $DFSHost + "." + $SystemDomain
+    }
+    # WORK IN XMA DOMAIN
+    elseif ($XMA.IsPresent){
+      # Credentials for XMA
+      Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -XMA -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -XMA -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      # Variables for XMA
+      $SystemDomain = "xma.co.uk"
+      $DomainNetBIOS = "XMA"
+      $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
+      $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
+      $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
+      $OnpremisesMRSProxyURL = "xmaexchcas" + "." + $SystemDomain
+      $EOTargetDomain = "xmalimited.mail.onmicrosoft.com"
+      $PeopleFileServer = ""; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
+      $ProfileFileServer = ""; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
+      $StarterOU = "OU=Users,OU=XMA LTD,DC=xma,DC=co,DC=uk"
+      # Domain Controller for XMA
+      $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
+      $DFSHost = ""; $DFSHost = $DFSHost + "." + $SystemDomain
+    }
+    # (INVALID WORK DOMAIN DEFINED)
+    else {
+      Write-Host -ForeGroundColor Red "Bad domain."; Break
+    }
+    #endregion
 
   # ACTIVE DIRECTORY
 
@@ -69,7 +85,7 @@ function Process-OnBoarding01 {
     # Collect details of the TEMPLATE  user account
     if (Get-ADUser -Filter {SAMAccountName -eq $TemplateName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) {
     $TemplateUser = Get-ADUser $TemplateName -Properties * -Server $DC -Credential $AD_Credential
-    } else { Write-Host -ForegroundColor Red "User $TemplateName not found." }
+    } else { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - User $TemplateName not found." -ForegroundColor Red }
 
     # Construct parent OU of the TEMPLATE user account
     $TemplateAccountOU = ($TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),",'' } }).path
@@ -93,9 +109,9 @@ function Process-OnBoarding01 {
 
     # Check if the SAM Account Name  already exists. If it does, create a unique one
     if(! (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique." -ForegroundColor Green
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SAM account [$NewSAMAccountName] is unique." -Verbose
     } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Red
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Yellow
       Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
       $NewSAMAccountName = $global:NewSAMAccountName
     }
@@ -108,9 +124,9 @@ function Process-OnBoarding01 {
 
     # Check if the UPN already exists. If it does, create a unique one
     if(!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique." -ForegroundColor Green
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - UPN  [$NewUserPrincipalName] is unique." -Verbose
    } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Red
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Yellow
       Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
       $NewUserPrincipalName = $global:NewUserPrincipalName
     }
@@ -121,9 +137,9 @@ function Process-OnBoarding01 {
         $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
     }
     if(!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique." -ForegroundColor Green
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - EmployeeID  [$EmployeeID] is unique." -Verbose
     } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Red
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Yellow
       Create-UniqueEmployeeID -EmployeeID $EmployeeID
       $EmployeeID = $EmployeeID
     }
@@ -179,9 +195,9 @@ function Process-OnBoarding01 {
 
   # Check if the SECONDARY SMTP ALREADY EXISTS. If it does, create a unique one
   if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is unique." -ForegroundColor Green
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SMTP [$secondarySMTP] is unique." -Verbose
     } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForeGroundColor Red
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForeGroundColor Yellow
       Create-UniqueSMTP -SMTP $secondarySMTP
       $secondarySMTP = $global:secondarySMTP
     }
@@ -193,7 +209,7 @@ function Process-OnBoarding01 {
       Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP)} -Server $DC -Credential $AD_Credential # this is done in AD
      }
      catch {
-           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm:ss);  Write-Host "[$timer] Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
+           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
      }
      #TODO: Report success / failure / error
 
@@ -229,6 +245,7 @@ function Process-OnBoarding01 {
      #TODO: Report outcome of the mailbox creation / failure / error
     #endregion
 
+  # AD & AAD Syncronisation
     #region SYNC
     Get-ADSync -DC $DC -AD_Credential $AD_Credential
     Start-Sleep 30 # allow AD sync to finish
@@ -252,15 +269,40 @@ function Process-OnBoarding01 {
 
       #region Wait for the new account to APPEAR IN MSONLINE (AAD)
           do {
-          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Waiting for MS online user account. (next check is in 30 seconds)"
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for [$NewUserPrincipalName] to syncronise to Microsoft Online ... (next check is in 30 seconds)" -ForegroundColor Yellow
           Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue
           Start-Sleep -Seconds 30
           }
           until(Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue)
-          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - OK - o365 account present"
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution" -Verbose
       #endregion
 
-      #region LICENSING the new user
+  # DISTRIBUTED FILE SYSTEM
+
+    #region DFS PARAMETERS
+      if ($Westcoast.IsPresent) {
+        $PeopleTargetPath = "\\$PeopleFileServer\PEOPLE$\$NewSAMAccountName"
+        $ProfileTargetPath = "\\$ProfileFileServer\PROFILES$\$NewSAMAccountName"
+        $PeopleDFS = "\\$SystemDomain\PEOPLE\$NewSAMAccountName"
+        $ProfileDFS = "\\$SystemDomain\PROFILES\$NewSAMAccountName"
+      }
+      elseif ($XMA.Ispresent){
+
+      }
+    #endregion
+
+    #region PROVISION DFS
+    if ($Westcoast.IsPresent) {
+    Create-NewDFS -NewSAMAccountName $NewSAMAccountName -PeopleDFS $PeopleDFS -PeopleTargetPath $PeopleTargetPath -ProfileDFS $ProfileDFS -ProfileTargetPath $ProfileTargetPath # -DFSHost $DFSHost -AD_Credential $AD_Credential
+    }
+    elseif ($XMA.Ispresent){
+      #FIXME: What to do for XMA user shares?
+    }
+    #endregion
+
+  # USER REPORTING
+
+    #region LICENSING the new user
        # When the user account is present, assign licensed to it to match the template (minus the licenses that come from groups)
        # Location is always GB
         Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation
@@ -272,17 +314,19 @@ function Process-OnBoarding01 {
         }
       #endregion
 
-      #region USER REPORT
+    #region USER REPORT
+      Write-Host # separator line
       Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential
       Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
       #endregion
 
 }
+
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUl/5CddiVt3S0a0PO5R5XKf32
-# /KOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUAnuhPCUInI+O0aPRiaZ4OhkY
+# EmegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -349,11 +393,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/XNOuQrQRdNsnzdTe8/ZuLn0Yx8wDQYJKoZI
-# hvcNAQEBBQAEggEALlNm3QCAgII6RMD4Amn6uQrQOi2Q20nEE2Bwbzn/VUVR7mJh
-# sN70xrC0jKAs3G5UvpGUvNUeBFhMY3wofBhftfaqxhuHeqRL3V5fDabPqTkw2TQs
-# p1pr8aY7Z0VG/8MPTAv3urDgzle83SASryTYoPEbN86sjaQNyKglvD5T5bOx/HmP
-# pNjNUt6eG941gm63H18xVc9spkB8vxKCh7ryf9Oqcjliqw3g7eBKYTZasEM4Vb02
-# dCfDBhlsN9/cZqHMtlTuIeQNHZnPYqJxCuAeQoQSWd3dl16x1gUkrh+JKt2hg1oR
-# QTDlWLl9weBwW+2M8pVCrRJFeStV6XsvsyW1Iw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU3rtaJ2P66km6SmxcQLBsR6kSgZowDQYJKoZI
+# hvcNAQEBBQAEggEALoXtWyXAqHMMXK+B++PPLBKtyRNsalVYP0D9m8x1PXrmTt7L
+# +aVXMVddyncKQOUYGi8GMwhOEeyOQirp9YeGEX7HYyIO13aMF1PloDZTVHdkw5tZ
+# Xrpdru9vJNSX8RVZ7Wh6ADZK8Uj8TEGHPhOP50I7N7R5LbdJDJZepfQTey1gIwL0
+# BhHe+kjOPUX0x5ntS2iOJZa85pCDSsShfuLM0oAv/hiv2oh+qRZBHsDh3ybjKnb/
+# Js3TTOgtqUYt9VSwAto/1vgE1fKwUQ3e39KLA79YECGTnQkPBYgXWUXBuKxam77y
+# 2f8DajdgtlWH9rw42JTQhC+CxInDI7uMKi3iFw==
 # SIG # End signature block

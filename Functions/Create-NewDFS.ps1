@@ -1,48 +1,53 @@
- function Generate-UserADReport {
-     [CmdletBinding()]
-     param (
-         [Parameter(Mandatory=$true)] [string]
-         $NewSAMAccountName,
-         [Parameter(Mandatory=$true)] [string]
-         $DC,
-         [Parameter(Mandatory=$true)] [pscredential]
-         $AD_Credential,
-          [Parameter(Mandatory=$true)] [pscredential]
-         $AAD_Credential
-     )
+function Create-NewDFS {
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory=$true)] [String]
+    $NewSAMAccountName,
+    $PeopleDFS,
+    $PeopleTargetPath,
+    $ProfileDFS,
+    $ProfileTargetPath#,
+    # $DFSHost,
+    # [Parameter(Mandatory=$true)] [pscredential]
+    # $AD_Credential
+)
 
-    #region USER REPORT
-      # Gather user report
-        $FreshAccount = Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential
-        Write-Host # separator line
-        If ($FreshAccount.extensionAttribute10 -eq 1) {$JBA = "YES"} elseif ($FreshAccount.extensionAttribute10 -eq 0) { $JBA = "NO"} else {$JBA = "N/A"}
-        If ($FreshAccount.extensionAttribute11 -eq 0) {$Contract = "Full Time"} elseif ($FreshAccount.extensionAttribute11 -eq 1) { $Contract = "Part Time"} elseif ($FreshAccount.extensionAttribute11 -eq 2) {$Contract = "Temp"} elseif ($FreshAccount.extensionAttribute11 -eq 3) {$Contract = "External"} else {$Contract = "N/A"}
+    # #Create the physical folders
+    # if (!(Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue)){
+    #     [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
+    # }
+    # if (!(Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction SilentlyContinue)){
+    #     [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
+    # }
 
-      # Display report
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] (SUMMARY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
-        Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)"
-        Write-Host "UserPrincipalName   : $($FreshAccount.UserPrincipalName)"
-        Write-Host "First Name          : $($FreshAccount.GivenName)"
-        Write-Host "Last Name           : $($FreshAccount.SurName)"
-        Write-Host "Template used       : $($TemplateUser.DisplayName)"
-        Write-Host "EmployeeID          : $($FreshAccount.EmployeeID)"
-        Write-Host "Title               : $($FreshAccount.Title)"
-        Write-Host "Department          : $($FreshAccount.Department)"
-        Write-Host "Company             : $($FreshAccount.Company)"
-        Write-Host "Office              : $($FreshAccount.Office)"
-        Write-Host "Manager             : $($FreshAccount.Manager)"
-        Write-Host "Holiday entitlement : $($FreshAccount.extensionAttribute15)"
-        Write-Host "Start Date          : $($FreshAccount.extensionAttribute13)"
-        Write-Host "Contract type       : $Contract"
-        Write-Host "JBA Access          : $JBA"
-        Write-Host "User domain         : $UserDomain"
-            }
+    #START
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting File server / DFS configuration" -Verbose
+
+    # Create PEOPLE DFS folder
+    if (Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue){ # if the folder exists
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose  "[$timer] - DFS folder [$ProfileDFS] already exists" -Verbose
+    } else { # otherwise it is not existing yet
+    [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
+    [void] (New-DFSNFolder -Path $PeopleDFS -State Online -TargetPath $PeopleTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating" -Verbose
+    }
+
+    # Create PROFILE DFS folder
+    if (Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction SilentlyContinue){ # if the folder exists
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] already exists" -Verbose
+    } else { # otherwise it is not existing yet
+    [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
+    [void] (New-DFSNFolder -Path $ProfileDFS -State Online -TargetPath $ProfileTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating" -Verbose
+    }
+
+}
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtThha8jAHPPLTHOfkywnjBXF
-# gX6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZw7KI8sGRnMorF+mpmYAKBzw
+# 6TigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -109,11 +114,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUGyUxDNYMBteTXPbIII6RDey4R84wDQYJKoZI
-# hvcNAQEBBQAEggEAZiWtRB0F1gMD+6iOy697HlPyAls0cINzrv+xuAqtzOYdcDXj
-# MIDWmSVcG1s93PZyuSAt8XNaw9enPbFgbVdqevm2e9Pkn73Clx34nPOZJ71VOIsv
-# u/wzdxOoEA7iKmV2hrTOKcUSnzUJ4VMAZnJDEEJp5EJ9Bx9ZTK0Il/S0d03I+3oU
-# FXCacWK2JTL+5bd2uZPcOJvrzqR++XUcct82QUz1I5tHjIk5B6nz58owjZirbds/
-# gg39a1bLvS0uTW8pFLNn1T4d0aXiJklhWbZBZvaeNm7D61vfUIzPF+hEBx/KFdJ+
-# KWcjcpUWSBBkA3dEJHsIS6nTQjHKOsheEkGQGQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU7f3FRw7SedEcaTiy1ETiWbvQNQwwDQYJKoZI
+# hvcNAQEBBQAEggEALNtqdEurbODK/rXNlhfoWydxT07S3o3yG3idC2z/9VuTzqk5
+# 7MQRuUmKweEkLtfbmM0iARBoZSbc+KR2vY7bSylwswmZbuv1Ertwa+C2ogsAfo1B
+# y/Esssvvj53ktBhB+whF9lZDY7FgG99MyoQ7juT2pXeiEKZInW7oTfunXObL+K8s
+# 6He7LFU8Zs7Q0ogHR6focviIVrVOAC+hF31Qc0cpIAqCQjx/Or789C8RwEQOqFIv
+# 5gkYpLZ7mik9ZLwLAofCtXpOKggnmI+H85XS66kiH6KdeNGr8b+pzbcARbDL+6ZT
+# kyKH9ouEjUk4qg7cqM6HAk+LqNOOE5RowvAyLQ==
 # SIG # End signature block
