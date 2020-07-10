@@ -48,6 +48,7 @@
       $TemplateName                   = $Line.TemplateName
       $HolidayEntitlement             = $Line.HolidayEntitlement
       $EmployeeStartDate              = $Line.StartDate
+      $EmployeeEndDate                = $Line.EndDate
       $ContractType                   = $Line.ContractType
 
       # Run against each line
@@ -81,6 +82,8 @@
 
   # Save the report into a CSV as well, for archiving purposes.
   $CSVImport | Export-csv -Path $CSVExport01 -NoTypeInformation -Force # first add in the original import
+  #TODO: Add FULL reporting
+  #TODO: Add logging
 
   # Finally, discard the processed original input file
   #Remove-Item -Path $($I.Fullname) -Force #-Whatif
@@ -98,8 +101,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYHf5k9Zy90th4NWh8cPeBws9
-# ZBWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUdNOXrGA1azDBS6Gt9b3izQDE
+# 1WmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -166,11 +169,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUflzTfVmla+cl4kQIM/NTG114lOcwDQYJKoZI
-# hvcNAQEBBQAEggEASBPqdHZ0xYzDy/MCP/E11JDqwgr0UBvP9+0GF9aWBYP2GvVe
-# kOnnmzk+jx/fsCcBlbI6rgQbi7PhBU23EsEjE3+7pt6F9OnwBMNxK3Bg2PJOr7Zb
-# 2TPBlNEzk3/2KHuKZFTYTJZDq/IaVZEMroNviArEa/xl0VCdZt8qKEMTUXMHIIhS
-# 4v6x/nPRa6bjve0vNzjfbFMZzwfBxcNZIKeX7/xb0BEoLoNLsDMpSoEff6MH1s/9
-# 3m1+wh/8OuaMhqgJkR1k4RfQb7uBVVzJWCUO8CUMzXk69/uOjauhXr8bw5voLM+Y
-# dH2FJpXgFg3H9ad308Ru8PTYWvvSxstND0SO0w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUN0nqStaNOS0ALmPCQijPzde+gLUwDQYJKoZI
+# hvcNAQEBBQAEggEAD4KqHXp4BaDLbMkd0H04sHQwE872LmxwkL5TPyIpnlawbrWn
+# x0DFiBcZhkfWTqDtcOSRhl2FKd/OmXvLpfSRDSX/7QeT19V+T7hAHleR50tNyWBJ
+# QrY5lb8wTfpvy2ueapY6eKyDoA546WfZiFWDKcIDRz89MLKzvylRi7Rib1v8i9fN
+# SugYmicd+mhOdzyt67N1uDsLpW3dHyJzx/ychzRL9PhLCGJvZ4YqSviEQargvwoA
+# v6LR+yQ0qQD+F8lZBCAmvy6cFGFiUB+KfqOqRBN0VTc8xh8ljkpTQumDppuHmw6a
+# I+p28j6a9ZxVAsCeOLK0GHqUnuxGOsil2eNaIQ==
 # SIG # End signature block

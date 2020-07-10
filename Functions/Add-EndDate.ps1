@@ -1,32 +1,29 @@
-function Add-StartDate {
+function Add-EndDate {
 [CmdletBinding()]
 param (
         [Parameter(Mandatory=$true)] [string]
-        $EmployeeStartDate,
+        $EmployeeEndDate,
         $NewSAMAccountName,
         $DC,
         [Parameter(Mandatory=$true)] [pscredential]
         $AD_Credential
 )
 
-          if ($EmployeeStartDate){
-        if ($EmployeeStartDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting Start Date  [$EmployeeStartDate] on [$NewSAMAccountName]" -Verbose
-          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute13 = $EmployeeStartDate } -Server $DC -Credential $AD_Credential
+        if ($EmployeeEndDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting End (expiration) Date  [$EmployeeEndDate] on [$NewSAMAccountName]" -Verbose
+          Set-ADAccountExpiration -Identity $NewSAMAccountName -DateTime $EmployeeEndDate -Server $DC -Credential $AD_Credential
         } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Start date is incorrect - [$EmployeeStartDate]. Please ensure it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] End (expiration) date is incorrect - [$EmployeeEndDate]. Please ensure it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
         }
-      } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Start date is not defined." -ForegroundColor Yellow
-      }
-      #TODO: Add outcome of the addition of the start data
+
+      #TODO: Add outcome of the addition of the End data
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUxnt2YrvxTbAMw2q96zbGskCM
-# WPqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULAefsuz0y60WjQGdevXp6skO
+# 1dmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -93,11 +90,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUUb5HD1gB4Tue4qhB2TIAouQCVFcwDQYJKoZI
-# hvcNAQEBBQAEggEAWJi/F4xEiLlkY2E/79rUSQlygfvZddCP/jkDaQEXg/AuYHYi
-# djc7r3INmWKj3QiN4c7mPX+SxRtn8mJKIzApvD/g2NEzMk3SK6UascM9bmiSMacR
-# MmPekBZ8H/rxl8AFp50dxcQ7feSREOY+B/0fPVBIqNDGp5Xrtukf0/ZJGWDRk/QY
-# 6wNsAxD1TRHZ+TmATl3ga+tZVn3NTCitfewTvuaOx7JFp+wPj88CHdQ5JRc0+NyD
-# WSUXU2U/io/Z3AnRIcPo3osgmq7MT/eYG72j8OKJcsPkdn7TnkAa2ibdPTgMqXnx
-# Us6MrHtOtVOXrP+4L7CQzONf5sAxPjhq12gVWg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUy1tI4GkFdFb2VU+SW+1zVhMDIiowDQYJKoZI
+# hvcNAQEBBQAEggEAhnp/dP5p1qPWvbBeQUbtH3177TPWK0ZYSuOg/X4Bn2TdyDVP
+# ifi7z8owxV87WRZvop4JuqEfEhZSyouLHPMGS5Ys4COKW2QLdPrPfLbucrw+mdp0
+# IfuK2ouZLDXq1vTlto+pFe+OZaOP17zFFqGFpwG2Os+4/Z8lbDC2FmXe7IyRBpwE
+# IEYdS32KI413t1lSxVskYIu+PMFDZZT3J0IwO4Vjec9D3RP17IzW1NYkCZdXbPJw
+# m+ge8ids9j4EZCilB0Kt2o7B89QgRtNZ/o5TNRiToO5S0BlFYFxF6QywgfWvsVp/
+# M7ibDRMAM9q5Wr6tKt8gjS+gOwYAbU3IJcmMGw==
 # SIG # End signature block

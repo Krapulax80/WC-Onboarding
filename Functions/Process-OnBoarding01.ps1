@@ -171,6 +171,11 @@ function Process-OnBoarding01 {
       Add-StartDate -EmployeeStartDate $EmployeeStartDate -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
       }
 
+      # Set the END/EXPIRATION DATE of the account. (Account will stop working after it expired!)
+      if ($EmployeeStartDate){
+      Add-EndDate -EmployeeEndDate $EmployeeEndDate -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+      }
+
       # Select the releavant CONTRACT TYPE of the new AD user
       if ($ContractType)
       {
@@ -325,8 +330,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUAnuhPCUInI+O0aPRiaZ4OhkY
-# EmegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfF9gz+tXatkILFtJCvTbjX5A
+# sPmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -393,11 +398,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU3rtaJ2P66km6SmxcQLBsR6kSgZowDQYJKoZI
-# hvcNAQEBBQAEggEALoXtWyXAqHMMXK+B++PPLBKtyRNsalVYP0D9m8x1PXrmTt7L
-# +aVXMVddyncKQOUYGi8GMwhOEeyOQirp9YeGEX7HYyIO13aMF1PloDZTVHdkw5tZ
-# Xrpdru9vJNSX8RVZ7Wh6ADZK8Uj8TEGHPhOP50I7N7R5LbdJDJZepfQTey1gIwL0
-# BhHe+kjOPUX0x5ntS2iOJZa85pCDSsShfuLM0oAv/hiv2oh+qRZBHsDh3ybjKnb/
-# Js3TTOgtqUYt9VSwAto/1vgE1fKwUQ3e39KLA79YECGTnQkPBYgXWUXBuKxam77y
-# 2f8DajdgtlWH9rw42JTQhC+CxInDI7uMKi3iFw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUh/UH0CWiaMtnK2oewBkU7PAyJHowDQYJKoZI
+# hvcNAQEBBQAEggEApUPLPjMeLQT0J2uLkZ7813VrWiVR18xdNrLy7ITqMZ6+o6eB
+# 4buTpqXA8fk2szCnkYiblccmMYUTyysgoPu1WV6clmBNLZzYXadWAngaNHNt8VQm
+# DehQqVHghn9PJv0RXN8l8lv2sqi52LmTXdIUjYGJwht0+yEzqyLBuwQwqST4xu9X
+# ry4Iqhj0YzyjdKtPVhV5SPOoqwt+SWXA85JK/IUEnAtz9Q8W0HcQapzeHCi+mlHP
+# BBhGpao74eu4O7N8/Biaq1uV7cU5GJumEUOIVF2ioLF6BdNmYCsYeDiJ6vNHKSGW
+# Cv8DO7z4cTukUqyWHO/RzvhN3Bz9pB4W083M0Q==
 # SIG # End signature block
