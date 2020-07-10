@@ -12,14 +12,14 @@ param (
        Get-PSSession | Remove-PSSession
         Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
         [void](Enable-RemoteMailbox -Identity $NewSAMAccountName -RemoteRoutingAddress $NewRemoteRoutingAddress)
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it." -Verbose
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it."
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU3HGR69q5JTKxtbgK8BbJIWuL
-# CjqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUxUOFVXe4D1csUgeggxglgRR3
+# z1ugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -86,11 +86,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUJ9VNejGoJgpVpG2Uz7gvJiQWL6QwDQYJKoZI
-# hvcNAQEBBQAEggEADAY75vtObKTgYRWKbo+EgWAKAn2RpBGsuC0VIoaiblER6kHa
-# 9bxtfuB0iqeOqk+FGB2QXmv1AtWkLAgtiKCjMn4IqB5PK9rwl4wTSWNcHIgx1s9z
-# 5rnZh+M2AhPutxVujbqDs9Ndz3IrZDmDXySK97PRmDrjAzh5W7mOKqhzFo+l0j5K
-# s8P1cxEWKR48v2KVflGmI7uepNgs/E+m7ouNr5dlye71SdV9DaJ31Pdw55u57jkI
-# D9GHzuBOCyPKEaOC4eeavcX2AWMs8GfgFcRqyBt/IseGe37N7lw9AmQyLqdPLwS1
-# g4EUwSboSOjlyoAhbeD67n9IyIsKAxvaczEY/w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUA54IPrgr9vfjFxCZul8XRMGEXNwwDQYJKoZI
+# hvcNAQEBBQAEggEA75WkFAIq7U7/LNydzu+xT4kzRatV49swDgzcMuCQqPQnEje7
+# kFRMb05iX8F1TTTUoZLTiiOfmfquz4XrFupy9xosYPXRq1zXgfjyqxDxUSkhjaX+
+# 4uGthapPOgddvYhAnOumjl5q4prChV8Sqrv7YFXhU+em6jlNLGLNeFeuXlmnqoq3
+# e69MQWdI/2JtnsCczweDtVg/W1+Qt9ckBMw0o16pRrX7d5IYN/4TNQ1IuNwEBuvy
+# iH66JGcAsLca8g8er6Zc0jzDlcFpI+OqgdLIEt6plKL9lcUdDerjQowEDPucv2O/
+# HJHAJf5MgvVV2+dwm9Jvv6xx+tYU3hN2tzDBhw==
 # SIG # End signature block

@@ -10,14 +10,14 @@ function global:Create-UniqueSMTP {
       $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0,1) + $x + "@" + $UserDomain #add the number into the secndary SMTP
       $x++
 		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value." -Verbose
-    $global:secondarySMTP = $secondarySMTP 
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value."
+    $global:secondarySMTP = $secondarySMTP
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU3ojipb0042nzChSzi12PyTso
-# OU6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjWujkRp6kZt16nBdKPn55EQn
+# i3igggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -84,11 +84,11 @@ function global:Create-UniqueSMTP {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUIzBlkZnP+NcJXSlTH3jxpjiMxmgwDQYJKoZI
-# hvcNAQEBBQAEggEAoZWjNTluwhASK7BwxBG2ejSk92ugGD86pdCQje9UBwPWGPTG
-# MfN0A/m4NqoibMiAaRFeY6KKn1UfKeV+/msuib0Jo36oo0gNwKP8d3x6OOL2ckhn
-# HYe6GbTHRuOFy8fA1JHlmo3TymxXXqGhyXWQiaN/+B1o9CKcJEAukix7sUVnpbTN
-# iztVvqL0bXqqSm/d0kIfg1PNeN4m+0d+9uB++G0K5nVc2q40YyOyWMHHfYDlDDKk
-# D+ibs3vVQEPhSpvq+ZRAncIgF0H134o36e/nODyrQN+Lx0iOulIIeDCi4ItfUaJd
-# kpAYyg1vmCI1x6TeAGGHyBSp1iDSpMXIePzkqg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU18tUxxFL6mBOXQfp403G7hd4D/IwDQYJKoZI
+# hvcNAQEBBQAEggEA5KmP4SupMEn28/LYtS+C8dm8hf7WOYj0G+tZpc48pVpi1m8B
+# XTRqsfOsMHx0J8PdbePGdn88ixLsRjKqStqAa6isCNFIhQ+MHKq5AJuqcnfpr97M
+# bPMIqA6QtubbsxD57bUVBCtARCTagnIXYC0oBv/fT9na5qf2cwTIdExOShl9H59b
+# 8t1C16VX+9D6orOZta/By8sXoyeibC9aTpHFS5Vstct/pgvjc00kEhpNQlYQSDon
+# VPOcq+yV+JsmeZOYeY+fP+V+8HCVz6Y6NWbVTUpAYS8PTvsA+fzA6a/D/ylgRJmJ
+# Gjk4MkX5WCt3EO2P9UPqFLoHpADViLmyUFwlhw==
 # SIG # End signature block

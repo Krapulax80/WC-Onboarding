@@ -10,8 +10,8 @@ param (
         $AD_Credential
 )
           if ($TemplateUser.Manager)
-      { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]" -Verbose
-         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential -Verbose
+      { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]"
+         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential
       }
       #TODO: Add outcome to manager added
 }
@@ -19,8 +19,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqPYaw0q0BTCftkC9zdlrXrL7
-# pISgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULgFKk0fI7/iZzuJATw17vvuf
+# rLSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -87,11 +87,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUwChvv60JZCINcnN/KBc7OvrLiakwDQYJKoZI
-# hvcNAQEBBQAEggEAJcwkwH1NbMli3Z+E5Mep9LfL7JUy2ZPwOPswzT5wfo/O5h4O
-# fULwcLuecKTY7sW9Wg3TDaIbSjvesWB3JTXP7agd5CBqKgqRwj1XT3DD0I4o7sOq
-# Bo4ykW+5WADdjr5knf1FLhkChNDWv/+4eyNu+w+TVXZiF8RzBic4kfqvv7wvh48W
-# 6+eONr9jywcfMqDce1q0muWWojP/bUrevW+eyddqWFpYegw/Ek0meq/ltGvahOLz
-# N/m41Iwxkaxxxwiq6YxOxwtMpcEnjyBPtPBQRzaW4QOHoFTlRS0DE5+1e7DmiRSK
-# DP56g/kgi5UJzC4M9/U7DZyxXplBBvolGERyWA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUjnoAKAAOAfUPuil7Zd/O+xsD+DIwDQYJKoZI
+# hvcNAQEBBQAEggEATBWF/vtrfZ1pJa/aOEJTWXFXV0Oa6XK/DVxWDu/4HsMVi+9R
+# /4Fq7WwN4D/HBUJ8lORDAzVWExtVKA83rlxJYtgbeWVUvm4oYMQncIDQrQdS3Qb1
+# HcjLQvKIGMH1I03KO3yerU6ReHFaeHRV1gvkoqpZNfv6xq6nAlMwwoCFrLCZQbfZ
+# o2yjPjxzU6f54mNLZ2+dMZjv6lM6Dre+V3IhxjNuDtb8wLtk7BrIPmMfG1qj7Tzo
+# LGFZsi4hB8867z7OculzmdkpglfvKGKZPdg9pwV2J9lxIL6traD/pK+PeiN7ut7y
+# pE+zSHOsFhdNdjETDnAS8fQLE9JSVoy4bqThvA==
 # SIG # End signature block

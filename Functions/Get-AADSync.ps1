@@ -7,7 +7,7 @@
   )
 
         # START
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting AAD syncronisation." -Verbose
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting AAD syncronisation."
         $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
 
 
@@ -28,7 +28,7 @@
             try{
                 DeltaSync
                 $success = $true
-                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Syncing AD to AAD" -Verbose
+                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Syncing AD to AAD"
             }
             catch{
                 # Each failure (usually fail is the result of an ongoing sync) increases the coutner.
@@ -49,8 +49,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOFr0r6jD5x0VFXZ1CBXRKsmH
-# c+6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUcW50owpk1ZJIxSRhclnP6MHz
+# D7GgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -117,11 +117,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUjCAJT898h164Cd/4SSs0FraFV/gwDQYJKoZI
-# hvcNAQEBBQAEggEAY1Ytcqns1Ld8glISstr13cPqGYeC0CeQ5CNUO3tSENenik6X
-# Lya6YuZZ9svsxCKL3Dv8jFZiGCDNOyEBf121Rl2g8K/EETlIUare5tKgsKeZebQL
-# U2poY4OoccGq78GLQ3aeBmkS1bc/dfuH2NatUeRBj2mDFHMaMjbCv3ho0+wX/jar
-# ihEikDV6Zn5frwW/r4rNmbbXDOjkheT3v6Nbve9WbC6CHl5UPPMfTtky+joFjJf0
-# zjHWjopvvEV4Ng1cP38oWfBjnlUuBDNic9BMpTo1SW3wRTczFJBGZHbi24hBVT5c
-# Gx0dbBqXCatB7oIApfLjWY2W8h+f/5tpBId8vw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUARygxpRLIilS2XPcOcR85ma3oWswDQYJKoZI
+# hvcNAQEBBQAEggEAkfM3gdcP7lq5f6wli4Wrj3H3wktxzRajRv/ml7v6eQXX1GkB
+# VDxeLW6pby/ovulV12s8w/3ugsPs7Z+lVs3P1YCXaVPc8hT8CNuXAGNH6sc44OTd
+# bzj8tSvxCqsf4PI7pTSCNhUDhfHeUZgDX3f2qYzOU3RVInDVIl/9925TCOdpbXZB
+# WDiCWlDgUZ6aZngylY6JsMHLUoleyBBPSTr5+aLdAk6+Q8qgJVXnTQPd8IfcyAX3
+# 8Vnlt0iXCdsygDUR4skfy9Esg28tjVpphNknqnL+mhPSLYThbvl3D1fJpoAKJQCy
+# fy403MsYfAa3ve7gTf57PHjbPE3u+EEyvBQDhg==
 # SIG # End signature block

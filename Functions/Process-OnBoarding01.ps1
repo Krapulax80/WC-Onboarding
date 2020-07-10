@@ -111,7 +111,7 @@ function Process-OnBoarding01 {
 
     # Check if the SAM Account Name  already exists. If it does, create a unique one
     if(! (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SAM account [$NewSAMAccountName] is unique." -Verbose
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SAM account [$NewSAMAccountName] is unique."
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Yellow
       Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
@@ -126,7 +126,7 @@ function Process-OnBoarding01 {
 
     # Check if the UPN already exists. If it does, create a unique one
     if(!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - UPN  [$NewUserPrincipalName] is unique." -Verbose
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - UPN  [$NewUserPrincipalName] is unique."
    } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Yellow
       Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
@@ -139,7 +139,7 @@ function Process-OnBoarding01 {
         $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
     }
     if(!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - EmployeeID  [$EmployeeID] is unique." -Verbose
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - EmployeeID  [$EmployeeID] is unique."
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Yellow
       Create-UniqueEmployeeID -EmployeeID $EmployeeID
@@ -194,14 +194,14 @@ function Process-OnBoarding01 {
 
     #endregion
 
-  ## AD Syncronisation
-  <# This syncornisation is needed in order for exchange to be aware of the existance of the new account, so mailbox can be created
-  #>
+    ## AD Syncronisation
+    <# This syncornisation is needed in order for exchange to be aware of the existance of the new account, so mailbox can be created
+    #>
+
     #region SYNC
     Get-ADSync -DC $DC -AD_Credential $AD_Credential
     Start-Sleep 30 # allow AD sync to finish
     #endregion
-
 
   ## EXCHANGE
     #region Construct mailbox's PARAMETERS
@@ -211,7 +211,7 @@ function Process-OnBoarding01 {
 
   # Check if the SECONDARY SMTP ALREADY EXISTS. If it does, create a unique one
   if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SMTP [$secondarySMTP] is unique." -Verbose
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SMTP [$secondarySMTP] is unique."
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForeGroundColor Yellow
       Create-UniqueSMTP -SMTP $secondarySMTP
@@ -221,7 +221,7 @@ function Process-OnBoarding01 {
 
   # Set the new secondary SMTP on the AD object
      try {
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] " -Verbose
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] "
       Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP)} -Server $DC -Credential $AD_Credential # this is done in AD
      }
      catch {
@@ -232,7 +232,7 @@ function Process-OnBoarding01 {
      # (For non-UK users only)
     # For non-UK users set the primary SMTP to their relevant COUNTRY DOMAIN (eg. westcoast.ie)
       if ($UserDomain -ne $Systemdomain){
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Non-UK user detected. Modifying SMTP addresses." -Verbose
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Non-UK user detected. Modifying SMTP addresses."
           #Create old (ToRemove) SMTP and new (ToAdd) SMTP
       $NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
       $OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
@@ -292,7 +292,7 @@ function Process-OnBoarding01 {
           Start-Sleep -Seconds 30
           }
           until(Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue)
-          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution" -Verbose
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution"
       #endregion
 
     #region LICENSING the new user
@@ -343,8 +343,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUiWLqnEE5GHC/pfLiwTuYV+5u
-# YXOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUbkvLOb+Lhvqcg3iuiulWSo1v
+# cJmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -411,11 +411,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUR4sGt2WdbaizyS2MHSdgkk95LWowDQYJKoZI
-# hvcNAQEBBQAEggEA80L2tKPzkE0d91WxmS9fi/c3ipHRHeQoskiw1xHsIOE66soq
-# LbSeRNVp/Ng5MVdE529I0hZR72e0CddcDED7xlZf9IEAwuoa+AAzmZM6W5yrgI4C
-# 5RGptUMODHJ467Eq9JmJp9NKPWXLPT4EU7H/0SUGRx/F9Frq0RDjU0s7TwfcCH2+
-# S6EoKKs5DpAQGSXoeXR5mZQdinIhtspnPLlFIFazXP40xlJMNK9EeGu4eqamsMQd
-# /9wJbqT+sanI9qf9ew835p1xXAkQDaZFxayi5FSPcKHS9JqNEbxrVOXkOOzXbEDS
-# ZaNmxkBeeGVGgCyKoDsDQw/v12PzvbBUzRfvEw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUZCeKGRHQ8FqbqFijrHToBVefEu0wDQYJKoZI
+# hvcNAQEBBQAEggEAN0bHwhCjet6e+CppX70mqfp39YAeC5pDZiyQIUi/XaS3youi
+# 9Xv6qxre8Es7C7Ej14RgTvDeD2aB1mw6MxUEf8nxOKtcDSod8YcbT80Edb6hDsOZ
+# kJgQ39MkCRXjat7oEiaPkwoTsUBc3R1xHKuv3ze8pg7qc+83B3xKpnds0kzVY3pv
+# /W4UA6vO0YHyxZKQiIAS3KNoEQxqrlyKIQXoe+oBOrmrQy5PDHBwLEoSEDiWOjii
+# wbucFu5FDhTvb9x5fd3CPGAjdQZo6mxIscHcfH0texxWFdED0BsaUkJlRiigsX4D
+# G3qU3kga14GMTEweLR6IcCI2WEMh3lGHa5QGHQ==
 # SIG # End signature block

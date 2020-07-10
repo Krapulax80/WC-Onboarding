@@ -21,24 +21,24 @@ param (
     # }
 
     #START
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting File server / DFS configuration" -Verbose
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting File server / DFS configuration"
 
     # Create PEOPLE DFS folder
     if (Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose  "[$timer] - DFS folder [$ProfileDFS] already exists" -Verbose
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose  "[$timer] - DFS folder [$ProfileDFS] already exists"
     } else { # otherwise it is not existing yet
     [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
     [void] (New-DFSNFolder -Path $PeopleDFS -State Online -TargetPath $PeopleTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating" -Verbose
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
     }
 
     # Create PROFILE DFS folder
     if (Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] already exists" -Verbose
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] already exists"
     } else { # otherwise it is not existing yet
     [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
     [void] (New-DFSNFolder -Path $ProfileDFS -State Online -TargetPath $ProfileTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating" -Verbose
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
     }
 
 }
@@ -46,8 +46,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZw7KI8sGRnMorF+mpmYAKBzw
-# 6TigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjD4NcgS9n4EdWN8JOTveKm4w
+# 0hSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -114,11 +114,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU7f3FRw7SedEcaTiy1ETiWbvQNQwwDQYJKoZI
-# hvcNAQEBBQAEggEALNtqdEurbODK/rXNlhfoWydxT07S3o3yG3idC2z/9VuTzqk5
-# 7MQRuUmKweEkLtfbmM0iARBoZSbc+KR2vY7bSylwswmZbuv1Ertwa+C2ogsAfo1B
-# y/Esssvvj53ktBhB+whF9lZDY7FgG99MyoQ7juT2pXeiEKZInW7oTfunXObL+K8s
-# 6He7LFU8Zs7Q0ogHR6focviIVrVOAC+hF31Qc0cpIAqCQjx/Or789C8RwEQOqFIv
-# 5gkYpLZ7mik9ZLwLAofCtXpOKggnmI+H85XS66kiH6KdeNGr8b+pzbcARbDL+6ZT
-# kyKH9ouEjUk4qg7cqM6HAk+LqNOOE5RowvAyLQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUp+TYKEp4aJ1Gg3iNE1fXoJDHYzMwDQYJKoZI
+# hvcNAQEBBQAEggEAAxslIPp5958ZMLcsWQMDQniXjllrt55VcLuR/f32T0QSiEYg
+# sZ3MUtMsnqDXNZx4jFHqK1FAzsBGWLR0vHaQQcEAg/JESoEUEm7tctmBSL41Uj/O
+# q75iUPn97YaAv3hP/5TvPlvotTinW+YxANjdBKrVonv10qxRYFTQKh5ix2wOmrbQ
+# LBcILDKeFb73cnFCGq3rq4vy5FntqtLIMIOMAufPtc/KEX4zTj/xPSa6s+yp6dkj
+# XzNn5tCD2dpwyC2bxb5fYpCXyTkIm5ONuR8KQPmOdpyDM9DgUn2OJoZbVH2zdxWU
+# OH7XDih69U7umnc+0Ihn57t6kccXbad6yaf8YA==
 # SIG # End signature block

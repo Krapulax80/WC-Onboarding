@@ -10,7 +10,7 @@ function Connect-OnlineExchange {
   # If there is an open session to Office 365, we do not re-connect.
 	if ($OpenPSSessions.ComputerName -contains 'outlook.office365.com' -and $OpenPSSessions.Availability -eq 'Available') {
 
-$timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange Online already available." -Verbose
+$timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange Online already available."
 
   }
   # If there is no open session, then we do connect
@@ -20,15 +20,15 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
     Import-Module ExchangeOnlineManagement}
     #Then connect
     [void] (Connect-ExchangeOnline -Credential $AAD_Credential -ShowProgress $false -ShowBanner:$false)
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Connecting to Exchange Online." -Verbose
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Connecting to Exchange Online."
 	}
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUC7P+kPcoj0Fe/IqpljdMRalC
-# XKKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU3x+NRrOTuNfV0m6gK+w3gBce
+# TU6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -95,11 +95,11 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUc6rX+kReYsIPg4Br0/Z/XmLzTngwDQYJKoZI
-# hvcNAQEBBQAEggEA0alrslLpB3hENfm2WDeliWxaQWSAQHyeincMiVYCDnYX8O/x
-# oVUgvT0pWpv6Embn2XLxYlMDGV0aejLVUZoXZ9spnqh8d3kzwsmm/eyYkYQUe+dY
-# Y7+TwPH+trxH1JooGC2wh8QQf6Z5F1Kb67oN0p17sIu7VvVQEOLK1YmKpi5T+kAU
-# ZdM9JgG0INcK7Qb7REmSP0rpnyEBC4V4hMwXgoo3KUKuHxvI2uF/e8zxxg0CKhex
-# ouPw5U6EZ+N2DpEJauvTMI+iejYRxyIZ2smPVQZC16WTIpJoGzVldcCtnnFxuU6M
-# y/kspujil6W7Hg4QEQ/aPDFdRVhRNxon7WK/EQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUM7qOXBEIIqjOeRtDR19TtOiSjNAwDQYJKoZI
+# hvcNAQEBBQAEggEAchq7gkuqHX2BxoG7F/+oHUOUpK0EcQZ+jE5O31Ck4XbGlf1H
+# o9Jd0T9bkJtdo4ELjC91mZ1e0Yeg48jUg/OiuBIYLyi9GEQsmKgGS6OYoYxIcqLd
+# Bp42n+NOWm/7QpbNc62JciJVJl1O5OZiKIVkE8bSq5v6515Pd4soEi+yha6sUMgc
+# mGA7MIYaxcx0o3zUQ1GQRhCau8ngbVxSqLuoqq+GM0Jg4+20NGgnL59TB0f8Z53v
+# pocF8AC3x0tzpKaZah8KRhBTRqJ9/X696XIWUcKkeK+9la2QSxbyx4Nwww6CCo76
+# uM7hKkLpOZHU7jZ5AyhHfGIS0POqQULAFqsVBw==
 # SIG # End signature block

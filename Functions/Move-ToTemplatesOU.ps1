@@ -10,7 +10,7 @@ function Move-ToTemplatesOU {
     )
 
 try {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -Verbose
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]"
         Get-ADUser $NewSAMAccountName -Server $DC -Credential $AD_Credential | Move-ADObject -TargetPath $TemplateAccountOU -Server $DC -Credential $AD_Credential
       }
       catch {
@@ -22,8 +22,8 @@ try {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7FoJml+M3z4IfO2Jk0cnxPh+
-# haWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZB0BKSPKhfDG0YLe+YLzgRfN
+# 7+OgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -90,11 +90,11 @@ try {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1QVh58J3rKrrSlC3dlfBHGbWyv8wDQYJKoZI
-# hvcNAQEBBQAEggEAQmRw/H6okXevaCnlp6IvudLxEgTvgIIx6mBFFEcRy3JiOJQI
-# /1x2x8N1x/zEbAta7SfzsYChnJ9VBIqQhTWD6GC3fVHZMTqvLbORVha7s3KOa18c
-# lTr0bDu39qjOs+T0OJnJKwGb8dkmvcz/rc1DoVkIl16g30ugnod40o0TvzcgTtYY
-# fXtdjYTB4t6LCpwMfv7zq8POxzovdLRlrMhWBtrVaLWH5QLLqg2O3GFWwBJ2+Kcd
-# SKLlA2q7xBpC3zC+lxmWirC1rwfWIbt851UMTZvswL8Q8sb+x1SBLbYFSn4+/McB
-# LaR6M+gGALzt6z65Mug7Sldm7DvZ15YWfiIpQQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUdQKNm1PiYDwIoQK/qliYTWGmI9kwDQYJKoZI
+# hvcNAQEBBQAEggEApuFw9dvR7KbWGf2jFSjls7qPHBeInT1MRCGrIE/o8FCMI2+I
+# rY50Af5ZiNVqsgmRRSSaVbySDId3bscf+ae91QqQSAoitKYYQtTGQ5SPIpkg8/d3
+# ZfI5Q6niZSHesg+PdOS8zZfhzvr6hDEQ5T8Puavw1ACU6P4j3bhg5Ffuauz1qYRF
+# 0nFAPws1QHjAVQ2vpFanqVfzQ1PjkRuKqvSlLwmHKQJYjxMaSKwPPefbStTmhpQU
+# B2SGZl8uTqXKgyXKi7kNnb3CQqAuxvZaayV36u2wZMRvtIR1LkpnscljNHAPJv4/
+# 7iS4fo8m/M5Tz5tvVT0r4iVecmPOc0Bfm5uMJw==
 # SIG # End signature block

@@ -22,11 +22,11 @@
         }
         do {
             [void] ($FreshMailbox = Get-mailbox $NewSAMAccountName -ErrorAction SilentlyContinue | Select-Object  *)
-            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in 30 second!" -Verbose
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in 30 second!"
             Start-Sleep 30
         }
         until ($FreshMailbox)
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Found mailbox of [$NewSAMAccountName]. Continuing" -Verbose
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Found mailbox of [$NewSAMAccountName]. Continuing"
       # Display report
           Write-Host # separator line
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
@@ -43,8 +43,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJAYl9GvSsv5B+VKgco14eSrW
-# XjegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU9MF/lNzrkKO5rv/iEZoLRz5W
+# W1WgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -111,11 +111,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU3tSpH09rQZU9+5upRAqm2h8bYoUwDQYJKoZI
-# hvcNAQEBBQAEggEA8FYfHz3CuTWVBdUH8R9UFI2sEwRBMov07jOO5MmkdD+6plkG
-# h0z9xpNOcdjwdVsOWfLInTHKocC1Pa2sCQlbN9CV497G8CACUJlfQFYGIg1v/DyO
-# /O7PRFdBU9ELoikt0I6oc8Hhzdaa3hh2f/BruLAOzlZu0GenIz82Etfz/NSDCWhU
-# qtbAfpj7KMPs/u+eXFv53F9flpEOr1aCID0yzZdp58E55thdGatHrOU3tm9alZ2j
-# NyVCM/OEhMziXNdx+lA8reNGKjqpSW4k2OPau/nwgRJ/5Q9OCR/utxNCpdjZoFlk
-# XheI95dvfiKbq8YcPSsd0VFlDu1zogFhOyJ4BA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQURgHLcuK4FaSeQGtTk/79E9E5JHkwDQYJKoZI
+# hvcNAQEBBQAEggEAM3QIXEuQvaIAQnxUBx4uyf3HZ2TV3dmX4C8lG37tphHDdZeU
+# KtzGhLwYlWgCCIUOrsxmjDzmdBVeliRvJMyp4Rr1OYbpVaHGoGTGzwgipGC+WV/K
+# UgyaDWefCW3LiZ9YqNf4gU8qD6Gnq9Slpsx9q7SzR74tKIkRT2ul2kg8WQ7ITfuf
+# 3JJ7hAmFh9zovvF82zrIWYpkxFkH2GuRexpUFGJMsFD0dtTot5Dagl9xvOMCriKP
+# TCFbwTGx5fS6X+k0RuGF6iSIHNjqMob6vVPMekfgMDUtILEp9Tu9c/nHm9chpFZP
+# mLyy+pmKUUKPzdr+QhQxIvdh1TSw25huze9ong==
 # SIG # End signature block

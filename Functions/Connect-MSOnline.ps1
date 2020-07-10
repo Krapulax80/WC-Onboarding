@@ -6,19 +6,19 @@ function Connect-MSOnline {
       $AAD_Credential
   )
 	    if (!((Get-MsolDomain -ErrorAction SilentlyContinue).count -le 0)) {
-            $timer = (Get-Date -Format yyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - MS Online already connected" -Verbose
+            $timer = (Get-Date -Format yyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - MS Online already connected"
 	    }
 	    else {
           Connect-MsolService -Credential $AAD_Credential >> $null
-          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online not available. Initiating connection" -Verbose
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online not available. Initiating connection"
 	    }
     }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU65Hy5jrlwQ8V5/fLqomoEEh5
-# A0KgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU+77tIYRnvNIODe8YBQQS05JJ
+# 65ygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -85,11 +85,11 @@ function Connect-MSOnline {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUZXY/Ah9T1wkYdWeYBVC4+6Tq6ZgwDQYJKoZI
-# hvcNAQEBBQAEggEAsp03vQqPzccrlL4Jazm0CIXfPLQ895i7vrAMZhZkrLI2mCmo
-# fsfDSO+YMlHkc4e7cmcyShvDjSAgIX7uSZN1qIYmt4+Awp5t2neJVTreGEnCf3HN
-# 7+RmU9mYP3OZeM9z6X+yX1g0WFwYGivIFHa7FK37cu6/M3TxdBjUWyawSDeKkXYU
-# 4J/umQaxTKjlfoMB/jzB/bY08O813tSkmbZ6h3DTNu+o9xif7r/taQg8ImTu8Ecc
-# 6NSp+Ts5VU6s1DbFlzgZO9ZZIpp4RVmdvmlhrJqzG8ayvCTXOJ4JMrpVrIuDEBsf
-# Uy3KJHsVRReSRRHfKIDxtTGnA001v5mArRMNFQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1JgqHHgul+sfl0O/NQH2da2cMzQwDQYJKoZI
+# hvcNAQEBBQAEggEAEXaWbc8cw5psFW+RYpc/bA9g4mcT/BYwNWxqBgOMNCuy2pr0
+# 2WwcQ9H40Rs6lvpq+Y4STeCM/hiI9LcMoWiIjWrLwgx3UEen1rJUyvzqllQAhHPS
+# h/BHYDZFXlwEazLfVwlbWz3mpm+gtrDm4TLVEj1KFSk6OPIV/bPLkw/RGXXPxTsN
+# 9+lDqGTLjtyH6kvL4ByB8zX3v5EXm39eZ9v9KIeOyBerLDqC03oXpzcGcH4yugnx
+# DKy/VmWow/yNSoGQCH8iw0C6IJBGFXFm2ab2BJ6mWpWfbSoqPRvdZ5iaG9O7u02a
+# 2PLcZ5gUQOCrjtcmnde7pMeYC0KVyAZ05s0dYA==
 # SIG # End signature block

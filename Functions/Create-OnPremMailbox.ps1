@@ -13,14 +13,14 @@ param (
         [void](Enable-Mailbox -Identity $NewSAMAccountName ) # create the mailbox
         [void](Enable-Mailbox -Identity $NewSAMAccountName -RemoteArchive -ArchiveDomain $EOTargetDomain) # places the archive in the cloud
         #Feedback
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem mailbox created for [$NewUserPrincipalName]. Archive is in the cloud." -Verbose
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem mailbox created for [$NewUserPrincipalName]. Archive is in the cloud."
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU5ervwins39ePi1+FDDefeaHz
-# lXSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU4ZLOVYh/VTmN96gtcwsjKX0X
+# 7JqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -87,11 +87,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUIRQNWRLvKQytva/e/jaEc0059d0wDQYJKoZI
-# hvcNAQEBBQAEggEA86F5sC/HUizW6fWE6wqfzGCzC7oroeQZxGDMo1t07Ph1y3Rz
-# tVNBZg6+zbhijBjxi+V/+XDIAWD07lrhc7AI1vObiJBYG0rbFXfB+lvI9+yewdGq
-# L37BvpxQrv4J5Ctlb1szRpMl6y4ndqWf6UJFRF1BFTU54r7trR19ZAmRSNo6SsGs
-# yUziglTI6WPLaBH51Oj3CRI00JV8XYX4HGoeRhDgoscwUAgOn0TY4ClcWag5kKaB
-# eQqXXMYpVcXWWtUKrGvwFkhWnJcKWDwlc/9NHNIp2uVwynWNLea3YfQJG4dlFvm0
-# muhii2zydJBV21XRuWrT612kXuobg6FR7bYIsA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUVHgewB2e1u9rBYSyunzYIZh8vsAwDQYJKoZI
+# hvcNAQEBBQAEggEA1MQxmuyF/J50p7lG4eLxRneTQEnG02QoFfyDTp3Rc0JYJK3K
+# 9/CtuEXbuxCGpleO37tJu0RS7JZk8ny1jMVB6s4zCPxyWymF1TZoNyst1le/OyCg
+# mBIcZGzu5yGP88X86VPoEXy8QPAlViv6XW14FrOZo9CtdF3Vz3SzaJyaQDoDcixR
+# rLOyCzT9IQ3hK8+9XU+CgEoSH6igp1hOnAdU7jL/82A5e2sIfiorrF3ZxregDmMT
+# LbZE01+EyySlmYV+BCjMJS99DpBhIk6QibgxxvrGqfYb8ZjkluRitdvWfVwNbdYs
+# ZrX1uAIQPm8MpuKz29NSXrmP50OtDLS9EE+7Sw==
 # SIG # End signature block

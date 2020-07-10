@@ -9,18 +9,18 @@ function Create-UniqueSAMName {
   do{
     #Truncate, so that the length stays under 20 characters
     if ( ($NewSAMAccountName.Length + (($x.ToString()).Length) ) -gt 20){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New SAM [$NewSAMAccountName] is too long, truncating..." -Verbose
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New SAM [$NewSAMAccountName] is too long, truncating..."
       $NewSAMAccountName = $NewSAMAccountName.substring(0,(20-(($x.ToString()).Length)))
     }
 
     $NewSAMAccountName = $NewSAMAccountName  + $x
 
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New SAM is generated: [$NewSAMAccountName]" -Verbose
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - New SAM is generated: [$NewSAMAccountName]"
 
     $x++
 
   } until (!(Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Server $DC -Credential $AD_Credential -Properties * -ErrorAction SilentlyContinue ))
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - [$NewSAMAccountName] is an unique SAM. Continuing." -Verbose
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Verbose "[$timer] - [$NewSAMAccountName] is an unique SAM. Continuing."
 
   #Output
   $global:NewSAMAccountName = $NewSAMAccountName
@@ -28,8 +28,8 @@ function Create-UniqueSAMName {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUxO8fO07Yz0DBf6IL/O/lt1Dm
-# r4agggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU0XoloYDz1d/C8L2Z581yEJss
+# zGGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -96,11 +96,11 @@ function Create-UniqueSAMName {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOhct/0zIylzuxuBJfWDx4YSe0LQwDQYJKoZI
-# hvcNAQEBBQAEggEAGJlFU0+Fmq9kj/P4OiHiUZmaytpZzSJ5EcbAXA5NOpMj5FdK
-# twOHZ+MVoXBwyWRpJMAr6dspicQiNhvDYl8T6fA5drKQ/hNmFI9tM7Ijm5chaH8G
-# QL3QRTWyr3oZFetnIOeOt0QVi8iCeHB3mVmpA5N6oz9uOq87NTrKT20x+K6zJyXb
-# L4faoHqC0W3Xsh9A6NNPc2l1zOt3ZTW86FYCmYo6HAMoIq4EEb6Tu+LtXGZ+Bqxr
-# BVo1xyuYc6carumKZPeBmxY2T8XJkoGMvuBBQ9JUkX8XIT4L52OC9lP4CFL4rh4z
-# US6Wp8CvBd/5wX62BNz0R0Ikn9q6+PL5n/YOgA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUIGWVpFquHu+eW/hOX8tCm4g+OkcwDQYJKoZI
+# hvcNAQEBBQAEggEAl9Ua40JOyBmKuvbOnkqhERCNm3GDDPnjhyciicfMJDuTztWB
+# ySjyS5Z6G8I8zb+upQQLvZ+TcXIEkXopAWaXhEuc+x7XeLrwGbSnCB9aT/z6aLQs
+# sx1+eOK1zMaIRNuWxBbCWmkmJvXo9Nt/F3CdJg6WaoCzRsrytF61Jz/ebzJIcefK
+# YFpw7kRlk6QQgWX4udz0qeW+ZfCHxglThxaIfHRfmfUvyci6AW1Fq1zfpqNYv77I
+# pzhFk7S2/DGb04/l4L9oMnsDPwlG5EUuHwpo4aavahgNVqhoy+TUiR9g1FY0dRNe
+# vn+4a3aLJK3oNMzbaevxHcWkoCerFvOkrGRHBQ==
 # SIG # End signature block

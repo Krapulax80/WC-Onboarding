@@ -8,10 +8,10 @@
 	$OpenPSSessions = Get-PSSession
   # If there is an open session to the on-prem exchange, we do not re-connect.
 	    if ($OpenPSSessions.ComputerName -eq $ExchangeServer -and $OpenPSSessions.Availability -eq 'Available') {
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem Exhange already connected" -Verbose
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem Exhange already connected"
 	    }
 	    else {
-				$timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem Exchange not available. Initiating connection" -Verbose
+				$timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem Exchange not available. Initiating connection"
 		    $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
 		    [void] (Import-PSSession (New-PSSession -SessionOption $pso -ConfigurationName Microsoft.Exchange -ConnectionUri http://$ExchangeServer/PowerShell/ -Authentication Kerberos -Credential $Exchange_Credential) -DisableNameChecking -AllowClobber)
 	    }
@@ -19,8 +19,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU4lWgwYBcVZxvl6iDfrex8U8Q
-# l8CgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU+9DWGxwBEvw82XBhoW3eb+Km
+# 1s+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -87,11 +87,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUwgH0ZQ7i0j8eAcCdj1aty9qmGxEwDQYJKoZI
-# hvcNAQEBBQAEggEAsq6IaawEwrFT+2kwUe9NeHF/ymlAYON8dpIqH/R1fWArEWKz
-# CGF0zHt4QV7O/XSfd9PQ9mBl8T4XeRXCcumJT9bftZQ9YVjgWNqWFAuY/+UDcJYh
-# MBEh/qMrR+tHkohmdf/yXsDkq4lHqnCWrK2bS449kmX5Qi/AAlt7hfqHdnZPgqzR
-# 3SPgX2YzSkVqg/LBrmfUE68IEb5qCsYAGtZEokaE/5heZ2F0xB5D0UfHSZ957mdK
-# sSgQkit0bOvIgOKGgH7eKwzO96iHjUHggxIdOSQwSJUUElsLw751UaeOlfU9AeN6
-# EjpWyEOEQYkc5yFtl+e3v2gxMpVLDCqAbjVATw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUyCvqEBlHQm5vtQyX9TIVhew6/TswDQYJKoZI
+# hvcNAQEBBQAEggEAOZ5X1l8o0qFRDLwjB9Epfcttz7ZJi44y79NfSznDhRbNPPSr
+# o85acf0tTx2rw2GeMRPZTaXDEm0CYO/SkQpOm77KwnGb4bDdRR8RgmnAG2Qe9bzu
+# 4qZPd/Podqcr/mQJuVzwZZWuC/6D850K26QpcZyT3O114OCHcXEkXUBtKV7FHffe
+# HwOPywXoTv/U3GDaIM7CFF5HScNfQD8rc0cpiifDDPxPslHq8vUX6maa2vkEl6/j
+# UFrnKh6c6g6QnFgp5sc14XC96LfTBydfdsQA81oiYMS7LO5TXS0R8qBEPcEueD1l
+# hDQpLL/aHwzhdcKaQ9DwEczRJ8+GxlF3Qbft8w==
 # SIG # End signature block

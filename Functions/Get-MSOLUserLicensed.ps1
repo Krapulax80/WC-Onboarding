@@ -13,9 +13,9 @@ param (
             try {
               # First attempt using a group for licensing
                 if ($LicenseSKU -match "ENTERPRISEPACK"){
-                  Add-ADGroupMember "LICENSE-Office_365_E3" -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential -Verbose
+                  Add-ADGroupMember "LICENSE-Office_365_E3" -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
                 } elseif ($LicenseSKU -match "DESKLESSPACK"){
-                  Add-ADGroupMember "LICENSE-Office_365_F1" -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential -Verbose
+                  Add-ADGroupMember "LICENSE-Office_365_F1" -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
                 } else {
               # If the license has no group, add it directly
                   Set-MsolUserLicense -UserPrincipalName $NewUserPrincipalName -AddLicenses $LicenseSKU #-ErrorAction Stop
@@ -33,8 +33,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUUpnTfqzBxWIgcQ0p1aX01TC8
-# Z/6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzPD79TDplANxAdX7pij9lJKj
+# JXagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -101,11 +101,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUq+2Ugan3vMSbtkeep/BM8GJNz3MwDQYJKoZI
-# hvcNAQEBBQAEggEANhmZ45p+QpRlpJPZrclTypp9mUaTM4wrIofd+g4VPIsejj1B
-# hrYW4649N7pL8YwlszD5W1Knh4+3PqucTpjsFgDfStcO+N/GAF5yc2W+q8fu2BoH
-# xBbBCPeoeNcVupQ9KNjKP7SXubivd1Io4p41Er75d48wGoGvx56yqBTWZCP6AUo1
-# FE4nwrHVKL1+hEjDV7ZsbXfQJeouUQRnmrZ+B3XK/AmuvqxlkHt3hmmKLlxbpDVX
-# 4JEnUTIj6m58xKIrU1qnopvMdYrZ871LuxSJPuoPxVI0Jsv9y1vXtaGh4HGt04zK
-# d2FAbmV0Am5ptEEzSw+bcGIXAvfkEt0Psri84g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUE+Qj+eN8Ja+VT+2/jXY4vNXkzJswDQYJKoZI
+# hvcNAQEBBQAEggEA4vIWMA003M/zPlarmwZ/vWsrzXM9JFabZldVHmBLzEJ2qw5l
+# aEqMxGx52xPOUPsbw3qyL06QaQCGc6vnkxBJ5ja6BH1LztVv2qvvBRv26JeMt0Lv
+# DIHMIRTcyccJvCnqZNebVNIwaL/9tw3hR4/ulWQ58l4orATXhKcahYwTifb2aKW8
+# wi0A6i86c90OGtVKABWdFxoRqu2xB3NzAfDb5SgxWeUWEttrFhUokFJ1XQhn75Re
+# BQeldvrKzgwgY0ojTHYL/byC2++WVYzH3fI52Tx2O8oIHE3/+4FVK7phDrXdOyVy
+# 6z+9kXEcR20R4kNoVaCzyTDf0gI6Oz8Gw5PvBg==
 # SIG # End signature block

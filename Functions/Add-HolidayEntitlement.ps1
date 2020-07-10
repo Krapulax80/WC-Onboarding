@@ -11,9 +11,9 @@ function Add-HolidayEntitlement {
   )
 
     if ($HolidayEntitlement){
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting Holiday Entitlement  [$HolidayEntitlement days] on [$NewSAMAccountName]" -Verbose
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting Holiday Entitlement  [$HolidayEntitlement days] on [$NewSAMAccountName]"
               if ($HolidayEntitlement -gt 0){
-              Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute15 = $HolidayEntitlement } -Server $DC -Credential $AD_Credential -Verbose
+              Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute15 = $HolidayEntitlement } -Server $DC -Credential $AD_Credential
               }
     } else {
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Holiday Entitlement is undefined for [$NewSAMAccountName]" -ForegroundColor Red
@@ -24,8 +24,8 @@ function Add-HolidayEntitlement {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU6KM1lucX5D4e80kay4+DlIc9
-# 7cagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFaM1PnH9+QLQh66RFOC69AQ1
+# 4u2gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +92,11 @@ function Add-HolidayEntitlement {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUo5Qgpx0AQ3aJiUQ/TA3jmtQAWGswDQYJKoZI
-# hvcNAQEBBQAEggEAByvVZSOuXBN0VqKIhXWv5eR1c/rrW/jKhZDLkY00Msbz3+V/
-# twHOol2WijbqJWXJlMKBDz9SoSFuVfPBKRuMBVt8w/q2oLj0o4/HFDGc/6q918cN
-# qmFtDNjjaaGA+twcRE0sl+FCiqQCwmJx8WvOR57TYS6aprJaa5xhX5Qq93Q3Ld7k
-# gkVhHoD8LxeK/ai0BwONu721ideq6k9RKpUJKB7a7dvV5jaX3oWGL7r95RuMz43R
-# er3lAc3ATx76a0zsOziYnub/0nEuKth4SfnDaTv/u0LkQ0qPkRx7sAtcMrtzN0DR
-# wcxB5XYEJWq7WffLKbuBANjQeF/EcjesNJmpVA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1Z9EJBlq6r66It77F7TmgAfEEr0wDQYJKoZI
+# hvcNAQEBBQAEggEA2i2vDfByxz4IGvXszGauIqsHAWW92O4jxBmeAwi9x6VFWthm
+# mQ04l9FJcRZ8e2UQy2163+Y+AqL7IWps5Wfb4lsOpd5NgqDuXL349MyKOXHXdPfy
+# mMUCYOGa/UhA7DEjDqz/49QfmYYleUZ6SFRvX2e29r8rDYhw+WJAyZX5e8mQwQI8
+# 87IICi/QF6P2Yy1pUYM5/VHF+ZXRh2l0lvq9sME6gyDakNaoybmRFzzDCntI8C/g
+# 9Rw4w/RgnLX4Iv9JNjW23ODQXiKT0mNiYJA8XkZekXMJgNS72VQOirrNR7wUYIJe
+# TUVo/8wVjB2w7JJCtOeVq3V0H/a8mGjoQfPeyA==
 # SIG # End signature block
