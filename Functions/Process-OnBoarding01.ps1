@@ -21,9 +21,9 @@ function Process-OnBoarding01 {
       Create-Credential -XMA -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
       #>
 
-  # WORK IN WESTCOAST DOMAIN
+  # DOMAIN SELECTION
 
-    #region Select work domain
+    #region WESTCOAST
     if ($Westcoast.IsPresent){
       # Credentials for WC
       Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
@@ -46,7 +46,8 @@ function Process-OnBoarding01 {
       $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
       $DFSHost = "BNWITRDS01"; $DFSHost = $DFSHost + "." + $SystemDomain
     }
-    # WORK IN XMA DOMAIN
+    #endregion
+    #region XMA
     elseif ($XMA.IsPresent){
       # Credentials for XMA
       Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
@@ -67,13 +68,14 @@ function Process-OnBoarding01 {
       $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
       $DFSHost = ""; $DFSHost = $DFSHost + "." + $SystemDomain
     }
-    # (INVALID WORK DOMAIN DEFINED)
+    #endregion
+    #region (INVALID WORK DOMAIN DEFINED)
     else {
       Write-Host -ForeGroundColor Red "Bad domain."; Break
     }
     #endregion
 
-  # ACTIVE DIRECTORY
+  ## ACTIVE DIRECTORY
 
     #region Construct the new user account's PARAMETERS
 
@@ -172,7 +174,7 @@ function Process-OnBoarding01 {
       }
 
       # Set the END/EXPIRATION DATE of the account. (Account will stop working after it expired!)
-      if ($EmployeeStartDate){
+      if ($EmployeeEndDate){
       Add-EndDate -EmployeeEndDate $EmployeeEndDate -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
       }
 
@@ -192,7 +194,16 @@ function Process-OnBoarding01 {
 
     #endregion
 
-  # EXCHANGE
+  ## AD Syncronisation
+  <# This syncornisation is needed in order for exchange to be aware of the existance of the new account, so mailbox can be created
+  #>
+    #region SYNC
+    Get-ADSync -DC $DC -AD_Credential $AD_Credential
+    Start-Sleep 30 # allow AD sync to finish
+    #endregion
+
+
+  ## EXCHANGE
     #region Construct mailbox's PARAMETERS
 
   # Construct the secondary SMTP ADDRESS
@@ -250,14 +261,16 @@ function Process-OnBoarding01 {
      #TODO: Report outcome of the mailbox creation / failure / error
     #endregion
 
-  # AD & AAD Syncronisation
+  ## AD & AAD Syncronisation
+  <# This syncornisation is needed in order for AAD to be aware of the new AD account so that it can be licensed
+  #>
     #region SYNC
     Get-ADSync -DC $DC -AD_Credential $AD_Credential
     Start-Sleep 30 # allow AD sync to finish
     Get-AADSync -AD_Credential $AD_Credential
     #endregion
 
-  # MICROSOFT ONLINE SERVICES
+  ## MICROSOFT ONLINE SERVICES
 
       #region CONNECT to MSOnline
       Connect-MSOnline -AAD_Credential $AAD_Credential
@@ -282,7 +295,19 @@ function Process-OnBoarding01 {
           $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution" -Verbose
       #endregion
 
-  # DISTRIBUTED FILE SYSTEM
+    #region LICENSING the new user
+       # When the user account is present, assign licensed to it to match the template (minus the licenses that come from groups)
+       # Location is always GB
+        [void] (Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation)
+        # Assign each licenses of the template account to the new user
+        if ($LicenseSKUs){
+          foreach ($LicenseSKU in $LicenseSKUs){
+            Get-MSOLUserLicensed -LicenseSKU $LicenseSKU -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
+          }
+        }
+      #endregion
+
+  ## DISTRIBUTED FILE SYSTEM
 
     #region DFS PARAMETERS
       if ($Westcoast.IsPresent) {
@@ -305,24 +330,12 @@ function Process-OnBoarding01 {
     }
     #endregion
 
-  # USER REPORTING
-
-    #region LICENSING the new user
-       # When the user account is present, assign licensed to it to match the template (minus the licenses that come from groups)
-       # Location is always GB
-        Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation
-        # Assign each licenses of the template account to the new user
-        if ($LicenseSKUs){
-          foreach ($LicenseSKU in $LicenseSKUs){
-            Get-MSOLUserLicensed -LicenseSKU $LicenseSKU -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
-          }
-        }
-      #endregion
+  ## USER REPORTING
 
     #region USER REPORT
       Write-Host # separator line
-      Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential
       Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
+      Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential
       #endregion
 
 }
@@ -330,8 +343,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfF9gz+tXatkILFtJCvTbjX5A
-# sPmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUiWLqnEE5GHC/pfLiwTuYV+5u
+# YXOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -398,11 +411,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUh/UH0CWiaMtnK2oewBkU7PAyJHowDQYJKoZI
-# hvcNAQEBBQAEggEApUPLPjMeLQT0J2uLkZ7813VrWiVR18xdNrLy7ITqMZ6+o6eB
-# 4buTpqXA8fk2szCnkYiblccmMYUTyysgoPu1WV6clmBNLZzYXadWAngaNHNt8VQm
-# DehQqVHghn9PJv0RXN8l8lv2sqi52LmTXdIUjYGJwht0+yEzqyLBuwQwqST4xu9X
-# ry4Iqhj0YzyjdKtPVhV5SPOoqwt+SWXA85JK/IUEnAtz9Q8W0HcQapzeHCi+mlHP
-# BBhGpao74eu4O7N8/Biaq1uV7cU5GJumEUOIVF2ioLF6BdNmYCsYeDiJ6vNHKSGW
-# Cv8DO7z4cTukUqyWHO/RzvhN3Bz9pB4W083M0Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUR4sGt2WdbaizyS2MHSdgkk95LWowDQYJKoZI
+# hvcNAQEBBQAEggEA80L2tKPzkE0d91WxmS9fi/c3ipHRHeQoskiw1xHsIOE66soq
+# LbSeRNVp/Ng5MVdE529I0hZR72e0CddcDED7xlZf9IEAwuoa+AAzmZM6W5yrgI4C
+# 5RGptUMODHJ467Eq9JmJp9NKPWXLPT4EU7H/0SUGRx/F9Frq0RDjU0s7TwfcCH2+
+# S6EoKKs5DpAQGSXoeXR5mZQdinIhtspnPLlFIFazXP40xlJMNK9EeGu4eqamsMQd
+# /9wJbqT+sanI9qf9ew835p1xXAkQDaZFxayi5FSPcKHS9JqNEbxrVOXkOOzXbEDS
+# ZaNmxkBeeGVGgCyKoDsDQw/v12PzvbBUzRfvEw==
 # SIG # End signature block

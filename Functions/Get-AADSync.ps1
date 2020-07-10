@@ -1,4 +1,5 @@
     function Get-AADSync {
+     [CmdletBinding()]
   param (
       [Parameter()]
       [PSCredential]

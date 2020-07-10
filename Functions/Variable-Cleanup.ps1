@@ -1,4 +1,6 @@
 ﻿function Variable-Cleanup {
+     [CmdletBinding()]
+     
   Get-Variable |
   Where-Object { $startupVariables -notcontains $_.Name } |
   ForEach-Object {

@@ -28,18 +28,23 @@
         until ($FreshMailbox)
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Found mailbox of [$NewSAMAccountName]. Continuing" -Verbose
       # Display report
-         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
+          Write-Host # separator line
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
         Write-Host "Name                : $($FreshMailbox.Name)"
         Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)"
-        Write-Host "EmailAddresses     : $($FreshMailbox.EmailAddresses)"
+        $x = 1
+        foreach ($EmailAddress in $($FreshMailbox.EmailAddresses)){
+        Write-Host "Alternative email address [$x]     : $EmailAddress"
+        $x++
+        }
         $FreshAccount = $FreshMailbox = $null
             }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUN4jZuAlzIesRYPB55/aVEOET
-# b5qgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJAYl9GvSsv5B+VKgco14eSrW
+# XjegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -106,11 +111,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUHPpczs8PBTNNF/VzNJHZUuaYSyswDQYJKoZI
-# hvcNAQEBBQAEggEAlyJExBbr7vIy5+YfU8mH1VbpbeukN2Nz42InD3ua8h2Na77Q
-# CMHNtZsKVB/ZJYx9IkNwRMLe2mZe7gzFne/eNzEJCgdckXKOk11EWqSBOiXOIQ7f
-# 2VwruJPUzWt1e++siwozyZCtWCb2MyFprXRIrzZpMpdXH/uuGsJxMlUapLzZQVUA
-# BhF6KWVr4Ja6Q9V4G8DAHsRiEx7/quWbHzqqx1hoJ8xHia+xzduBTiN8NQ9KXsq+
-# 9vRDhzI3gIOhrONGqqBnQJ4WNRZckEWyrOlVqGJGiOho1+idT59KEtu8AijBPxMF
-# PHBZrA7nBuqpVkM4HVm/RNrnitWyIFmbYXC4Ww==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU3tSpH09rQZU9+5upRAqm2h8bYoUwDQYJKoZI
+# hvcNAQEBBQAEggEA8FYfHz3CuTWVBdUH8R9UFI2sEwRBMov07jOO5MmkdD+6plkG
+# h0z9xpNOcdjwdVsOWfLInTHKocC1Pa2sCQlbN9CV497G8CACUJlfQFYGIg1v/DyO
+# /O7PRFdBU9ELoikt0I6oc8Hhzdaa3hh2f/BruLAOzlZu0GenIz82Etfz/NSDCWhU
+# qtbAfpj7KMPs/u+eXFv53F9flpEOr1aCID0yzZdp58E55thdGatHrOU3tm9alZ2j
+# NyVCM/OEhMziXNdx+lA8reNGKjqpSW4k2OPau/nwgRJ/5Q9OCR/utxNCpdjZoFlk
+# XheI95dvfiKbq8YcPSsd0VFlDu1zogFhOyJ4BA==
 # SIG # End signature block

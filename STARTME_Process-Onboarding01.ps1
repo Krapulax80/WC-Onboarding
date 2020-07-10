@@ -1,3 +1,7 @@
+     [CmdletBinding()]
+     [CmdletBinding()]
+     param (
+     )
 # This is the script wrapper that should be called for the execution.
 
 ## SET UP THE ENVIRONMENT
