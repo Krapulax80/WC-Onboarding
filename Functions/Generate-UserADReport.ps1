@@ -40,6 +40,7 @@
         Write-Host "Manager             : $($FreshAccount.Manager)" ; $Obj | Add-Member -MemberType NoteProperty -Name Manager -Value $($FreshAccount.Manager)
         Write-Host "Holiday entitlement : $($FreshAccount.extensionAttribute15)" ; $Obj | Add-Member -MemberType NoteProperty -Name HolidayEntitlement -Value $($FreshAccount.extensionAttribute15)
         Write-Host "Start Date          : $($FreshAccount.extensionAttribute13)" ; $Obj | Add-Member -MemberType NoteProperty -Name StartDate -Value $($FreshAccount.extensionAttribute13)
+        Write-Host "End Date            : $($FresAccount.AccountExpirationDate)" ; $Obj | Add-Member -MemberType NoteProperty -Name EndDate -Value $($FresAccount.AccountExpirationDate)
         Write-Host "Contract type       : $Contract" ; $Obj | Add-Member -MemberType NoteProperty -Name ContractType -Value $Contract
         Write-Host "JBA Access          : $JBA" ; $Obj | Add-Member -MemberType NoteProperty -Name JBAAccess -Value $JBA
         Write-Host "User domain         : $UserDomain"  ; $Obj | Add-Member -MemberType NoteProperty -Name UserDomain -Value $UserDomain

@@ -16,7 +16,6 @@ function Add-EmployeeID {
        catch {
          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to set EmployeeID on [$NewSAMAccountName]" -ForegroundColor Red
       }
-      #TODO: Add outcome of setting the EmployeeID
 }
 
 # SIG # Begin signature block

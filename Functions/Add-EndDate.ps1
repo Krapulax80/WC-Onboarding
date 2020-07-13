@@ -15,8 +15,6 @@ param (
         } else {
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] End (expiration) date is incorrect - [$EmployeeEndDate]. Please ensure it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
         }
-
-      #TODO: Add outcome of the addition of the End data
 }
 
 # SIG # Begin signature block

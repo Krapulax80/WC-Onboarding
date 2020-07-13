@@ -28,7 +28,6 @@ if ($ContractType){
       } else {
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Contract type undefined on [$NewSAMAccountName]!" -ForegroundColor Red
       }
-      #TODO: Add outcome of the contract type setting
 }
 
 # SIG # Begin signature block
