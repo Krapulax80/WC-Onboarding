@@ -7,15 +7,15 @@ param (
   Get-Variable |
   Where-Object { $startupVariables -notcontains $_.Name } |
   ForEach-Object {
-    try { Remove-Variable -Name "$($_.Name)" -Force -Scope "global" -ErrorAction SilentlyContinue -WarningAction SilentlyContinue }
+    try { Remove-Variable -Name "$($_.Name)" -Force -Scope "global" -ErrorAction Ignore} # -WarningAction Ignore }
     catch {}
 	}
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUyr2+trYc6+OKvv2DHKiUs13S
-# Q6ygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUNFwPXeNoTaGxRGnWfhTpGIV1
+# y2CgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -82,11 +82,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUm0xYwSGrED6OSLK9zUByd2W7f80wDQYJKoZI
-# hvcNAQEBBQAEggEADAwFCYGraHrn2JiiitMiFFYXYTuUJ9XaNJNHxmL5ODx3SX3H
-# cCMBDvua2ny3nAIql2sTyW2jl3VEVx1JWnszlyn0t8HR2KYpZkIWMAf7uMREHijW
-# vX6JBK2pJuA5X27WqML2eui23EBu/yO3NfD99F2N6Ps7/hM1wot7+NN0l5d83Zmn
-# vaiEj+PMmheIh7ixCs3N6vjLbzNkSrbaWs2In1tFZSBI7o8ea4WGEEc4t8sjpPMq
-# LUN7ODU0TuYElS+4Eim6rvKZHIM/HaEo1xOqPiqIm8yc0DsGK3qDdFnHogBUDnbB
-# NWUvQzaVBCdV2YkM6Mpv/irvmYrq4PLS0iqRTg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUeebx8+LB8AbfvV18SA7x6QHB+OgwDQYJKoZI
+# hvcNAQEBBQAEggEA0+BeSbK/vcvxFnyitCPwaknkhaEq7Gqons/G414RtL25G3iI
+# hzbomcBkoLU2QuncB1pNLvT/lJVxRUonM467uzJvZgY+Hoc+6bBfDrkJX8QTk/iA
+# BONFlh2ootYzDCh+6cGnpARNC4IbwKmOmEg7k67VlJSGCCpt5654/jeUSLCyE6Vk
+# Z1kExi6TeYFteLemfcgWCvjXaq7YN4/tTF1tc3zrYCMT6wvycqG7DABYuUdG2voc
+# Ni8BqDSN7FlvS0j2i7EnCHEpyHkoshFurYrk0qUsP+EU0AsG9uQQnBck4NlPFheR
+# TRXF+EW/XKQBQva1UY9KumN7CAcc/Rx7TKXalA==
 # SIG # End signature block

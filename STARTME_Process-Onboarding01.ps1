@@ -4,6 +4,9 @@
      )
 # This is the script wrapper that should be called for the execution.
 
+## CLEAR PREVIOUS ERRORS
+  $Error.clear()
+
 ## SET UP THE ENVIRONMENT
   Import-Module PSWriteColor
   # Collect work folders (names)
@@ -98,11 +101,12 @@
   #Remove-Item -Path $($I.Fullname) -Force #-Whatif
 
   # Transcript STOP
-  #Stop-Transcript
-  if ($Error ) {$Error | Out-File $ErrorFile}
-  else { "[INFO] NO ERRORS DURING SCRIPT RUN"| Out-File $ErrorFile} # also send errors to a file
-  #TODO: Check error logging
-  #FIXME: Prevent error buildup
+    #Stop-Transcript
+  #Error logging
+    if ($Error) { $Error | Out-File $ErrorFile }
+    else { "[INFO] NO ERRORS DURING SCRIPT RUN"| Out-File $ErrorFile} # also send errors to a file
+    #TODO: Check error logging
+    #FIXME: Prevent error buildup
 
 
   # And cleanup the variables
@@ -112,8 +116,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEJi8nF96bD7BHjBVicrrQCTV
-# 0gmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUBgkEvxjPFqIzuCJwL1IQ7W2d
+# Th+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -180,11 +184,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUWxZ3tvSKG3ujxoyd84cS02/Bo+cwDQYJKoZI
-# hvcNAQEBBQAEggEAxWXql8Sb00xKNzD7JgvW1l/mU+L1GQOLQfY5H5l5NQrs+4RC
-# iwvxLi0Yt/d9LR1BqwPtOJBabzlzB4ROguhkqOAiUPhViZQvpS7x6UbUF8LuDbXB
-# prpN4bU8WMeoh4qA5w01cQ/Lj7AiPGPoFpetZlA6XXnyL4KBso0loBaFwJwup3iu
-# O+CCmfcwb17TBST1pDKaykqiSFAbzpV+t8pUXNx7UTUpWu82EETdNf7jXJcIR3pb
-# nalp44YRPsNS3Uxr0iHRb92gfmdUx3lBlH0Kemtm/W3yKRyHDhjUi8V39/WYi5C3
-# hpDo0pHQzHKUj9HrpxdUeSH3UUGR1hdih1G/Og==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUq/S+NNspyhYWCLO7+i6ZaN88bBYwDQYJKoZI
+# hvcNAQEBBQAEggEAdZ9VJf6sTIY2m920xOOXNeAI2vn4iWNTp4cdtWB0+yY18iUJ
+# wFYUT1nNAjjaswRYcQk/AQ5EU/UY53FXIldOgsgqJpdMkB43Pn6/0TydX73VwjS0
+# XNRDuAWIoD/1KoDbFoLajJsexcT5gfx6jQs5iq96Rn/aKxMqf5sib8DVW/u6b/JQ
+# kwJO6jDbvKqt7iu+m9ioh2qyqylSvALA29lo2oB6G4YdeJd2R6+4if7BeqiDU7R6
+# oW5mW16CMbBBzXGGo7DL1BjHpzVTRaC+dalu0ImOd6prI9LkkiGIxv8oEax6Eyau
+# mcFRewK2vfebaz5cP5WkeXCbF45VcJwF4UvdDw==
 # SIG # End signature block
