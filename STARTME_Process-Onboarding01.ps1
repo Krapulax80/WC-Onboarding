@@ -10,6 +10,7 @@
     $FunctionFolder   = "Functions"
     $InputFolder      = "Input"
     $OutputFolder     = "Output"
+    $ConfigFolder     = "Config"
     $LogFolder        = "Logs"; #$LogFolder = "$global:CurrentPath\$LogFolder"
   # Establish script location
     $CurrentPath = $null
@@ -30,6 +31,10 @@
       $TranscriptFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
       $ErrorFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
 #      Start-Transcript -Path $TranscriptFile
+
+    # Create today folder
+    $Today = Get-date -Format ddMM
+    [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
 
 ## ONBOARDING PROCESS -
   # Announce start of the process
@@ -59,14 +64,18 @@
       # TODO: report, if the domain is correct
         # Pipe, if the workdomain is WestCoast
         if ($Domain -match "WestCoast"){
+        $configCSV = ".\" + $ConfigFolder + "\westcoast.csv"
+        $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
+        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config
         Write-Host
         }
         # Pipe, if the workdomain is XMA
         elseif ($Domain -match "XMA"){
+        $configCSV = ".\" + $ConfigFolder + "\xma.csv"
+        $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName
+        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config
         Write-Host
         }
         # Pipe, if the domain is not within the expected values
@@ -76,16 +85,18 @@
         }
     }
 
-  # Define the report file
-  $CSVExport01 = ".\" + $OutputFolder + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
-
-  # Send a report after each progressed file via email
+  # Reporting
   Write-Host # separator line
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Generating report of the script run"
-  #Send-ProcessReport
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Generating reports of the script run"
 
-  # Save the report into a CSV as well, for archiving purposes.
-  $CSVImport | Export-csv -Path $CSVExport01 -NoTypeInformation -Force # first add in the original import
+    #Report on the input file
+    $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
+    Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
+    #Report on AD actions (in the Generate-USERADREport.ps1)
+    #Report on Mailbox actions
+    #Report on misc actions
+
+  #$CSVImport | Export-csv -Path $CSVExport01 -NoTypeInformation -Force # first add in the original import
   #TODO: Add FULL reporting
   #TODO: Add logging
 
@@ -105,8 +116,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUafsbx68CTQ5Dr+xI246hJ74K
-# aCugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU+uCf/5XVmAcDigiQUcjZnCyg
+# a72gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -173,11 +184,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUJchTO6QovudIHOdmxvEpR7BLguIwDQYJKoZI
-# hvcNAQEBBQAEggEA9GlBXHjH5TRTgrW+uTWz6G2Nwz92T+NZv0YE7n+d0oxQ6W3o
-# WRZdsnjjOd3fcgV5F9cyPZVDU7pXQM7NPmR269kdljt3U3eI/mexzmASvSXIKxmf
-# 8oa1z1tGj5GV6hgS61p+D/i4Ck95qSv3lRv9pM1r52qbf7AcgjuPrbxjbmPjrJX5
-# VXB/oR9wwRfv0STEsIZvEFKjxmEnvEw2m/6DUfVXdjoVYDAMX0RGPIK8e8FY74B1
-# u/E12DnJB35GrcujNkjIqg2ZWU8kEzDgBYbMkNadyIGIej91Q7ay3X1II//vxhMD
-# pHkCB8DKrUXamazbV2x9ArOSeOzUAMA3YGjuxQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUs6sam7D2JeeyI15nkFQITBKhR3UwDQYJKoZI
+# hvcNAQEBBQAEggEAeuC1Xv320975CJbs0GSQP0pV7vmiTDhErI4FhC+bnlEeJSzW
+# YwP0p9hHoEkHkQuTYmVqScGVKbrXhmggA8rrTIoGb9/Kyyhn74R8Czuh/SKJELrX
+# a9sS0t8lTY0sEEV+P+OggcXlziYuYYYSG50CAxMb6NIS4BzDn2oxyw1/g//1bYnD
+# J5WD1Er2kT8Usx+0qv66o2KM4olm08v5nK1nH1N7B7BCaNPoi2lqjlsrrSaFJ3sG
+# nSP7geJwvObdW1XTWEJVvMArsuid7Xm1847jt2Qv3/Q7VoHPKt3NlDqRWVzRO/IP
+# E7TfDkIqhsmWGtonPgJ3dxpCr8BTtsg/81OLlA==
 # SIG # End signature block

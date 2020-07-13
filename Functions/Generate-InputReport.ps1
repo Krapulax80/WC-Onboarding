@@ -1,67 +1,24 @@
- function Generate-UserExchangeReport {
-     [CmdletBinding()]
-     param (
-        [Parameter(Mandatory=$true)] [string]
-         $NewSAMAccountName,
-        [Parameter(Mandatory=$true)] [string]
-         $Flag,
-        [Parameter(Mandatory=$true)] [pscredential]
-         $AAD_Credential,
-        [Parameter(Mandatory=$true)] [pscredential]
-         $Exchange_Credential
-     )
+function Generate-InputReport {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Object]
+        $CSVImport
+    )
 
-    #region USER REPORT
-       # Gather mailbox report
-        if ($Flag -match "online") {
-          Get-PSSession | Remove-PSSession
-          Connect-OnlineExchange -AAD_Credential $AAD_Credential
-        } elseif ($Flag -match "onprem") {
-          Get-PSSession | Remove-PSSession
-          Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
-        }
-        do {
-            [void] ($FreshMailbox = Get-mailbox $NewSAMAccountName -ErrorAction SilentlyContinue | Select-Object  *)
-            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in 30 second!"
-            Start-Sleep 30
-        }
-        until ($FreshMailbox)
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Found mailbox of [$NewSAMAccountName]. Continuing"
-
-      # Create report object
-        $global:UserExchangeReport = $null
-        $global:UserExchangeReport = @()
-        $Obj = $null ; $Obj = New-Object -TypeName PSObject
-
-
-      # Display report
-          Write-Host # separator line
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
-        Write-Host "Mailbox Name        : $($FreshMailbox.Name)" ; $Obj | Add-Member -MemberType NoteProperty -Name MailboxName -Value $($FreshMailbox.Name)
-        Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)" ; $Obj | Add-Member -MemberType NoteProperty -Name PrimarySMTPAddress -Value $($FreshMailbox.PrimarySMTPAddress)
-        $x = 1
-        foreach ($EmailAddress in $($FreshMailbox.EmailAddresses)){
-        $Name = "AdditionalEmail" + "[" + $x + "]"
-        Write-Host "$Name               : $EmailAddress" ; $Obj | Add-Member -MemberType NoteProperty -Name $Name -Value $EmailAddress
-        $x++
-        }
-        $FreshAccount = $FreshMailbox = $null
-
-      # Generate CSV report
-        $global:UserExchangeReport += $Obj
-        $global:UserExchangeReport =
-          $global:UserExchangeReport |
-          Get-Member -MemberType NoteProperty |
-          Select-Object @{name='Name';expression={$_.name}},
-                        @{name='Value';expression={($($global:UserExchangeReport)).($_.name)}} |
-          ConvertTo-Csv
-            }
+    $global:InputReport =
+    $CSVImport |
+    Get-Member -MemberType NoteProperty |
+    Select-Object @{name='Name';expression={$_.name}},
+                  @{name='Value';expression={$CSVImport.($_.name)}} |
+     ConvertTo-Csv
+}
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUKt2r/MHUMuDdfH9sN8c6mBwO
-# 5D2gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUkkBkKHYIwfT1fxGgWcXsnGHn
+# 0NagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -128,11 +85,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUp7ddWDWBxy11wLXJEJH8B20ed9QwDQYJKoZI
-# hvcNAQEBBQAEggEAVH1+KO7mHGHZyZvIFu3U2C+7aAC5m39vK10q70+d2dLHpNOy
-# n+rGUcrMhovcvOTFC2igMj9aXS/SioYyMy2SC+FRH3zgALOwixvx89xSqWiBn16f
-# TwyDtevIViUlHpAoKNZJm6Ys2i1IJNfV+B8D2f4ufKlHkQxSkbvSE1x7qwWt+pgQ
-# m+01K2IuQDdsTj9Arn8ME4gu2efVKgXpXPGyhh5BtKInisBy1A4oKVdWQqzm9/Hn
-# iqGQ7Rxm+Mngi329mGDC9GHSaQ54Vp1yHKZWJdFt1SP8H8GBZee5ZrOO/GBAagDL
-# k8nYMDlSbjJxzTepjZPNteTzb1cOSmn0Rvs6ow==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOjoZSc/U4Npvujho7kZz7Nqs6t8wDQYJKoZI
+# hvcNAQEBBQAEggEAnqbKX+JKRpRNI89MS54ZcHsJZS01jdXjBlcnz2+eltpWp7hB
+# 7I8hS902du4cqOpyamgrpHJSwlsB+AtkiZJvFhsF4ot5qRpmt8mb//K8pildm0wy
+# 6kH+8r91HcaMzxLY04jy+mFk6+2ieXOpj4I0mnyfGpie+/NQGZIsl6pHlQE6J8wx
+# 78lIpg1k97BxluOn2EvCTcdeef2pcOBTVzDWnFF7DF/ut+5DmzXANBGN/t2OI2kG
+# C4b105svHRZ75MK91hY9HQ1PvY63x6EYTPCUwQYQqzZkxj4QljVsQofUd+walUes
+# XA8ARTT/Tcm79TyftoJTN/pgyH1NRZTRVu4oJQ==
 # SIG # End signature block

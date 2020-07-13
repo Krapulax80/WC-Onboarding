@@ -7,18 +7,21 @@ function Process-OnBoarding01 {
     [Parameter(Mandatory=$true)] [string]$LastName,
     [Parameter(Mandatory=$true)] [string]$EmployeeID,
     [Parameter(Mandatory=$true)] [string]$TemplateName,
+    [Parameter(Mandatory=$true)] [string]$OutputFolder,
+    [Parameter(Mandatory=$true)] [string]$Today,
+    [Parameter(Mandatory=$true)] [object]$config,
     [Parameter(Mandatory=$false)] [switch]$NoJBA
   )
 
       <#
       # Internal use only: this is only for updating the passwords used for the script
-      Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
-      Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
-      Create-Credential -WestCoast -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -WestCoast -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -WestCoast -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -WestCoast -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
 
-      Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
-      Create-Credential -XMA -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
-      Create-Credential -XMA -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -XMA -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -XMA -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
+      Create-Credential -XMA -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
       #>
 
   # DOMAIN SELECTION
@@ -26,12 +29,12 @@ function Process-OnBoarding01 {
     #region WESTCOAST
     if ($Westcoast.IsPresent){
       # Credentials for WC
-      Create-Credential -WestCoast -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -WestCoast -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -WestCoast -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -WestCoast -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -WestCoast -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -WestCoast -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
       # Variables for WC
-      $SystemDomain = "westcoast.co.uk"
-      $DomainNetBIOS = "WESTCOASTLTD"
+      $SystemDomain = $config.SystemDomain
+      $DomainNetBIOS = $config.DomainNetBIOS
       $AADSyncServer = "BNWAZURESYNC01"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
       $ExchangeServer = "BNWEXCHDAG01N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
       $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
@@ -50,12 +53,12 @@ function Process-OnBoarding01 {
     #region XMA
     elseif ($XMA.IsPresent){
       # Credentials for XMA
-      Create-Credential -XMA -AD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -XMA -AAD -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -XMA -Exchange -CredFolder "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -XMA -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -XMA -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -XMA -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
       # Variables for XMA
-      $SystemDomain = "xma.co.uk"
-      $DomainNetBIOS = "XMA"
+      $SystemDomain = $config.SystemDomain
+      $DomainNetBIOS = $config.DomainNetBIOS
       $AADSyncServer = "BNXO365SYNC02"; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
       $ExchangeServer = "BNXEXCH001N01" ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
       $HybridServer = "migration" ; $HybridServer = $HybridServer + "." + $SystemDomain
@@ -333,9 +336,16 @@ function Process-OnBoarding01 {
   ## USER REPORTING
 
     #region USER REPORT
+      #Report to display
       Write-Host # separator line
       Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
-      Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential
+      Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential -NewPassword $NewPassword
+      #Report to  - AD
+      $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_AD_PROCESSED.csv"
+      $global:UserADReport | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force
+      #Report to  - AD
+      $UserExchangeReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_Exchange_PROCESSED.csv"
+      $global:UserExchangeReport | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force
       #endregion
 
 }
@@ -343,8 +353,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUbkvLOb+Lhvqcg3iuiulWSo1v
-# cJmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUcK0B2R7eParNZAjxrFGNbjXm
+# jXagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -411,11 +421,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUZCeKGRHQ8FqbqFijrHToBVefEu0wDQYJKoZI
-# hvcNAQEBBQAEggEAN0bHwhCjet6e+CppX70mqfp39YAeC5pDZiyQIUi/XaS3youi
-# 9Xv6qxre8Es7C7Ej14RgTvDeD2aB1mw6MxUEf8nxOKtcDSod8YcbT80Edb6hDsOZ
-# kJgQ39MkCRXjat7oEiaPkwoTsUBc3R1xHKuv3ze8pg7qc+83B3xKpnds0kzVY3pv
-# /W4UA6vO0YHyxZKQiIAS3KNoEQxqrlyKIQXoe+oBOrmrQy5PDHBwLEoSEDiWOjii
-# wbucFu5FDhTvb9x5fd3CPGAjdQZo6mxIscHcfH0texxWFdED0BsaUkJlRiigsX4D
-# G3qU3kga14GMTEweLR6IcCI2WEMh3lGHa5QGHQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUScoawecndSj3Y8KnEB9oesBzhhowDQYJKoZI
+# hvcNAQEBBQAEggEATRgW3I6UBLtEZMz+4LEXpuuprn2Afx2weEZj3S3SrQySGN5j
+# qcahvdJKmIuic2iI3FU0OSVgj6ZwN6EbAtG4eglQ6VMQfoekZ8938KucFRuIU2a1
+# x/yAh3b4XWNhcPdr6rar9eS/ALNxMxfpXRkMVr2sKXM9b9g7Ix9S7iSqX2vkN+mQ
+# JXdiT98vd3dFSVyXpSqDDq1i2jo6GvcrtXGPdBhjh4wg3odNjsMbulTQQGKUXLiR
+# XUkZeNpHVWxt2zNkf0tGFtrv6e+fw3MYrfob9D4xL/KPCsp/3fNz88D6fYRv9hXx
+# VHGSuJuPrSziYcc0w9I4bAu6ab94W8WzwTt4+w==
 # SIG # End signature block
