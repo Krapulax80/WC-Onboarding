@@ -43,9 +43,9 @@ function Process-OnBoarding01 {
     #region WESTCOAST
     if ($Westcoast.IsPresent){
       # Credentials for WC
-      Create-Credential -WestCoast -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -WestCoast -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -WestCoast -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -WestCoast -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+      Create-Credential -WestCoast -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+      Create-Credential -WestCoast -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
       # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
       #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
       $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
@@ -54,9 +54,9 @@ function Process-OnBoarding01 {
     #region XMA
     elseif ($XMA.IsPresent){
       # Credentials for XMA
-      Create-Credential -XMA -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -XMA -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
-      Create-Credential -XMA -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\"
+      Create-Credential -XMA -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+      Create-Credential -XMA -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+      Create-Credential -XMA -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
       # Domain Controller for XMA
       $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
     }
@@ -342,8 +342,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUngRrT2fRSUToqkgPRCYXgjdo
-# COygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/NphZVPX9z4YUy2obuGsgikt
+# CRygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -410,11 +410,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQULgp78FupocqmRGQTGryYBzI/qecwDQYJKoZI
-# hvcNAQEBBQAEggEA7rtsZzSsckGk3TvRm7ptLoKRo168Tzt73j5/6k8Tc6vHm67Y
-# SxqokZP7eYN5M1f9XGtqEPS9Ald9v7o5vh9VS83JU5y+tlELKLkQMegRxm9uhUxU
-# KF+titDfwZeW59z4YERtJbBqtqouWcIdtsqtwSr9VKw46wdzXZvaskQjo7vi5W9o
-# LImz0ZEf19BKgTnDA0cNC/Ro9W2jjfEr3CSsprZdl/B40e5OVro1lx3JBxkpl0D5
-# JxIcYVfk0c17E0OQ2a2nPZ+Xyi+jQyOxdI60EvxRGQq3tjBMska9vdPw80u5p2Su
-# zI1/2khfgrjv31iwzaTTKAL1rHAimZo+Y2K2Wg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQULw361fKrzKsDAYl+ja6aLuuoUAgwDQYJKoZI
+# hvcNAQEBBQAEggEAgTbm11Ka8exaQtYF9D2bFXVIXVN9NgKO2CCmN1fdO3rz0hQX
+# C86bXxQ7labNyvKGE5G8/HHVqXRZZYznKwSvl6x/2iQ58UDSpf52kz4tORO08j75
+# Qy6jhj40LE5JYRLCZKVwOP5u1D0ydPe9EkMxmcTAqZBQfKDxjNRQBjaYIG/RIkxj
+# kw10zgIcpXT7GkBYso32rjuuRhsW0wXmkYNonVlUY5nZIlKYo9Gsaim7owQoW8jm
+# irip0vw8zW1Y3Aef5ATKRL/pfdIS+ZcKhuqz+z90VZCD/MsQIta3bF2wI1o9Xj9o
+# yyWxV28GolZU0OiY+EiL2OjcB3EoEEydOohzWQ==
 # SIG # End signature block

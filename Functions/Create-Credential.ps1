@@ -25,17 +25,18 @@
     [switch]
     $Exchange,    # Exchange credentials
     [string]
-    $CredFolder = "\\BNWINFRATS01.westcoast.co.uk\c$\Scripts\AD\ONBoarding\Credentials\"
+    $CredFolder,
+    $AD_Admin,
+    $AAD_Admin,
+    $Exchange_Admin
+
   )
 
     # Westcoast
     if ($WestCoast.IsPresent){
     $domain = "WC"
-    $AD_Admin = "svc.adchanges@westcoast.co.uk"
     $global:AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@westcoastltd365.onmicrosoft.com"
     $global:AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-    $Exchange_Admin = "migration@westcoast.co.uk"
     $global:Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
       if ($AD.IsPresent){
         # If specified, update AD password for Westcoast
@@ -71,11 +72,8 @@
     # XMA
     elseif ($XMA.IsPresent) {
     $domain = "XMA"
-    $AD_Admin = "svc.adchanges@xma.co.uk"
     $global:AD_CredentialFile = $CredFolder + $domain + "_AD_credential.txt"
-    $AAD_Admin = "svc.o365mgr@xmalimited.onmicrosoft.com"
     $global:AAD_CredentialFile = $CredFolder + $domain + "_AAD_credential.txt"
-    $Exchange_Admin = "migration@xma.co.uk"
     $global:Exchange_CredentialFile = $CredFolder + $domain + "_Exchange_credential.txt"
       if ($AD.IsPresent){
         # If specified, update AD password for XMA
@@ -118,8 +116,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUtzVUWQJTE7tExNEPsG8ZjlfH
-# 5BmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYW/L6cHfp1iRhATDfCUT97wp
+# TWugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -186,11 +184,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDa1Tnjxqkggk6YrA8RH1vm97PogwDQYJKoZI
-# hvcNAQEBBQAEggEALgLDBovNoaTscZ0sdPVPc+5Ag2k3qOtMTO6vJLy1JtbjDXGA
-# Nkp8gMeZO45mg5uhrd8xG2KYbPDsnQh3r7LO3iqt2xxxqpKy1JHRVipzDY3U3aH7
-# GMWPpzu9fz2EnhCUMhnFnaLmdXbosGHvy109DBND0PaK4X/cI8H6Bu6WtIdOs4LW
-# hBDLJLXcfrzPYRzB1qrei9pJC9zxht7o1W7ow9fgPFh6XXJsqgFRgfJLoYCEzK7x
-# bfNtB8uP782XAipqXhJjX2O54IQ7U3jUtHttxKS5JBRGDF3F2UkwAaNppS0W7hKk
-# Y/LNXduqDYAfBSAuYexE6TQS9rrIka7ihrU+Rg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQURI1RyxbkBrP+UK07pgX2M3C7dQkwDQYJKoZI
+# hvcNAQEBBQAEggEAcE76fVw2qeWUmRWFgf0hjFwAEwrMvleTY3YHF/zeI+ywRtdW
+# EE57zZwS8NUmwR7rvaLRwHlvV92b2HDnXE0sa+JdzbnOJJg75sUnbRYSR/85gaKx
+# 9OX80FKas3+NUHnIcfpSiNVVq0Q19F6C1UbZjRQXdBKjckNOiy9yfgMD7HF8OLWY
+# RdRtM4rwxBEIrWHmKauj71ZL65oDdG1KzXuBhA32HAygGhRAWzlWBglydal/yJqL
+# tN8EPcbs2bnDnwQS5ha7j9sqQb+98hvbjxHtz0OryTopd1eYr2Rg8o4NFDdULAws
+# 1E4nrdTRgm8QkjnGzv7wdRQkJ/RuXZd0mvGfYw==
 # SIG # End signature block
