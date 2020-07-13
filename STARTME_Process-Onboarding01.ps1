@@ -61,7 +61,6 @@
       $ContractType                   = $Line.ContractType
 
       # Run against each line
-      # TODO: report, if the domain is correct
         # Pipe, if the workdomain is WestCoast
         if ($Domain -match "WestCoast"){
         $configCSV = ".\" + $ConfigFolder + "\westcoast.csv"
@@ -92,13 +91,8 @@
     #Report on the input file
     $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
     Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
-    #Report on AD actions (in the Generate-USERADREport.ps1)
-    #Report on Mailbox actions
-    #Report on misc actions
+    #TODO:Report on misc actions (DFS,Licensing,etc.)
 
-  #$CSVImport | Export-csv -Path $CSVExport01 -NoTypeInformation -Force # first add in the original import
-  #TODO: Add FULL reporting
-  #TODO: Add logging
 
   # Finally, discard the processed original input file
   #Remove-Item -Path $($I.Fullname) -Force #-Whatif
@@ -107,6 +101,8 @@
   #Stop-Transcript
   if ($Error ) {$Error | Out-File $ErrorFile}
   else { "[INFO] NO ERRORS DURING SCRIPT RUN"| Out-File $ErrorFile} # also send errors to a file
+  #TODO: Check error logging
+  #FIXME: Prevent error buildup
 
 
   # And cleanup the variables
@@ -116,8 +112,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU+uCf/5XVmAcDigiQUcjZnCyg
-# a72gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEJi8nF96bD7BHjBVicrrQCTV
+# 0gmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -184,11 +180,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUs6sam7D2JeeyI15nkFQITBKhR3UwDQYJKoZI
-# hvcNAQEBBQAEggEAeuC1Xv320975CJbs0GSQP0pV7vmiTDhErI4FhC+bnlEeJSzW
-# YwP0p9hHoEkHkQuTYmVqScGVKbrXhmggA8rrTIoGb9/Kyyhn74R8Czuh/SKJELrX
-# a9sS0t8lTY0sEEV+P+OggcXlziYuYYYSG50CAxMb6NIS4BzDn2oxyw1/g//1bYnD
-# J5WD1Er2kT8Usx+0qv66o2KM4olm08v5nK1nH1N7B7BCaNPoi2lqjlsrrSaFJ3sG
-# nSP7geJwvObdW1XTWEJVvMArsuid7Xm1847jt2Qv3/Q7VoHPKt3NlDqRWVzRO/IP
-# E7TfDkIqhsmWGtonPgJ3dxpCr8BTtsg/81OLlA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUWxZ3tvSKG3ujxoyd84cS02/Bo+cwDQYJKoZI
+# hvcNAQEBBQAEggEAxWXql8Sb00xKNzD7JgvW1l/mU+L1GQOLQfY5H5l5NQrs+4RC
+# iwvxLi0Yt/d9LR1BqwPtOJBabzlzB4ROguhkqOAiUPhViZQvpS7x6UbUF8LuDbXB
+# prpN4bU8WMeoh4qA5w01cQ/Lj7AiPGPoFpetZlA6XXnyL4KBso0loBaFwJwup3iu
+# O+CCmfcwb17TBST1pDKaykqiSFAbzpV+t8pUXNx7UTUpWu82EETdNf7jXJcIR3pb
+# nalp44YRPsNS3Uxr0iHRb92gfmdUx3lBlH0Kemtm/W3yKRyHDhjUi8V39/WYi5C3
+# hpDo0pHQzHKUj9HrpxdUeSH3UUGR1hdih1G/Og==
 # SIG # End signature block

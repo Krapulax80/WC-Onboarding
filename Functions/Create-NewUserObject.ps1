@@ -38,7 +38,6 @@ function Create-NewUserObject {
 
       # Create the NEW USER ACCOUNT
       New-ADUser -Name $NewDisplayName @params -Server $DC -Credential $AD_Credential -Erroraction Stop #-Whatif
-      #TODO: Add reporting of success/failure/error
 
       # Wait for the NEW USER appear in AD
       do {
@@ -52,8 +51,8 @@ function Create-NewUserObject {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUp4UUNZLhRidugr6mYAw+0wM9
-# B16gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUv7dpQujOwPhI1RNv2QJMU5lE
+# aVWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -120,11 +119,11 @@ function Create-NewUserObject {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUKsMppv/uLiFgYT0GlCs+TUbOacUwDQYJKoZI
-# hvcNAQEBBQAEggEA1Dk8+k6JQNtSlULmei388qzWe9lNXm5emPIODaHIMSZlKdOK
-# Zq8QygNAJV89WCU9qx50v5s+wt28DNkFUgidz9TEd2B33fHwRNun7TsKH7fYtxjh
-# GCC8jOquvx+bchxcDBtzMfGTPk31kptbTO6d4ww+L8gWBiD4QY2H7bYiYo53yaH/
-# LOp1t4yoXcu3sc80NV+Kus382ii/Sp1KKPRfVrINJJJzpJx+szZSElh6EJ0Mwuqx
-# Z1NvRsB+5zaEz8EwHPSaBZ9FDSSfYMrGhZSTy0forLABV4HLn32wOkYUpgmFQ4yz
-# Tce8X4fIytLl2kEM5eJnuCev4h9jCynuE25YSw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUhQjxtDeDXSDaroHd7whzchBjd0IwDQYJKoZI
+# hvcNAQEBBQAEggEAvxemBUjkHVT+K1oY4BKAtJ8eIXRCCQ1JwvLKX7fZZkpbfZxH
+# 9iQS6FJFlqJWDwaKsydAF9Gr75shxXricfxcGSrjCGfBWQtYGzy5O/8nhr4r1mfm
+# Jevht4bq/xD32fjJ3LS6VsmOapBcSVXjjLP5L+a0AARLjsn0tZBkyKNp53q22pMf
+# xuzDT8j200gUV/ubD9Z23yRIlk21jw8S6CzUkxCE25vDVdc4CGes3aTKi5GfwOaw
+# xcSxlqu4yZljm9v9UzDH3qwyPs+Za54KANFS37ujWeFhoWNn6W/I6Rw8QWWku87q
+# 1+TZIudVgVLWWgUTQL46VhjwaqTaOh+9NjaMtQ==
 # SIG # End signature block

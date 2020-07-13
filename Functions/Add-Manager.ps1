@@ -13,14 +13,13 @@ param (
       { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]"
          Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential
       }
-      #TODO: Add outcome to manager added
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULgFKk0fI7/iZzuJATw17vvuf
-# rLSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURVlNBqdyvg8dFZmo1fQo0wlZ
+# e2egggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -87,11 +86,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUjnoAKAAOAfUPuil7Zd/O+xsD+DIwDQYJKoZI
-# hvcNAQEBBQAEggEATBWF/vtrfZ1pJa/aOEJTWXFXV0Oa6XK/DVxWDu/4HsMVi+9R
-# /4Fq7WwN4D/HBUJ8lORDAzVWExtVKA83rlxJYtgbeWVUvm4oYMQncIDQrQdS3Qb1
-# HcjLQvKIGMH1I03KO3yerU6ReHFaeHRV1gvkoqpZNfv6xq6nAlMwwoCFrLCZQbfZ
-# o2yjPjxzU6f54mNLZ2+dMZjv6lM6Dre+V3IhxjNuDtb8wLtk7BrIPmMfG1qj7Tzo
-# LGFZsi4hB8867z7OculzmdkpglfvKGKZPdg9pwV2J9lxIL6traD/pK+PeiN7ut7y
-# pE+zSHOsFhdNdjETDnAS8fQLE9JSVoy4bqThvA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUTI5leK6aOyE7ZYnz1pPqbgB5DCQwDQYJKoZI
+# hvcNAQEBBQAEggEATSX0OiXDF3X+nEXoWcgQEnzdLQXiBHbacdaHs2m4y3h1n6HV
+# Qs6S2zs1LojoKr0SDyo3gEzQwnqJ+7d1domqf1yReNx/LTwlleiQBuuIsn6FdO4n
+# NtIwl5iKJweh/INgVBWbXET5AoqAe8qRjKrcyeqQ2PHXF2aluxTi4j3D+T4Oh1vX
+# 0qteH/NcOKwGf2VluSHkFwp7WmjOE2H+C66G6WzTt9dvNxOnmH/jLo6jnzsmiRZz
+# TxPLrQnyUvV1ztljpMeRfvKywV5Z90u3JzegC2fWO3aVyxfr+1T3i2p8k1mtaowu
+# Q1/M1mKDJIkcRnvg8X/O60Ccuf6jH0hczrCzow==
 # SIG # End signature block

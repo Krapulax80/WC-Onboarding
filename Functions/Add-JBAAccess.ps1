@@ -17,14 +17,13 @@ function Add-JBAAccess {
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Adding JBA access to [$NewSAMAccountName]"
         Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute10 = 1} -Server $DC -Credential $AD_Credential
       }
-      #TODO: Add outcome to JBA access level
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUcuHqsYgOYFGvu972xzu+jBNv
-# cGqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7p00544345OBXznTSuYOgJj/
+# k0igggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -91,11 +90,11 @@ function Add-JBAAccess {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUvPdWV/rR/YcVNs1XAconhzHTwkwwDQYJKoZI
-# hvcNAQEBBQAEggEAbJ+rlZ5pXJf4ttevraOHn+js4JjgigGhZVEc19nO31Nk19D8
-# eFnaP6x31uj5N8FN1/FVGdxspZxG9PEpc09+UNj4n0M/E4RJdwaGClggnV7LyKU9
-# z8b7WahR/LEgchvmDFJKepA2HvRDkXAFj879xf6Sqg2iit0LarqfWP8SdusDzoRS
-# FtP5oCLeNb16TquE5tAdpN52TqDD4C/UuzTra2Wvq+ZYem91mdQsKOEgV7lOstUR
-# nDevz7NrxVxRZKSgX7symDzD2Bs/o5mlnz2CHQd4echWtotc/znqZbLLmE5o7CJt
-# mDn2OlZBuFDOOjuo4sfW8Iwh2UBlmd2QBhbmxQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUcqfcfWFyY1lVbExWKgQzQTipfUswDQYJKoZI
+# hvcNAQEBBQAEggEAIkAGdAxhzG08lZWWDZ8Jq5eF8U/uRLgiRczklRUhkHo35kVQ
+# cQbV+d+IRlgv8vNkFdhTC6cl/Yh3+Ilayno7Ux1WJzspIwcIBkilSg+wdARRXPk/
+# RTITL4Ug6T8kPEohfX0H0D5RWn6DtS6zk2wAtYvIGlEEdnUbSiTwJhZ7fgMmch4e
+# zpyfibzZvZ9XDDHxLgPr92q9dy/J6xazt/DN5/qlWPyMoke+3RsBM+u89v0VfdKD
+# PPfXPkGDdOI2cejff9uoucf8ngE0Nk38ZnCKYstfpWoHFKd4oXto9V+s/Y8xB39w
+# GSW5RrtnF61ujYu7doyyRWN3xMJ9IA9S6EYInw==
 # SIG # End signature block

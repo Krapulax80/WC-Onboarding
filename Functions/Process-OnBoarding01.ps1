@@ -109,7 +109,6 @@ function Process-OnBoarding01 {
       Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
       $NewSAMAccountName = $global:NewSAMAccountName
     }
-    # TODO: Report the SAM Name
 
     # Derivative names created from the SAM Account Name (these should make these guranteed unique, however we will double check this just in case)
     $NewUserPrincipalName = $NewSAMAccountName + "@" + $UserDomain
@@ -124,7 +123,6 @@ function Process-OnBoarding01 {
       Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
       $NewUserPrincipalName = $global:NewUserPrincipalName
     }
-    #TODO: Report the UPN
 
     # Check if Employee ID already exists. If it does, create a unique one
     if (($EmployeeID.gettype()).Name -notlike "String"){
@@ -137,7 +135,6 @@ function Process-OnBoarding01 {
       Create-UniqueEmployeeID -EmployeeID $EmployeeID
       $EmployeeID = $EmployeeID
     }
-    #TODO: Report the EmployeeID
 
     #endregion
 
@@ -176,8 +173,6 @@ function Process-OnBoarding01 {
       Add-ContractType -ContractType $ContractType -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
       }
 
-      #FIXME: Add expiry / end date
-
       # Mirror ALL GROUP MEMBERSHIP of the template account to the new user
       Add-ToTemplatesGroups -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
@@ -209,7 +204,6 @@ function Process-OnBoarding01 {
       Create-UniqueSMTP -SMTP $secondarySMTP
       $secondarySMTP = $global:secondarySMTP
     }
-  #TODO: Add reporting of success/failure/error
 
   # Set the new secondary SMTP on the AD object
      try {
@@ -219,7 +213,6 @@ function Process-OnBoarding01 {
      catch {
            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
      }
-     #TODO: Report success / failure / error
 
      # (For non-UK users only)
     # For non-UK users set the primary SMTP to their relevant COUNTRY DOMAIN (eg. westcoast.ie)
@@ -236,8 +229,7 @@ function Process-OnBoarding01 {
         # Update mail address if needed
         Set-ADUser -Identity $NewSAMAccountName -Replace @{mail=($NewSAMAccountName + "@" + $UserDomain)} -Server $DC -Credential $AD_Credential
     }
-     #TODO: Report success / failure / error
-    #endregion
+     #endregion
 
     #region Create the NEW MAILBOX
 
@@ -250,7 +242,6 @@ function Process-OnBoarding01 {
       Create-OnPremMailbox -EOTargetDomain $EOTargetDomain -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
       $Flag = "onprem"
      }
-     #TODO: Report outcome of the mailbox creation / failure / error
     #endregion
 
   ## AD & AAD Syncronisation
@@ -342,8 +333,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/NphZVPX9z4YUy2obuGsgikt
-# CRygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfDJwh5he6jgEbey1ebTn6N79
+# /2qgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -410,11 +401,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQULw361fKrzKsDAYl+ja6aLuuoUAgwDQYJKoZI
-# hvcNAQEBBQAEggEAgTbm11Ka8exaQtYF9D2bFXVIXVN9NgKO2CCmN1fdO3rz0hQX
-# C86bXxQ7labNyvKGE5G8/HHVqXRZZYznKwSvl6x/2iQ58UDSpf52kz4tORO08j75
-# Qy6jhj40LE5JYRLCZKVwOP5u1D0ydPe9EkMxmcTAqZBQfKDxjNRQBjaYIG/RIkxj
-# kw10zgIcpXT7GkBYso32rjuuRhsW0wXmkYNonVlUY5nZIlKYo9Gsaim7owQoW8jm
-# irip0vw8zW1Y3Aef5ATKRL/pfdIS+ZcKhuqz+z90VZCD/MsQIta3bF2wI1o9Xj9o
-# yyWxV28GolZU0OiY+EiL2OjcB3EoEEydOohzWQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/CBemvOqqOwgj4GlIuxlWt0tsbUwDQYJKoZI
+# hvcNAQEBBQAEggEAs9mJySmmiJdKuPIm4easLUeD/ZLmUKwX8F99PJzWMz3rEOsF
+# T9PZr6jF0fmvKjKbZC72UTYGYHu2ddSS19JxrUzEreLkZmy7d94xjm4oIuHZDWPT
+# UV0wrRvL8cmcTZUsPI26rFUEK9LGYiChITJvhtF111BHR3XuQsquUHbu1ueo1RQ7
+# TuzEoUuh46t+EM+iBwm/YyD3vt9oqh8cRW0b/mL+Jv1qBI7DhMOWU4/E19p372NL
+# 3oMJk+TRQkmGgG1QQHvFflG2Hvt0hu3ClCSesOnDfS0eO0ZqGAan44Z1pGQeBkJ4
+# O/JtcrwCT4uF9gWQQxStqyMxzrQDnNc5+2bCCg==
 # SIG # End signature block
