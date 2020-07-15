@@ -17,18 +17,20 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
 	else {
     #If the module is not imported, import it
     If (!(Get-Module -Name ExchangeOnlineManagement)){
-    Import-Module ExchangeOnlineManagement}
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Importing Exchange Online modules"
+    [void] (Import-Module ExchangeOnlineManagement -Verbose:$false)
+    }
     #Then connect
-    [void] (Connect-ExchangeOnline -Credential $AAD_Credential -ShowProgress $false -ShowBanner:$false)
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Connecting to Exchange Online."
+    [void] (Connect-ExchangeOnline -Credential $AAD_Credential -ShowProgress $false -ShowBanner:$false)
 	}
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU3x+NRrOTuNfV0m6gK+w3gBce
-# TU6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnSy3Pzl2KA9RbuX7sskDQ+uo
+# 626gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -95,11 +97,11 @@ $timer = (Get-Date -Format yyy-MM-dd-HH:mm);		Write-Verbose "[$timer] - Exchange
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUM7qOXBEIIqjOeRtDR19TtOiSjNAwDQYJKoZI
-# hvcNAQEBBQAEggEAchq7gkuqHX2BxoG7F/+oHUOUpK0EcQZ+jE5O31Ck4XbGlf1H
-# o9Jd0T9bkJtdo4ELjC91mZ1e0Yeg48jUg/OiuBIYLyi9GEQsmKgGS6OYoYxIcqLd
-# Bp42n+NOWm/7QpbNc62JciJVJl1O5OZiKIVkE8bSq5v6515Pd4soEi+yha6sUMgc
-# mGA7MIYaxcx0o3zUQ1GQRhCau8ngbVxSqLuoqq+GM0Jg4+20NGgnL59TB0f8Z53v
-# pocF8AC3x0tzpKaZah8KRhBTRqJ9/X696XIWUcKkeK+9la2QSxbyx4Nwww6CCo76
-# uM7hKkLpOZHU7jZ5AyhHfGIS0POqQULAFqsVBw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUxf7d8MEzMl3ULBjNAULBdabz5P8wDQYJKoZI
+# hvcNAQEBBQAEggEATdPP7yE2PrHGW8KwM6t4Md5lDxVMn+XECUv731J0XVdVl7nU
+# GpAn8GJvd7O9Ugm//7ub7VSeggK2Qf3EY2b+JaS7vq9MWEiIsgAZK+2Evt8FlpL4
+# XBTkluSnB9IR+B7+UsotmeAOP+yu/EzGoOq4Jlwf/GtWYWaxLUUKGlyG0EyYSTHU
+# iNdZn9uP+CNoPQMEOXTWPVHkoRRd3WricFXeIrbQh5e6PFJeIhRk3dnHxaGBLVip
+# 8Dj5b+3KZCTHH7NGFRRKN2cbikzvh5Bp7TGPwRwL0rbTl7dJaYHACnYkmmMC09zw
+# a9vH6u3SD2q22pQHhwpIvIWGXvTzFiElCEborg==
 # SIG # End signature block

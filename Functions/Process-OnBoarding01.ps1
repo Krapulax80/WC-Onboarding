@@ -103,7 +103,7 @@ function Process-OnBoarding01 {
 
     # Check if the SAM Account Name  already exists. If it does, create a unique one
     if(! (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SAM account [$NewSAMAccountName] is unique."
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique."
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Yellow
       Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
@@ -117,7 +117,7 @@ function Process-OnBoarding01 {
 
     # Check if the UPN already exists. If it does, create a unique one
     if(!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - UPN  [$NewUserPrincipalName] is unique."
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique."
    } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Yellow
       Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
@@ -129,7 +129,7 @@ function Process-OnBoarding01 {
         $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
     }
     if(!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - EmployeeID  [$EmployeeID] is unique."
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique."
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Yellow
       Create-UniqueEmployeeID -EmployeeID $EmployeeID
@@ -198,7 +198,7 @@ function Process-OnBoarding01 {
 
   # Check if the SECONDARY SMTP ALREADY EXISTS. If it does, create a unique one
   if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - SMTP [$secondarySMTP] is unique."
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is unique."
     } else {
       $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForeGroundColor Yellow
       Create-UniqueSMTP -SMTP $secondarySMTP
@@ -207,17 +207,17 @@ function Process-OnBoarding01 {
 
   # Set the new secondary SMTP on the AD object
      try {
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] "
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] "
       Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP)} -Server $DC -Credential $AD_Credential # this is done in AD
      }
      catch {
-           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
+           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
      }
 
      # (For non-UK users only)
     # For non-UK users set the primary SMTP to their relevant COUNTRY DOMAIN (eg. westcoast.ie)
       if ($UserDomain -ne $Systemdomain){
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Non-UK user detected. Modifying SMTP addresses."
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Non-UK user detected. Modifying SMTP addresses."
           #Create old (ToRemove) SMTP and new (ToAdd) SMTP
       $NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
       $OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
@@ -256,7 +256,7 @@ function Process-OnBoarding01 {
   ## MICROSOFT ONLINE SERVICES
 
       #region CONNECT to MSOnline
-      Connect-MSOnline -AAD_Credential $AAD_Credential
+      Connect-MSOnline -AAD_Credential $AAD_Credential -SystemDomain $SystemDomain
       #endregion
 
       #region Gather LICENSE LIST from the template user
@@ -270,12 +270,24 @@ function Process-OnBoarding01 {
 
       #region Wait for the new account to APPEAR IN MSONLINE (AAD)
           do {
-          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for [$NewUserPrincipalName] to syncronise to Microsoft Online ... (next check is in 30 seconds)" -ForegroundColor Yellow
-          Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue
-          Start-Sleep -Seconds 30
+          $MSOLACCPresent = $null
+            # Delay between each check. Increased for XMA to avoid spam.
+            if($SystemDomain -match "xma.co.uk"){
+            $delay = 180
+            } elseif ($SystemDomain -match "westcoast.co.uk") {
+            $delay = 60
+            } else {
+            $delay = 60
+            }
+          $MSOLACCPresent = Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue
+          if (!($MSOLACCPresent))
+          {
+            $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for [$NewUserPrincipalName] to syncronise to Microsoft Online ... (next check is in $delay seconds)" -ForegroundColor Yellow
+            Start-Sleep -Seconds $delay
           }
-          until(Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue)
-          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution"
+          }
+          until($MSOLACCPresent)
+          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution"
       #endregion
 
     #region LICENSING the new user
@@ -333,8 +345,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfDJwh5he6jgEbey1ebTn6N79
-# /2qgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsRDuGtdDrCZN4dzG1KrMAVJo
+# JyugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -401,11 +413,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/CBemvOqqOwgj4GlIuxlWt0tsbUwDQYJKoZI
-# hvcNAQEBBQAEggEAs9mJySmmiJdKuPIm4easLUeD/ZLmUKwX8F99PJzWMz3rEOsF
-# T9PZr6jF0fmvKjKbZC72UTYGYHu2ddSS19JxrUzEreLkZmy7d94xjm4oIuHZDWPT
-# UV0wrRvL8cmcTZUsPI26rFUEK9LGYiChITJvhtF111BHR3XuQsquUHbu1ueo1RQ7
-# TuzEoUuh46t+EM+iBwm/YyD3vt9oqh8cRW0b/mL+Jv1qBI7DhMOWU4/E19p372NL
-# 3oMJk+TRQkmGgG1QQHvFflG2Hvt0hu3ClCSesOnDfS0eO0ZqGAan44Z1pGQeBkJ4
-# O/JtcrwCT4uF9gWQQxStqyMxzrQDnNc5+2bCCg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDaPOdxA1x10oeeDxbAoQQD8VPMYwDQYJKoZI
+# hvcNAQEBBQAEggEAdIuzcPRyQW3gSyPFXyTiT/wAHeqMKJWA6mSxH919vpbbmClN
+# zxry8WOQhK/hmg7rSOLApPULd6disj64+Zqwc+a6VhxVkdV2zJbumru+7AsNuhs5
+# fBY8/P34vt9cn8z+XvqK/jOjNUtGpRcnu4nWSET6H+52m+oabYZn92DQWR2CRl1X
+# Oz9FghJ2apcnvTzrxLBFSPRSFaHXtdwd+PcrjUrS08ucGC0VqIYAzYGsZqqW+Sqk
+# 0D2HNEqOdagRDMkS+8NBhGDDRBUxOsW92nJfhtcu5cdprNQQjz4icQk2tl3eVxOz
+# 493nsObLGzLXWrxdTud4fPt3wnHDj553Zk32mg==
 # SIG # End signature block

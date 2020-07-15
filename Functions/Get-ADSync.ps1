@@ -8,7 +8,7 @@ param (
     $AD_Credential
 )
 
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting Active Directory syncronisation."
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Starting Active Directory syncronisation."
     $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
     [void] (Invoke-Command -ComputerName $DC -Credential $AD_Credential  -SessionOption $pso -ScriptBlock {
         & 'C:\Windows\System32\repadmin.exe' /syncall
@@ -18,8 +18,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfGfi4HdoByzg18etQA1aqlRA
-# 7EugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUS1nzRhvaLUaXu4y8WoHIyxQK
+# hzWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -86,11 +86,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUEL3ehqe/DjDq03LFgF4oRUJdIuAwDQYJKoZI
-# hvcNAQEBBQAEggEAGl8L8lpuIGUd342rsucYTCbs2yBdSAGTOLg0x09GXr05A+Bk
-# is2Hz90X3abehmsu+eXSwkG3sYDDS78seOkCPG49IVwtiEA9aAtACvlZKZVNOBJ/
-# /RwvhBgaoS9rEgqZBu/M0o5iPZL0aG/IAgVcbaDV+NbAfdc3bHxm4LaKu54MjF4E
-# 0XkECpYej1Hv2+Md68448Ii2z++HtzN6IxJzJeUaPKV0itTbccnRakcIiJMX6xmd
-# FQN3zk/0GP5y7bDDHJEnMhRRCVlefkgfrj3CEcO/dSrizSY0FeDx0p5bIct/bb42
-# oGxW8yO2hKDZ2CWk9E3fMXMlIUekVXa8iudeGg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUf8bms6ySm28miV/ZyuSa1okO/6MwDQYJKoZI
+# hvcNAQEBBQAEggEAbAjCshcW7eoggutRETugm4jmArVzgHBfsz9dqhfau7ROEVri
+# Huaow5bRpgvQgNq3pyITLpfeRpjDDpGJaK2QmCk23qnNKHePUfVEvoCLlc2fT54t
+# Xr1vqpGms5Li7UV34B+RBozWYGZnPNHvx5D09spi0eDV+xFCoCxu/NBQBo2pVUoW
+# N62xq1k111xmk+LVKQ1oArVUf86WNAgOFsO0yg/82BP/12CFZbmu6CK/04svfdZf
+# 8Km0E41y+XwN0XXWu4OaZoE5BlvCWHVMzU/MyBvV3EJuuKYg+jhjaRS7CFl8SEKN
+# rhgTJDnzZcUUHQFDSupjFnxtcWvh6FiUV9fcCA==
 # SIG # End signature block

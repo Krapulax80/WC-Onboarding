@@ -10,7 +10,8 @@ param (
         $AD_Credential
 )
           if ($TemplateUser.Manager)
-      { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]"
+      {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]"
          Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential
       }
 }
@@ -18,8 +19,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURVlNBqdyvg8dFZmo1fQo0wlZ
-# e2egggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUH+poPINsiqe2kUVjj2MlDp8N
+# dwmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -86,11 +87,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUTI5leK6aOyE7ZYnz1pPqbgB5DCQwDQYJKoZI
-# hvcNAQEBBQAEggEATSX0OiXDF3X+nEXoWcgQEnzdLQXiBHbacdaHs2m4y3h1n6HV
-# Qs6S2zs1LojoKr0SDyo3gEzQwnqJ+7d1domqf1yReNx/LTwlleiQBuuIsn6FdO4n
-# NtIwl5iKJweh/INgVBWbXET5AoqAe8qRjKrcyeqQ2PHXF2aluxTi4j3D+T4Oh1vX
-# 0qteH/NcOKwGf2VluSHkFwp7WmjOE2H+C66G6WzTt9dvNxOnmH/jLo6jnzsmiRZz
-# TxPLrQnyUvV1ztljpMeRfvKywV5Z90u3JzegC2fWO3aVyxfr+1T3i2p8k1mtaowu
-# Q1/M1mKDJIkcRnvg8X/O60Ccuf6jH0hczrCzow==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/t9ysesyXndGQnoTH4HCy+u9fTwwDQYJKoZI
+# hvcNAQEBBQAEggEAgbDJ+DS3UVx4kpRmBXa99aIpvPOPtI25TEpZQvWkihwVpDYk
+# Dc6jQC03deGi24dFuUfyDJTw/6LVyYSBUVNHNi6xqGgcUiKVmDtj8mRyeGvCuRVC
+# 3FYWM0klj5yQx7p11WNREQBQdP4Q0ddyZEcV2SgWZ2z0c4kZh1titfD1s6SAXTy9
+# KATi9KN33DjRt9mhYMxLMr5rQCOdcYgBj3Wvg9SBsMfTCD4YYIvsg61Yy+Vx7KHj
+# /Kr+cs07xcntpRVyuM+g8/zEuKZlTezpGdJDBn629M9ol5Njy/138Lq8pYcrpVrG
+# 3+8dGrcrfT85+becyHe6IYMU7faEQJPxrFDkkw==
 # SIG # End signature block

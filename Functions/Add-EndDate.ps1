@@ -10,18 +10,18 @@ param (
 )
 
         if ($EmployeeEndDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting End (expiration) Date  [$EmployeeEndDate] on [$NewSAMAccountName]"
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting End (expiration) Date  [$EmployeeEndDate] on [$NewSAMAccountName]"
           Set-ADAccountExpiration -Identity $NewSAMAccountName -DateTime $EmployeeEndDate -Server $DC -Credential $AD_Credential
         } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] End (expiration) date is incorrect - [$EmployeeEndDate]. Please ensure it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - End (expiration) date is incorrect - [$EmployeeEndDate]. Please ensure it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
         }
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFBmDoT6oxnPElOHOcw4sLOb5
-# bAygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU4lIzZhIEF/I3pLZgONsB6UgM
+# 4x+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -88,11 +88,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUiK6joshpNhDCen++FA7uugqVcLgwDQYJKoZI
-# hvcNAQEBBQAEggEAWQBjmuN4J0xn4MJzvm9nk1yOyUwlmCc7nxRW5eqHinhv8K7x
-# GQ+VYwhajmViEMs6Y0a9HqUyVUb//IUw1IgGJdLC8eOLzpvl6z6xlzxijdse6sYH
-# R0Ca8mliyCF8Bw1px9QQr4mbkypOGMsV3Gmnubye4sOKqpJiFYjuMpIi4HZCuVp7
-# H3SxIbMSGV8XdUwLNCQPrv0X4/wkez+8SVsmJHWLC7Xg7h370WjvzKZL2MbOPQm6
-# WgdgMgOD4KKmGo8bYekMM9mT5vXgQGo/wqrsuK8EZl+e1ruo/I+vkSXsBHrFpQ9p
-# txP9duvHaWIYHsvXpJtAPXQjV7KkT6FU7EpEmA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUROQalG5ODxYcUm/fR9RGQMQBJxgwDQYJKoZI
+# hvcNAQEBBQAEggEAck1196GxOHhomeGPQCOqixG3qmaDbf86/zJin0Niu00ysT2P
+# KVJwRVBKWMVUcZecPY02nxYDXBU7jTPVWg7nw4q7k/h5oZqR8iIBbum3XQkhEXX8
+# 34H0DXwoCg5cejHz7E4o4Kkf8nESwZ4y+WBUzv2ItdAP81e8BPsTodMHB2tp6qMB
+# q/gShkPuOEWHHQhmMi1k772X0uDgO6ybknEXZk00DhYkKi0afBG+kYOok12unnSs
+# TW2xk8sAVwIcsA8PzfR7Lux8JMLQnikeJZlsdCKu+CLxf5jOHwegHJzJyj3tOeqC
+# BeUaJB8KSOIoL9+vD/7kMJ7HuL6YR4qWFYj+PQ==
 # SIG # End signature block

@@ -21,24 +21,24 @@ param (
     # }
 
     #START
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - Starting File server / DFS configuration"
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Starting File server / DFS configuration"
 
     # Create PEOPLE DFS folder
     if (Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose  "[$timer] - DFS folder [$ProfileDFS] already exists"
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] already exists" -ForegroundColor Yellow
     } else { # otherwise it is not existing yet
     [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
     [void] (New-DFSNFolder -Path $PeopleDFS -State Online -TargetPath $PeopleTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
     }
 
     # Create PROFILE DFS folder
     if (Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] already exists"
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] already exists" -ForegroundColor Yellow
     } else { # otherwise it is not existing yet
     [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
     [void] (New-DFSNFolder -Path $ProfileDFS -State Online -TargetPath $ProfileTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
     }
 
 }
@@ -46,8 +46,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjD4NcgS9n4EdWN8JOTveKm4w
-# 0hSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUKb9fA3BDNXjuq/oK1zW2tqvY
+# v5OgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -114,11 +114,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUp+TYKEp4aJ1Gg3iNE1fXoJDHYzMwDQYJKoZI
-# hvcNAQEBBQAEggEAAxslIPp5958ZMLcsWQMDQniXjllrt55VcLuR/f32T0QSiEYg
-# sZ3MUtMsnqDXNZx4jFHqK1FAzsBGWLR0vHaQQcEAg/JESoEUEm7tctmBSL41Uj/O
-# q75iUPn97YaAv3hP/5TvPlvotTinW+YxANjdBKrVonv10qxRYFTQKh5ix2wOmrbQ
-# LBcILDKeFb73cnFCGq3rq4vy5FntqtLIMIOMAufPtc/KEX4zTj/xPSa6s+yp6dkj
-# XzNn5tCD2dpwyC2bxb5fYpCXyTkIm5ONuR8KQPmOdpyDM9DgUn2OJoZbVH2zdxWU
-# OH7XDih69U7umnc+0Ihn57t6kccXbad6yaf8YA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUNvZErH+A43K8SOZNLKHCev+IHecwDQYJKoZI
+# hvcNAQEBBQAEggEA542ZsYcbeEos70JWyH+QNV46nhfPjSjy+tbs3EVrv0Kj4ww6
+# kJVjsD61mC+rIniPyQEbsUiFddNOBG+rRbO5bgTaYhCQcsW//IG0UjkCjECx188z
+# QgBgDqofN9qn+twv8sXHZRjwbo4rp61uajkdKQSi65/GDWlZDK3Z2j3j+yTyhidP
+# Xf4FL/b7wi6Ko1Wx2l1JRI5L06sC2ZVbPKrWo9yjuQ0/T2MpQGtb5nj5/1/ExNNu
+# rseTfa0F2DSFOAUSISjaCzDVSzj/SJX8V2p58OvqVSZDWldaPePhykDcW1YNE4cP
+# bLXWlIDeHTlIlfXH00lEabVJhN1vuExCwh6kkg==
 # SIG # End signature block

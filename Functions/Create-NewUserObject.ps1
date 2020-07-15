@@ -42,7 +42,7 @@ function Create-NewUserObject {
       # Wait for the NEW USER appear in AD
       do {
         $Userfound = (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] - Configuring account [$NewSAMAccountName] - please wait."
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Configuring account [$NewSAMAccountName] - please wait."
         Start-Sleep -Seconds 15
       } until ($Userfound)
 
@@ -51,8 +51,8 @@ function Create-NewUserObject {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUv7dpQujOwPhI1RNv2QJMU5lE
-# aVWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFwL5cK7/oIyrXLRABkjX/W8E
+# YAKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -119,11 +119,11 @@ function Create-NewUserObject {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUhQjxtDeDXSDaroHd7whzchBjd0IwDQYJKoZI
-# hvcNAQEBBQAEggEAvxemBUjkHVT+K1oY4BKAtJ8eIXRCCQ1JwvLKX7fZZkpbfZxH
-# 9iQS6FJFlqJWDwaKsydAF9Gr75shxXricfxcGSrjCGfBWQtYGzy5O/8nhr4r1mfm
-# Jevht4bq/xD32fjJ3LS6VsmOapBcSVXjjLP5L+a0AARLjsn0tZBkyKNp53q22pMf
-# xuzDT8j200gUV/ubD9Z23yRIlk21jw8S6CzUkxCE25vDVdc4CGes3aTKi5GfwOaw
-# xcSxlqu4yZljm9v9UzDH3qwyPs+Za54KANFS37ujWeFhoWNn6W/I6Rw8QWWku87q
-# 1+TZIudVgVLWWgUTQL46VhjwaqTaOh+9NjaMtQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDTvSl5ihohGyN0JAAdKkzDgXLOowDQYJKoZI
+# hvcNAQEBBQAEggEAfCnxnT1h9bOvNiLBkP1mMHXtdlcMj/YXTVLRV1O0xzZ1Xvmn
+# Xqpi0I+fwVzp4yKNPC3650/+lOkceE9zlVtW8HJxKexVSziAW8EMwRNwZYIghqEN
+# HO+CpmZXD05wO8FyImbr9k7yUyPQGl6S5Tw0HXXZbWE7ADEvmJDxN+AzaxbEY3Mt
+# z/xj4+TTM/NxQtz/PFwyBX1xT6Az+InG1YxoUpeOGm1KaWcgl12dg2nQW8Ein1x/
+# Pnam7nAbrNiCfMFzZf1fBuFBejpcTDg9KHO/E2UUeMEYO1Jee3YvsL24LutNt3vf
+# ZaP5paMbeuDRLJjx21zlE9fGu91fN1lkxoIAyA==
 # SIG # End signature block

@@ -12,11 +12,11 @@ function Add-ToTemplatesGroups {
 
 
      try {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] "
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] "
         $TemplateUser.Memberof | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential}
       }
       catch {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
       }
       #TODO: Add outcome of the group addition
 }
@@ -24,8 +24,8 @@ function Add-ToTemplatesGroups {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzU3A4MvgA3TqP88CqE/mVBOm
-# 6oOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsFfxjkNJrlz7hC1kFxDXlgjN
+# qVWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +92,11 @@ function Add-ToTemplatesGroups {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUkRV3PyIyFHFQQDT/+EAwjJOFH/cwDQYJKoZI
-# hvcNAQEBBQAEggEA11gdaw7qQfVUxPVjf35Sw98mTuv26UcKp6F/3orIZmr4OBDo
-# sz1FyMRN0+wGWV/mBcjiqroD5aSMhLMmWjlaCJQ+F0qmC3UJyoOQaHb1ZRSJeJj0
-# 2QL5sWYXayMKu2kxA4yvB+Lt7aTSRvqrbPMeehj36eFOTzLLF+HQnRWi4khx0z/1
-# 33zLh11XNumM/AWlVIf4l3jHtxk9z7QSRRrOoSMYlMEHA4mxeqGt2G33ESflGdtJ
-# CL3xomteOHyWZUE3hGt/mgp3dHa0OJhqqAZjjP2Auivcc3ssQY3QFd3jpkac8Y2A
-# UH+YmNZ92Rg2XKk1D/ndWdj3F4OK7FzoTmKx3A==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUK8eE9T+T8J3J0sqlwJvQ5ufsy/YwDQYJKoZI
+# hvcNAQEBBQAEggEAzTbanuVpGDGrmc04+EYXhUgT0kYao0HkslFSqnAZKr9aRaKa
+# 98EM6EXmbM1w030v99dcVqkOOaDdsvheQDOETal1tkCClB3S1t7asTdOvPQIaBa9
+# SeLbOKevLauY/wNEq6THkJmwOhFulByYK+WD6IxC0ln/aAx1/0NS5yoC0KOITQ/y
+# Wzt95mM5Lvq7HW7iQZt+e6U9J7BvH66KzbzgJL+1IlTQdGmE5VqWvgGmw88d23UT
+# TaAC3aJi/IwckpZV7WZtaXxkFqtZ0ROVAWy/i/UK6Rf13SG0UaRTUwRf5C8z3IUN
+# zqpKrz8WUJoWMr7m2atXIN9f8Yn8SseJnMeCjw==
 # SIG # End signature block

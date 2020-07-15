@@ -10,19 +10,19 @@ function Add-EmployeeID {
   )
 
       try {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Setting EmployeeID [$EmployeeID] on [$NewSAMAccountName]"
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting EmployeeID [$EmployeeID] on [$NewSAMAccountName]"
         Set-ADUser -Identity $NewSAMAccountName -EmployeeID $EmployeeID -Server $DC -Credential $AD_Credential
       }
        catch {
-         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to set EmployeeID on [$NewSAMAccountName]" -ForegroundColor Red
+         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to set EmployeeID on [$NewSAMAccountName]" -ForegroundColor Red
       }
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUE38YPkCjjYgjPm9E/nBa6ag/
-# U2WgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU11PLckNN5tp/yPapPyfG+b9J
+# 3vugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -89,11 +89,11 @@ function Add-EmployeeID {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUu+XSsOOWg2CiKE/88FLFXZWHpz8wDQYJKoZI
-# hvcNAQEBBQAEggEAyJp6h2xl3y0uFsZfmBBm716ZbK7mxbuJ5oak+loZC9Ui3GJn
-# EWQgU+NEyIKjaMAMSPNB0Jsag8My5pDsWK2dWIomsB8roD7zJQAYRpdoSXBDc19t
-# IEyfIbJKPvDayS9lqZ5VxBKe04hx7/IlPUJssdbGdyQGBpy4wy+mblf6uCz7HLMA
-# 2hcGza0ybywG/fx24YciLS5DDmfd75YrtNti9klBrDPDCn9zsnSyPNGHxjNCM/Sm
-# BtZ5hKEGn9PJmhGYmWjhbu+VoANPdWVtYNQYbwuvOwMclljpv0Wif4XTv80GO+iv
-# agtNKicNpcLBg2xHfRv2VnUBC59+LgmjobqrhQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOyHpsGoKEVnUbEuL+i3c8KrK9pswDQYJKoZI
+# hvcNAQEBBQAEggEApgw2ltXyxlh5PBG5UX/05jPBvkuZrLmk1SbvXIwCq+Vyp3CH
+# K4wrHzVhobzuYZ9WygcMKvkOdzqrbKubPkLgWaHwYL1JUrSfDN1Mv1nRCCrNBFRd
+# Pt6MJl+2hAsmfWIin43MivjORpS5ubbIA/7rjLwEpHoWWk4NU0GJVFYaJyMytbCX
+# VBwGHitHjqWlK8Rw23BgEMmQAy6J3emZJLorfzwixpPycQGNOQeMWKHl01FeFVGd
+# XlHMKqfMdtyo+5kcoKaTIJ+egftFv5f+VJ3661EsvG7ky711begu2YAiVQPoqcO4
+# f7thXgD2o/ksTm3vD1iArPChw2GgrF/RuUbjqA==
 # SIG # End signature block

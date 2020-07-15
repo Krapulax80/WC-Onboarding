@@ -8,7 +8,10 @@
   $Error.clear()
 
 ## SET UP THE ENVIRONMENT
-  Import-Module PSWriteColor
+  # Module importing
+  Import-Module PSWriteColor -Verbose:$false
+  Import-Module ActiveDirectory -Verbose:$false
+  Import-Module ExchangeOnlineManagement -Verbose:$false
   # Collect work folders (names)
     $FunctionFolder   = "Functions"
     $InputFolder      = "Input"
@@ -89,7 +92,7 @@
 
   # Reporting
   Write-Host # separator line
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host -ForegroundColor Yellow "[$timer] - Generating reports of the script run"
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host  "[$timer] - Generating reports of the script run" -ForegroundColor Yellow
 
     #Report on the input file
     $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
@@ -116,8 +119,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUBgkEvxjPFqIzuCJwL1IQ7W2d
-# Th+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUg8F0vVAEG43L8nMw1C9CntSa
+# +LigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -184,11 +187,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUq/S+NNspyhYWCLO7+i6ZaN88bBYwDQYJKoZI
-# hvcNAQEBBQAEggEAdZ9VJf6sTIY2m920xOOXNeAI2vn4iWNTp4cdtWB0+yY18iUJ
-# wFYUT1nNAjjaswRYcQk/AQ5EU/UY53FXIldOgsgqJpdMkB43Pn6/0TydX73VwjS0
-# XNRDuAWIoD/1KoDbFoLajJsexcT5gfx6jQs5iq96Rn/aKxMqf5sib8DVW/u6b/JQ
-# kwJO6jDbvKqt7iu+m9ioh2qyqylSvALA29lo2oB6G4YdeJd2R6+4if7BeqiDU7R6
-# oW5mW16CMbBBzXGGo7DL1BjHpzVTRaC+dalu0ImOd6prI9LkkiGIxv8oEax6Eyau
-# mcFRewK2vfebaz5cP5WkeXCbF45VcJwF4UvdDw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUREHPLFjnT+sI5yyo7ShfMSTp0mQwDQYJKoZI
+# hvcNAQEBBQAEggEAkNN7UtKc8pjr2f+OhBUSX+YFVbMOb6DudAo/97jUszvmWgLx
+# CgCnTDzY/l/vHPqiZgjQUrpYCoDRQ+ksz5yL75gp4ONybrHWSO8F4RGKuW6Vrlo5
+# 31y9+U2pQApk8/NbM8cA4abMzjHBO/NU2UkWx9j0k9sXvutikT46kaoGbPTEcDvc
+# mfJgEXTjyprIyy1eMiLd5KYT7QVxSsb9jyr/RQSxU8wHKhlH2sa/JkDjdc1hCxZd
+# PfFnN6s8FWD8qFzY/x3OY82zCTGWFjH+d3tUT4Lu2BKBaqwTx1TnZHsXXuSz4y+z
+# /6v5Rt2kRjj2DT7VqGktc4MN0vLGaXjHP3gydw==
 # SIG # End signature block

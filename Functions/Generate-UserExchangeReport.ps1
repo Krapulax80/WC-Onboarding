@@ -22,11 +22,11 @@
         }
         do {
             [void] ($FreshMailbox = Get-mailbox $NewSAMAccountName -ErrorAction SilentlyContinue | Select-Object  *)
-            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in 30 second!"
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in 30 second!" -ForegroundColor Yellow
             Start-Sleep 30
         }
         until ($FreshMailbox)
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Found mailbox of [$NewSAMAccountName]. Continuing"
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Found mailbox of [$NewSAMAccountName]. Continuing"
 
       # Create report object
         $global:UserExchangeReport = $null
@@ -60,8 +60,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUKt2r/MHUMuDdfH9sN8c6mBwO
-# 5D2gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUhYDOYRYVtC5CjYAjcoD+hSOb
+# j7SgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -128,11 +128,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUp7ddWDWBxy11wLXJEJH8B20ed9QwDQYJKoZI
-# hvcNAQEBBQAEggEAVH1+KO7mHGHZyZvIFu3U2C+7aAC5m39vK10q70+d2dLHpNOy
-# n+rGUcrMhovcvOTFC2igMj9aXS/SioYyMy2SC+FRH3zgALOwixvx89xSqWiBn16f
-# TwyDtevIViUlHpAoKNZJm6Ys2i1IJNfV+B8D2f4ufKlHkQxSkbvSE1x7qwWt+pgQ
-# m+01K2IuQDdsTj9Arn8ME4gu2efVKgXpXPGyhh5BtKInisBy1A4oKVdWQqzm9/Hn
-# iqGQ7Rxm+Mngi329mGDC9GHSaQ54Vp1yHKZWJdFt1SP8H8GBZee5ZrOO/GBAagDL
-# k8nYMDlSbjJxzTepjZPNteTzb1cOSmn0Rvs6ow==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUex8ZPalCEWZW7b8hYdlg0N6GAYowDQYJKoZI
+# hvcNAQEBBQAEggEA6HGOn5ipMur8xrozs0cdy+Vk0Y8sfJQA7aZmjUTYkt0NvuMJ
+# fz6TFzFMEBcVQIUR/63pW0gy3dKRiJSjmUBHwhNw1RFXvwZUBlCPX5OyPSAv9rjm
+# r5Enk9nzuDRyNsMZOTcU11V5Z3h/5lonrpjsAO32lgU/9u477+yZApxmXsZ67rjG
+# Ae4TBp9T4sJxqHVdROteqMdKDsn5FFx0gH2v5XiH7AMJPV+Z/iiFkiUD1t/8BlCX
+# uL2BVinqkV6FKmFj+kwIe+UFiT/R8ssyln7aj7tp7yUQ1esMT5eQqjyjo248KIA3
+# 4QYS++1IbErngx98gtyo/eA660MVaJxK4R+49g==
 # SIG # End signature block

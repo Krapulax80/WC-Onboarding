@@ -10,19 +10,19 @@ function Move-ToTemplatesOU {
     )
 
 try {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]"
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Moving [$NewSAMAccountName] to the OU [$TemplateAccountOU]"
         Get-ADUser $NewSAMAccountName -Server $DC -Credential $AD_Credential | Move-ADObject -TargetPath $TemplateAccountOU -Server $DC -Credential $AD_Credential
       }
       catch {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Failed to move [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -ForegroundColor Red
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to move [$NewSAMAccountName] to the OU [$TemplateAccountOU]" -ForegroundColor Red
       }
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUozqM6gE19RFDbdRyJdOvnc3U
-# EnKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/dzlHeMDHbo37xR1v08+/DkU
+# P3CgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -89,11 +89,11 @@ try {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUxtTANpWYRr5q4VRMIe2fc0A9zGowDQYJKoZI
-# hvcNAQEBBQAEggEAzrhUEYIIL2FcZt1UUVENhAYYZviO6qIkCxnTSsRkoU1JmOFT
-# n7ODLllg3UDo3BMln8/x7gUd7e8iaznRlYWb9i0NhFgbCseX4Cr5lSLv5YIqolXg
-# QYJUL8JX2eS+Ls7YWQQd+nzmXpH0VCr+1kNhc0JY03tQtRBQMxuPjg+L82bcuk6h
-# IuylV27oLg4i94NGW/hxPvHCSFkYWPu5oRzXUCZJYc89SxV5qXMG8DMVBkQuc3KB
-# ljhM06icbXamhTRi2WVNWl9K+ZucK6FIjyVlDh74bn7EISr+FJeX5g+wbOl1VlCp
-# reXVkr4HL10+PFHTQeqi9lePdDky3OHXDx6hbw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUeZXmof9PtgJvNGtq2wNzL49C6NgwDQYJKoZI
+# hvcNAQEBBQAEggEA6HSuAwzoYul9qbIA2ovhtMdx4E6eATCzn17BM4NkTgXY4Rkj
+# UObansNLvBWCiEMpkzhn7T3P5vzBz+B1HLdRcPp1yYAZX4e+y4Wsnm8nQxVXc5Xj
+# bUYwQbQAiFw21sv0kfprecF9GngP1Zaa0/IU8OBps4zK8/eNVlDtn4NaivCIt7f6
+# LhP/nAAqAq8UQWeLn0OpbSNTfmnz81Vt/mnNyDTB/Xu79aW8HjjUIKsOEluf4NPJ
+# luSJ4HrSuj1b8Q533Wyee9psF740HH0+FucLSM4Lx+CIXCNFp1pjxdarhKg6NvYc
+# oHzCkzWgfuLgtgEiGq0r2GU00OA/UpJx0M2nqQ==
 # SIG # End signature block

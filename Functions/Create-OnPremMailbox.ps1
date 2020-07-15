@@ -13,14 +13,14 @@ param (
         [void](Enable-Mailbox -Identity $NewSAMAccountName ) # create the mailbox
         [void](Enable-Mailbox -Identity $NewSAMAccountName -RemoteArchive -ArchiveDomain $EOTargetDomain) # places the archive in the cloud
         #Feedback
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - On-prem mailbox created for [$NewUserPrincipalName]. Archive is in the cloud."
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - On-prem mailbox created for [$NewUserPrincipalName]. Archive is in the cloud."
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU4ZLOVYh/VTmN96gtcwsjKX0X
-# 7JqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJbB9DDAsxUshR3xGU0mrAJ4E
+# ZNqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -87,11 +87,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUVHgewB2e1u9rBYSyunzYIZh8vsAwDQYJKoZI
-# hvcNAQEBBQAEggEA1MQxmuyF/J50p7lG4eLxRneTQEnG02QoFfyDTp3Rc0JYJK3K
-# 9/CtuEXbuxCGpleO37tJu0RS7JZk8ny1jMVB6s4zCPxyWymF1TZoNyst1le/OyCg
-# mBIcZGzu5yGP88X86VPoEXy8QPAlViv6XW14FrOZo9CtdF3Vz3SzaJyaQDoDcixR
-# rLOyCzT9IQ3hK8+9XU+CgEoSH6igp1hOnAdU7jL/82A5e2sIfiorrF3ZxregDmMT
-# LbZE01+EyySlmYV+BCjMJS99DpBhIk6QibgxxvrGqfYb8ZjkluRitdvWfVwNbdYs
-# ZrX1uAIQPm8MpuKz29NSXrmP50OtDLS9EE+7Sw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUsO3recloLhRRYdN2PexpsEVTQJQwDQYJKoZI
+# hvcNAQEBBQAEggEAS+7TXMA/rFqejBDSo8tveS7mvSaiq6/gHkKwXget/weYvwGv
+# xpu6y9oZhIYiw1O+DwaglnSdlZARWJhCkQEbhOCDlpzotS5CGPQ8J9ZqfYmES856
+# j9q4WT/fzdhn98KQHXnAMvGp5IpWAIu08vGCOVezRz3dFo29QdF16rT7i965JRkt
+# BPq5RlFNTgnxIx9s94Rxs8JtkzKACyDdbMCa/58f+ND5xjCWML68SKFMHkZBiUqM
+# GZcHC2dNThoF56Y6v5T4hKM4NidvoMWURmlsnTvlmxNA5ogMcvtiNv74e5/2nGAS
+# l6dZPoLVFH0t6foN+/4/zY3OWWCwMYVDXJdlzg==
 # SIG # End signature block

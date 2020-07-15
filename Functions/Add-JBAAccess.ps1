@@ -11,10 +11,10 @@ function Add-JBAAccess {
     )
 
          if ($NoJBA.IsPresent) {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] Deny JBA access for [$NewSAMAccountName]" -ForegroundColor Red
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Deny JBA access for [$NewSAMAccountName]" -ForegroundColor Red
         Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute10 = 0} -Server $DC -Credential $AD_Credential
       } else {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Verbose "[$timer] Adding JBA access to [$NewSAMAccountName]"
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Adding JBA access to [$NewSAMAccountName]"
         Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute10 = 1} -Server $DC -Credential $AD_Credential
       }
 }
@@ -22,8 +22,8 @@ function Add-JBAAccess {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7p00544345OBXznTSuYOgJj/
-# k0igggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUgaHUO8YRzNI1Dz78jq3ZF77h
+# CYigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -90,11 +90,11 @@ function Add-JBAAccess {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUcqfcfWFyY1lVbExWKgQzQTipfUswDQYJKoZI
-# hvcNAQEBBQAEggEAIkAGdAxhzG08lZWWDZ8Jq5eF8U/uRLgiRczklRUhkHo35kVQ
-# cQbV+d+IRlgv8vNkFdhTC6cl/Yh3+Ilayno7Ux1WJzspIwcIBkilSg+wdARRXPk/
-# RTITL4Ug6T8kPEohfX0H0D5RWn6DtS6zk2wAtYvIGlEEdnUbSiTwJhZ7fgMmch4e
-# zpyfibzZvZ9XDDHxLgPr92q9dy/J6xazt/DN5/qlWPyMoke+3RsBM+u89v0VfdKD
-# PPfXPkGDdOI2cejff9uoucf8ngE0Nk38ZnCKYstfpWoHFKd4oXto9V+s/Y8xB39w
-# GSW5RrtnF61ujYu7doyyRWN3xMJ9IA9S6EYInw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUY5r3XY0sTIpLPrAZOFpWFFCSm+owDQYJKoZI
+# hvcNAQEBBQAEggEAZ9tLscVLdPCbnn4fjdhbxsPcxK/UQWxQW8d+2M+KPUTg1poq
+# VL03oz//wFC/a1qURuEb3ZCuN+6oDon1aVu5h2tsjtw7JRdEDP/cun0EBa4CUOZe
+# 5wjVaGISTD2o8EJlHzFLxFh3xA8Y9Uzxft2VGJvZi8HZAfE208JCuYIzEdgV9YlG
+# WsaZc4xDWcBsPzQT2Uoy6Ghfv1DuWQjsEDJcyxxjiKMoxNswA+fnn5DPA9S2EppQ
+# 8p4ztrdbuhyjSdxrg3UzzGWKMCEqwi7Y/yMnj/vBUOcFnd6YfSyTxtA+m9DgE/Oy
+# v/FYd03T0KxJU+ZSZHbRWuk/JSBpuRsoFqtg0w==
 # SIG # End signature block

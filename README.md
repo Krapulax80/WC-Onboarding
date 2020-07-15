@@ -12,12 +12,6 @@
 - DFS provisioning
 - reporting
 
-**Table of Contents**
-
-[TOCM]
-
-[TOC]
-
 #How to use / pre-requisites
 The script assumes the following folder structure:
 
