@@ -36,7 +36,7 @@
 
       # Display report
           Write-Host # separator line
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] (SUMMARY) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
+          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] -  (SUMMARY - EXCHANGE) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
         Write-Host "Mailbox Name        : $($FreshMailbox.Name)" ; $Obj | Add-Member -MemberType NoteProperty -Name MailboxName -Value $($FreshMailbox.Name)
         Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)" ; $Obj | Add-Member -MemberType NoteProperty -Name PrimarySMTPAddress -Value $($FreshMailbox.PrimarySMTPAddress)
         $x = 1
@@ -60,8 +60,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUhYDOYRYVtC5CjYAjcoD+hSOb
-# j7SgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk++tCiXJdp8pa1TsulVzlmGf
+# 05OgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -128,11 +128,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUex8ZPalCEWZW7b8hYdlg0N6GAYowDQYJKoZI
-# hvcNAQEBBQAEggEA6HGOn5ipMur8xrozs0cdy+Vk0Y8sfJQA7aZmjUTYkt0NvuMJ
-# fz6TFzFMEBcVQIUR/63pW0gy3dKRiJSjmUBHwhNw1RFXvwZUBlCPX5OyPSAv9rjm
-# r5Enk9nzuDRyNsMZOTcU11V5Z3h/5lonrpjsAO32lgU/9u477+yZApxmXsZ67rjG
-# Ae4TBp9T4sJxqHVdROteqMdKDsn5FFx0gH2v5XiH7AMJPV+Z/iiFkiUD1t/8BlCX
-# uL2BVinqkV6FKmFj+kwIe+UFiT/R8ssyln7aj7tp7yUQ1esMT5eQqjyjo248KIA3
-# 4QYS++1IbErngx98gtyo/eA660MVaJxK4R+49g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU4C6qtU31+X/S7K8Iemoax3hPDMswDQYJKoZI
+# hvcNAQEBBQAEggEAMCqQzjdtJIWenu0G5OP7HcKIlH3akqxE9m1wlN0Uu1TczjEf
+# PIBM16THRV/Mi/7IMGWHQOBc6qZga03EPyzy67ZswX54EpMOxnLWVsfdAy7NLx8z
+# l/mvu9jrSpGGih5Ps+WAn0w/DkHMOSo23mTodXv7Ukq7FrjQpDhe05TuCSfl6kZT
+# G+TfWkZCwAawOgEVyyvULe59NeqA5l1UzwLOXbx/ohJn2ONIULMeuStg8cVij+lB
+# 2MICCEiAOxUqLTBX3krYOSCHhM0QUtxmwYoMtS0VFoFCv5piu9E4ZC0/KHum8CIu
+# fuBNQ0uNHHi9kq6IAnNaO8twdh+FzKLmOH87SQ==
 # SIG # End signature block

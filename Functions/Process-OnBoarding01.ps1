@@ -328,16 +328,33 @@ function Process-OnBoarding01 {
   ## USER REPORTING
 
     #region USER REPORT
-      #Report to display
+
+      # Report to display
+      <# Here we create the report object, and at the same time display this for the user who is running the script.#>
       Write-Host # separator line
+      #Exchange
       Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
+      #AD
       Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential -NewPassword $NewPassword
-      #Report to  - AD
-      $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_AD_PROCESSED.csv"
-      $global:UserADReport | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force
-      #Report to  - AD
-      $UserExchangeReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_Exchange_PROCESSED.csv"
-      $global:UserExchangeReport | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force
+      #DFS
+      Generate-DFSReport -PeopleDFS $PeopleDFS -ProfileDFS $ProfileDFS -NewSAMAccountName $NewSAMAccountName
+
+      # Report to CSV
+      <# Here we save each report to a separate file#>
+      #Exchange
+      $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_AD_report.csv"
+      $global:UserADReport | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force -NoTypeInformation
+      #AD
+      $UserExchangeReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_Exchange_report.csv"
+      $global:UserExchangeReport | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force -NoTypeInformation
+      #DFS
+      if ($Westcoast.IsPresent) {
+      $UserDFSReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_DFS_report.csv"
+      $global:UserDFSReport | ConvertFrom-Csv | Export-Csv $UserDFSReportCSV -Force -NoTypeInformation
+      }
+      elseif ($XMA.Ispresent){
+      #FIXME: What to do for XMA user DFS?
+      }
       #endregion
 
 }
@@ -345,8 +362,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsRDuGtdDrCZN4dzG1KrMAVJo
-# JyugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUIuDALEyEU7xUu3TXYZFdRGNZ
+# AhCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -413,11 +430,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDaPOdxA1x10oeeDxbAoQQD8VPMYwDQYJKoZI
-# hvcNAQEBBQAEggEAdIuzcPRyQW3gSyPFXyTiT/wAHeqMKJWA6mSxH919vpbbmClN
-# zxry8WOQhK/hmg7rSOLApPULd6disj64+Zqwc+a6VhxVkdV2zJbumru+7AsNuhs5
-# fBY8/P34vt9cn8z+XvqK/jOjNUtGpRcnu4nWSET6H+52m+oabYZn92DQWR2CRl1X
-# Oz9FghJ2apcnvTzrxLBFSPRSFaHXtdwd+PcrjUrS08ucGC0VqIYAzYGsZqqW+Sqk
-# 0D2HNEqOdagRDMkS+8NBhGDDRBUxOsW92nJfhtcu5cdprNQQjz4icQk2tl3eVxOz
-# 493nsObLGzLXWrxdTud4fPt3wnHDj553Zk32mg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU7cyLlMe5OACTWTK9PFzKqW3zN7cwDQYJKoZI
+# hvcNAQEBBQAEggEAox5xI4SLfA1MmrOPevRHcOPHm5q0GjsVtghrnzms9F3tkLDR
+# 0IkOg/r4wRHGmQ93W143eHItJRf/FB/6z7lDMjZK/Ox8o9sXTSP6VnGjlbB7Ij3A
+# 6mw8HEro/6pYn/0g+ZJ3GWW5jerGkM7aM6YN1HcQJNLCiP1rAuYf78RATqydE4gI
+# ZlDbPxWprY8PoLxn31w+R6gi7xNgWPS+RY88/kLQ2fuAUVmzElWfSW2GZsLpBpoj
+# Z1Fa61Z1MI/g8c14nx+JUaMvqzY4pZV+odm2wIqd7R2wW0+ZQWz7PmgSL9FZ9rNJ
+# pMGe0tdC2Yeh57AKA040toqhcwiKVxlc4ElHeA==
 # SIG # End signature block

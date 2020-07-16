@@ -1,31 +1,42 @@
-function Add-StartDate {
+function Generate-DFSReport {
 [CmdletBinding()]
 param (
-        [Parameter(Mandatory=$true)] [string]
-        $EmployeeStartDate,
-        $NewSAMAccountName,
-        $DC,
-        [Parameter(Mandatory=$true)] [pscredential]
-        $AD_Credential
+    [Parameter(Mandatory=$true)] [String]
+    $NewSAMAccountName,
+    $PeopleDFS,
+    $ProfileDFS
 )
 
-          if ($EmployeeStartDate){
-        if ($EmployeeStartDate -match '^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$') {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting Start Date  [$EmployeeStartDate] on [$NewSAMAccountName]"
-          Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute13 = $EmployeeStartDate } -Server $DC -Credential $AD_Credential
-        } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Start date is incorrect - [$EmployeeStartDate]. Please ensure it is yyyy/mm/dd and between 1900/01/01 and 2099/12/31!" -ForegroundColor Red
-        }
-      } else {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Start date is not defined." -ForegroundColor Yellow
-      }
+$PPLDFS  = (Get-DFSNFolder -Path $PeopleDFS).Path
+$PROFDFS = (Get-DFSNFolder -Path $ProfileDFS).Path
+
+      # Create report object
+        $global:UserDFSReport = $null
+        $global:UserDFSReport = @()
+        $Obj = $null ; $Obj = New-Object -TypeName PSObject
+
+# Display Report
+Write-Host # separator line
+$timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] -  (SUMMARY - DFS) DFS changes [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
+Write-Host  "People DFS for [$NewSAMAccountName]             : $PPLDFS" ; $Obj | Add-Member -MemberType NoteProperty -Name "PeopleDFSPath" -Value $PPLDFS
+Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj | Add-Member -MemberType NoteProperty -Name "ProfileDFSPath" -Value $PROFDFS
+
+      # Generate CSV report
+        $global:UserDFSReport += $Obj
+        $global:UserDFSReport =
+          $global:UserDFSReport |
+          Get-Member -MemberType NoteProperty |
+          Select-Object @{name='Name';expression={$_.name}},
+                        @{name='Value';expression={($($global:UserDFSReport)).($_.name)}} |
+          ConvertTo-Csv
+
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU64GR8JCrAK7z4IspFmGzj8jA
-# rXCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvmWOoiY+YQ9sLaCkAIqXhCKd
+# T1OgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +103,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUAXPZRLWAm+tAiEh2u7n3u4jywLswDQYJKoZI
-# hvcNAQEBBQAEggEAVr89p98Oz2d+dPS5qRcTzcsa/o0pqFBvZtN9oF3oNPgQ32KY
-# I5IBnY+SRrCe/SrRQVrJCSLoQg9uJleUXT435FfpQE1heikHaN5wgdLkEqLrFM0o
-# 5BJU2YQWjJ8/quLxTk5dFA3AOKgeJvfjfyrH8FyN+CWJYdA2ND+oVMJuF1NcRgk6
-# NZq0yZQZwI+hsPnvKvEAuOavcXpVpExyIr5e2yltRjnRN4wRk0PYyMLFQ2YLU4yw
-# xCmZ2HLFFWtuB60PLnYmJ27oGsFvtYDlaGmkOyK7FrvNhKvNaNFz10NQjynYXZ7R
-# s/jpew49uqq8d3oYnpg6ExjA9kO3WufOEgx4rQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUMhcBdDqfg6P95/OaBD3kfHjaBMkwDQYJKoZI
+# hvcNAQEBBQAEggEA26Bahp+5KoaQamP14gdDQTgs4aNJeGudRHczDhhloSafOYFx
+# 84fbNPUAI232+G5YHSBdUdjISZSDNzVHqSquQcZMbRKicvA4kwRqVouB2KWnQ6uG
+# coLu7RFTM3iczKhrHoyERjpiKAAtS3i64Xx5LKgJWzBEL1PxFIHvzN0TeU9bH8Rx
+# wGF+NLLop+vH97+5JtrbslBA+esGDzqlpxMS9qbWnGint8RZflliKk7sQlxcX07d
+# 0kHZwpFABrWBkuoIIOVJ8i5hmdwC5U+MuyA+mx7UD7cmwkFN6zN29I8VvMWTHZGV
+# yKWNB3FVqpIwRaFyKNM+7HaeSk8N91bTEJILCw==
 # SIG # End signature block
