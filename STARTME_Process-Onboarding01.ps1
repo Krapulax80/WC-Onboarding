@@ -65,6 +65,7 @@
       $EmployeeStartDate              = $Line.StartDate
       $EmployeeEndDate                = $Line.EndDate
       $ContractType                   = $Line.ContractType
+      $Manager                        = $Line.Manager
 
       # Run against each line
         # Pipe, if the workdomain is WestCoast
@@ -72,7 +73,7 @@
         $configCSV = ".\" + $ConfigFolder + "\westcoast.csv"
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config
+        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config
         Write-Host
         }
         # Pipe, if the workdomain is XMA
@@ -80,7 +81,7 @@
         $configCSV = ".\" + $ConfigFolder + "\xma.csv"
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config
+        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config
         Write-Host
         }
         # Pipe, if the domain is not within the expected values
@@ -117,8 +118,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOoJeNkflh3It1CjaAqO+Xr+v
-# lNCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJxJTu8NrD6tU36qHAzA2Ntcr
+# mBegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -185,11 +186,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUPvqMh9LGEGmyOoPHu6FpDfddmvswDQYJKoZI
-# hvcNAQEBBQAEggEAOMH6F0T3F/+RqNpLgNlj5ldiBl+jwFI+K6TCgJubyfm4x1G1
-# g3NBJk/kK1VzROQ5nrORhnw5pKmCcCGXsX7AB7+ERQqKgslxP3CFhDe41Np47qAR
-# GCwDledtuby6uYQD38FkzweJo0MhPlAgSkKBMMBKWnK3Mz4/6shKiyFO8h0gYEYP
-# KEoq9F85yPtck0RDBAQcbv53vbAeAG1FXsY85lA+yU9Vp08PNSNJLEuR53eUB1w0
-# mhYOmvU+Le+ZygFKyIS2TLgtqcm7xKDWxO62h7IQeXdclocuKr/jnIUdIEsm0mNL
-# EvIEM5zm0iUCYRwY02leYTUbc+CxTwK/NGuW2Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUsfwFqwDWA6LfXkt5zpgHxdWUyawwDQYJKoZI
+# hvcNAQEBBQAEggEAZc4JftGzLMD/I/xNLnp7YBxZS9MtEvemZFGn3zVZYutDAEJY
+# 9rjEv4DpdY2doEoWMpEBtufyBrCGxifiP9y3AB7ri6kDDVNON8M+HCF7d0jy41N9
+# pXOSe9yXX+m/lG5dHLXp2jvVdW8BpQmrDtY27bTjLKoSXWUL0gljpbGs1NlWViVV
+# b2leAZ0Yq6SCSOVAbWmuA2CCPsfrlslQ4dOoxaUzn2wROsBxRMCABfgSxpiuk73o
+# MzDgdz89+zr+feFoOZYwysFQNctRjMz3w9q3/xhenZu2+i4gqelqxz8IMRJmZLFx
+# xZlBProLPnZ4hovUpu6UfIVMgD6wWc/k018FEA==
 # SIG # End signature block

@@ -1,18 +1,18 @@
 function Add-Manager {
 [CmdletBinding()]
 param (
-        [Parameter(Mandatory=$true)] [psobject]
-        $TemplateUser,
+        [Parameter(Mandatory=$true)] [string]
+        $Manager,
         [Parameter(Mandatory=$true)] [string]
         $NewSAMAccountName,
         $DC,
         [Parameter(Mandatory=$true)] [pscredential]
         $AD_Credential
 )
-          if ($TemplateUser.Manager)
+          if ($Manager)
       {
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]"
-         Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting [$Manager] as the manager of [$NewSAMAccountName]"
+         Set-ADUser -Identity $NewSAMAccountName -Manager $Manager -Server $DC -Credential $AD_Credential
       }
       #TODO: To get the manager from the input file instead of the template user (Janet's reques)
 }
@@ -20,8 +20,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUm8dQKOgTa1E26cOw/41ufhLN
-# mACgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUBg+4E9Kzw3c5yGV6fTOyB4+k
+# Da6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -88,11 +88,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU26oHpKyCB5JXwYQGN7iw3uYBNu0wDQYJKoZI
-# hvcNAQEBBQAEggEANmU/wOV9dp/u4QKWJP/9f60jI6SWgi6QjKFzHoh2OvHUWrCa
-# P8DLGqpF8wT3Z4mJIE285ELZo6X/eQ83fxog2cRM68s/EtCutw2/XzXpQ8dsQ9SQ
-# j7AWSCmRfgv5X1z/kXOMe2XYI4FP01NawuIYwH2vSdhVo6v7m0NBhjUZkqJFctPt
-# bOAM/2L8JBobv4MziA000lzwIGibbrOcDjJfaBb/DOXB06ZlDyBD+Pz0oPZJwsFE
-# gMEie7zUFfRsvCWiC0KJ1ajSihZMYNgA81gWrxG/JA0B29tBY6EJYu9ZsUIlOtkF
-# MxctmHUnddTVEAycKyavpZhmpYd46wmD+m4S/A==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUEgEGseAy8pSJqMDD0feelNr7TKowDQYJKoZI
+# hvcNAQEBBQAEggEAcdy4is7q25VCXqhHAGppV07QP1eVjEEPkWP7OQRzu10UwsYU
+# BNAA8ZEHB8NroBvs2eDPK9fz/5TLTLRfWWwAX0brGlNmLNUGMeDLEd1qcAhDY7mI
+# 0FS8XJBixNNFZqcpbPr2vqAUxzETRFobLAJR4fdqMQC8wlakZM5HQC//kxXlXmik
+# IQKYKuSw0rS+9Xh2cwg0PiCc5itx96HeI9H2k+nlKaKNR+v7myFLt0Nk05sYN6n8
+# 2dmLQJEf7RWVIKMnhcRcWf6A0936ox4gltjmXdpr2WdnOcwQqt9sGZs01chVXnJy
+# 7v/Pk3yHBPqj5f0QgAyiAJ69QH0w8Lwh268m4w==
 # SIG # End signature block

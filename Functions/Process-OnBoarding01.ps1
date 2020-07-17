@@ -9,6 +9,7 @@ function Process-OnBoarding01 {
     [Parameter(Mandatory=$true)] [string]$TemplateName,
     [Parameter(Mandatory=$true)] [string]$OutputFolder,
     [Parameter(Mandatory=$true)] [string]$Today,
+    [Parameter(Mandatory=$true)] [string]$Manager,
     [Parameter(Mandatory=$true)] [object]$config,
     [Parameter(Mandatory=$false)] [switch]$NoJBA
   )
@@ -39,6 +40,9 @@ function Process-OnBoarding01 {
       $RDSDiskFileServer = $config.RDSDiskFileServer ; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
       $StarterOU = $config.StarterOU
       $DFSHost = $config.DFSHost ; $DFSHost = $DFSHost + "." + $SystemDomain
+
+      $SmtpServer = "mail.westcoast.co.uk"
+      $ReportSender = "newstarter@westcoast.co.uk"
 
     #region WESTCOAST
     if ($Westcoast.IsPresent){
@@ -144,7 +148,7 @@ function Process-OnBoarding01 {
       Create-NewUserObject -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -FirstName $FirstName -StarterOU $StarterOU -LastName $LastName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
 
       # Check, if the template had a MANAGER. If yes, assign the new account to this manager
-      Add-Manager -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+      Add-Manager -Manager $Manager -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
       # Unless specifically said otherwise, assign JBA ACCESS to the account
       Add-JBAAccess -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
@@ -306,6 +310,7 @@ function Process-OnBoarding01 {
 
     #region DFS PARAMETERS
       if ($Westcoast.IsPresent) {
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Starting File server / DFS configuration"
         $PeopleTargetPath = "\\$PeopleFileServer\PEOPLE$\$NewSAMAccountName"
         $ProfileTargetPath = "\\$ProfileFileServer\PROFILES$\$NewSAMAccountName"
         $PeopleDFS = "\\$SystemDomain\PEOPLE\$NewSAMAccountName"
@@ -362,13 +367,19 @@ function Process-OnBoarding01 {
       }
       #endregion
 
+  ## EMAILING
+
+    #region EMAIL PASSWORD TO LINE MANAGER
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  password of [$NewSAMAccountName] to [$Manager]"
+    Send-PasswordToManager -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential
+      #endregion
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUQ0x1OoDI66BIOINp9ZImuuqU
-# WUegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZLWhSRlen0s9/Y7Tn9aTkP9z
+# OASgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -435,11 +446,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUG1Jji+rPq29HLKp4YV3bh9/ND5owDQYJKoZI
-# hvcNAQEBBQAEggEAkMnyQDZR5NHNDvRJF25HJtfse3WECF1cNV13arWDJaexj9wH
-# 5GV4zqyH71/J43WFbii/MKyH4E1HHsj4KnE1lGsSIt5xPM3f6SffU1k97H7lOAo7
-# /GPT4SLjw6SAYrLEvrdssagQj0VjYAwBDGoo+vismGlV/u+mNFq0ADEpGbRRgKei
-# 5Cp/ex/ZZthj9LsU578afzQBSWTfL4o4biqvhLAiPHsa2XwPTfG48fQl5/+3SFhi
-# DY2NGavDwUU/QSq/nyzpUgKgLJu8vAGHT8esRnM87Lc5ru6eMM5ElG2C+EBUobgO
-# /sj/uj8JpJlQoVUL44n06oMQ3pNUouLQG7RLGw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUg5YMurrFFx8E/ZlaW6CtKJeItcswDQYJKoZI
+# hvcNAQEBBQAEggEAd+NRg9UhX3AjE6GiMUa7b1pMjxoZOrqjXtk1dFBR61tPxNHE
+# bfh4hi1OuaTJefF9cN87ZC4zbmPN1YRApDa0NAlCP6Yyl81V6lVShqPixo4fM7bl
+# FIjhRuTkf01WxddpEZiJO5CcVzwu33WkqmoLbAT5Zuhjsg2SeBlF1txTZdIZTeYY
+# DKLdt75sp8z63pMX4cX55zDLbNasS9XwQ5mJgzs7hNRBlYUL8tBPRFwZxemNnJ7o
+# kkLkQkoeB68WMvVqV84rAIbrkPe8fTxkKPXi9pD1+spqgVmm0rJhqI4ohyF+t+dz
+# JMNxcTkzVX1zeSmbjCQImEKloTRdvGn0+jlRaA==
 # SIG # End signature block

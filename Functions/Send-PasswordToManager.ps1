@@ -1,52 +1,65 @@
-function Create-NewDFS {
+
+function Send-PasswordToManager  {
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$true)] [String]
+    [Parameter(Mandatory=$true)] [string]
+    $Manager,
+    $NewPassword,
     $NewSAMAccountName,
-    $PeopleDFS,
-    $PeopleTargetPath,
-    $ProfileDFS,
-    $ProfileTargetPath#,
-    # $DFSHost,
-    # [Parameter(Mandatory=$true)] [pscredential]
-    # $AD_Credential
+    $NewDisplayName,
+    $SystemDomain,
+    $SmtpServer,
+    $ReportSender,
+    $DC,
+    [Parameter(Mandatory=$true)] [PSCredential]
+    $AD_Credential
+
 )
 
-    # #Create the physical folders
-    # if (!(Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue)){
-    #     [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
-    # }
-    # if (!(Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction SilentlyContinue)){
-    #     [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
-    # }
+$TextEncoding = [System.Text.Encoding]::UTF8
+$EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the email."
 
-    #START
-    
-    # Create PEOPLE DFS folder
-    if (Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] already exists" -ForegroundColor Yellow
-    } else { # otherwise it is not existing yet
-    [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
-    [void] (New-DFSNFolder -Path $PeopleDFS -State Online -TargetPath $PeopleTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
-    }
+    #Find manager's email address
+    $MangerEmail = (Get-ADUser $Manager -Properties EmailAddress -Server $DC -Credential $AD_Credential).EmailAddress
+    $MangerDisplayName = (Get-ADUser $Manager -Properties DisplayName -Server $DC -Credential $AD_Credential).DisplayName
 
-    # Create PROFILE DFS folder
-    if (Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] already exists" -ForegroundColor Yellow
-    } else { # otherwise it is not existing yet
-    [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
-    [void] (New-DFSNFolder -Path $ProfileDFS -State Online -TargetPath $ProfileTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
-    }
+    #Construct Password Email Body
+    $EmailBody =
+        "
+            <font face= ""Century Gothic"">
+            Dear $MangerDisplayName,
+            <p> We have created the following user: <span style=`"color:blue`">" + " $NewDisplayName " + "</span> <br>
+
+            <p> Please provide the following details for this user for his/her first login: <br>
+
+            <ul style=""list-style-type:disc"">
+            <li> <p> SAM Account (login) name: <span style=`"color:blue`">" + " $NewSAMAccountName " + "</span>  </li>
+            <li> <p> Initial password: <span style=`"color:red`">" + " $NewPassword " + "</span>  </li>
+            <li> <p> (please ensure to keep this information confidential; <br>
+                     the user will also need to change this password during the first login to company systems; <br>
+                     the new password should be known only by the user and should not be shared!) </li>
+            </li>
+            </ul>
+
+            <p> As this information is not stored by IT, please ensure to keep this email. In case of any issues please contact the <a href='https://westcoast.atlassian.net/'>Service Desk</a>  <br>
+
+            <p> Thank you. <br>
+            <p>Regards, <br>
+            Westcoast Group IT
+            </P>
+            </font>
+        "
+
+    #Send email
+    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding #-ErrorAction SilentlyContinue
 
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUm04D9yvAa2pFhuaidkvSH/JC
-# b96gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvehSJFTm7jwpiv4U6uVHOtZ0
+# KZSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -113,11 +126,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUlYKKIjcHkpMD2W4ye+UyhbbAQ7AwDQYJKoZI
-# hvcNAQEBBQAEggEAFBWW6YwrBwIAa94lTh4Pe0TKQTYXfjUAFMIGLJdRNAvlQjic
-# Q0r9LBTSI/nYy1FKXS3HNPPtVTvos9dLFDInUhVKkDXJRJTBZwxoW9TaelKVj9SU
-# K1gRehN1pL+JNZtOpNk/iLXpasZbYW14LzRn7Civj4fdC1J6mTStHUD+IGsIB0F/
-# MAE61aS4ZIBLHcRJZjL1psS6/9SfGPEspjCfuubJHA2koML/2jH+o6G1TBo5CXSc
-# UBYaQNihg9zic8B7hiUjwP8tI7W+7gOsgHn6Nmz11tW3eG8NP1fEyuEOwIyV7QnF
-# VNIUaVyE6TiXaqcnvq1xL0aARsVT7HcTB+pvGg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUu5VL+4cEECs/XxZJAQVlaJmf6HUwDQYJKoZI
+# hvcNAQEBBQAEggEAV2qk/0D8FP28Vge+OjrLg0eq+U+fp7AamMIbuwrH1LtmDrtW
+# 8RazZHH/ZCHTGWYbrGshDXYl/EIzFZNsHheiNaCsDllOZXuF/r5OuxOm0hBnlGNG
+# 0CVyOt3EsPzDmP9cv6gC7gLYc4fYKbqRMkV4yb1wf1LLoM8aS9G4RpIA8YIln27j
+# kpOOVkedUiCWIC0Y/l16hdSbpB/lb/48rbKKD9dGavWr6KZaKrECwHcAVAQiDduG
+# kOMZUXSG+zspjdoKF015JJx4bsehBLteH/ZMSkFVUEuqBqJcoP00/HEeltbkkWnz
+# 2REL1h8ZUV9AfAOw7dKKq6VbuymPIRoO3mktHQ==
 # SIG # End signature block
