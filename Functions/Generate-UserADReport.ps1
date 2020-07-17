@@ -28,7 +28,7 @@
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - (SUMMARY - ACTIVE DIRECTORY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
         Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)" ; $Obj | Add-Member -MemberType NoteProperty -Name SAMAccountName -Value $($FreshAccount.SAMAccountName)
         Write-Host "Password            : $NewPassword"; $Obj | Add-Member -MemberType NoteProperty -Name Password -Value $NewPassword
-        #FIXME: How to / where to send the password and should it be shown on manual run?
+        #TODO: Send the password to the new starter's manager instead of the service desk (request from Janet)
         Write-Host "UserPrincipalName   : $($FreshAccount.UserPrincipalName)" ; $Obj | Add-Member -MemberType NoteProperty -Name UserPrincipalName -Value $($FreshAccount.UserPrincipalName)
         Write-Host "First Name          : $($FreshAccount.GivenName)" ; $Obj | Add-Member -MemberType NoteProperty -Name FirstName -Value $($FreshAccount.GivenName)
         Write-Host "Last Name           : $($FreshAccount.SurName)" ; $Obj | Add-Member -MemberType NoteProperty -Name LastName -Value $($FreshAccount.SurName)
@@ -59,8 +59,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUgBsN+3NVGF1oMdI83DhfdEml
-# IZugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUg/x7HOqVRt1YwkJut7TUtvk6
+# FomgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -127,11 +127,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQULeWXDS3oMXem0aIMK6e/SoWwvQcwDQYJKoZI
-# hvcNAQEBBQAEggEAg7jBIYezVJuBX/x5MAUmJ9XmCZd5MtM6R+VXl5rkzbPQSdoQ
-# dUkiJszVPIvONJn0dgrOs10Xdup4GRNEHGE9SmcWRUBv015v8qOPZxEeMj0qGekQ
-# EWWfaokE0CLFlxPUCFBQDwdQX5Pz9QU9RdAIaZQweMR2fA618QueppsenMtUzA61
-# 1XL9bI6mkeL0LmZRwKkJlFd+qZRY7te0+1iWpdcsJv/y4wjjxAjaVlwLIAYsUq29
-# rOihrKqEeFiWYD32hJJOp+i1uBNGI4eLfY2HqYT2Ub5hXNFeBv/+b6EPABZuL1Vd
-# ++da0ia6mCSw7sKN0t4zLjrHi3862RbSsRialQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUvUYxK1qPr6qYwyry8ZZrJq7hkjEwDQYJKoZI
+# hvcNAQEBBQAEggEADRZloyCclFY3oVjMPxgWabI40BUQrcfhIyDJr/lmketPG4ns
+# x7ActIoYJVhXCrDz99sgDuphM7+vqN5DMNeCaHoLD4jVJJkIlIv9KRYSkemYoTc7
+# MgOkCEBXV/HSBMyE5sEpTWI3Z53TstHCNdYFEezNfDDLITl2yIb0P22qaF4IO+3v
+# Hi7/xQ9kQPibgx4A5jXSaLZWuGHQWwW86hkVkH1GZjSdaxyiu3xMNpLIHucytsYa
+# yfkxTqTvpKD2ThO2acCVaXROgXRiAKDIB+vHptOIY8fkJkNj+0EnJj74GRj2lGI7
+# BqUFT8yTJmuA/IMmx4J9BPorPznXvLFX8LP34A==
 # SIG # End signature block

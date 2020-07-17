@@ -14,13 +14,14 @@ param (
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting [$NewSAMAccountName] to manager [$($TemplateUser.Manager)]"
          Set-ADUser -Identity $NewSAMAccountName -Manager $TemplateUser.Manager -Server $DC -Credential $AD_Credential
       }
+      #TODO: To get the manager from the input file instead of the template user (Janet's reques)
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUH+poPINsiqe2kUVjj2MlDp8N
-# dwmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUm8dQKOgTa1E26cOw/41ufhLN
+# mACgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -87,11 +88,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/t9ysesyXndGQnoTH4HCy+u9fTwwDQYJKoZI
-# hvcNAQEBBQAEggEAgbDJ+DS3UVx4kpRmBXa99aIpvPOPtI25TEpZQvWkihwVpDYk
-# Dc6jQC03deGi24dFuUfyDJTw/6LVyYSBUVNHNi6xqGgcUiKVmDtj8mRyeGvCuRVC
-# 3FYWM0klj5yQx7p11WNREQBQdP4Q0ddyZEcV2SgWZ2z0c4kZh1titfD1s6SAXTy9
-# KATi9KN33DjRt9mhYMxLMr5rQCOdcYgBj3Wvg9SBsMfTCD4YYIvsg61Yy+Vx7KHj
-# /Kr+cs07xcntpRVyuM+g8/zEuKZlTezpGdJDBn629M9ol5Njy/138Lq8pYcrpVrG
-# 3+8dGrcrfT85+becyHe6IYMU7faEQJPxrFDkkw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU26oHpKyCB5JXwYQGN7iw3uYBNu0wDQYJKoZI
+# hvcNAQEBBQAEggEANmU/wOV9dp/u4QKWJP/9f60jI6SWgi6QjKFzHoh2OvHUWrCa
+# P8DLGqpF8wT3Z4mJIE285ELZo6X/eQ83fxog2cRM68s/EtCutw2/XzXpQ8dsQ9SQ
+# j7AWSCmRfgv5X1z/kXOMe2XYI4FP01NawuIYwH2vSdhVo6v7m0NBhjUZkqJFctPt
+# bOAM/2L8JBobv4MziA000lzwIGibbrOcDjJfaBb/DOXB06ZlDyBD+Pz0oPZJwsFE
+# gMEie7zUFfRsvCWiC0KJ1ajSihZMYNgA81gWrxG/JA0B29tBY6EJYu9ZsUIlOtkF
+# MxctmHUnddTVEAycKyavpZhmpYd46wmD+m4S/A==
 # SIG # End signature block

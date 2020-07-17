@@ -275,9 +275,9 @@ function Process-OnBoarding01 {
             if($SystemDomain -match "xma.co.uk"){
             $delay = 180
             } elseif ($SystemDomain -match "westcoast.co.uk") {
-            $delay = 60
+            $delay = 120
             } else {
-            $delay = 60
+            $delay = 120
             }
           $MSOLACCPresent = Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction SilentlyContinue
           if (!($MSOLACCPresent))
@@ -321,7 +321,7 @@ function Process-OnBoarding01 {
     Create-NewDFS -NewSAMAccountName $NewSAMAccountName -PeopleDFS $PeopleDFS -PeopleTargetPath $PeopleTargetPath -ProfileDFS $ProfileDFS -ProfileTargetPath $ProfileTargetPath # -DFSHost $DFSHost -AD_Credential $AD_Credential
     }
     elseif ($XMA.Ispresent){
-      #FIXME: What to do for XMA user shares?
+      #TODO: To discuss OneDrive as an alternative solution
     }
     #endregion
 
@@ -333,11 +333,16 @@ function Process-OnBoarding01 {
       <# Here we create the report object, and at the same time display this for the user who is running the script.#>
       Write-Host # separator line
       #Exchange
-      Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
+      Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -SystemDomain $SystemDomain -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
       #AD
       Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential -NewPassword $NewPassword
       #DFS
+      if ($Westcoast.IsPresent) {
       Generate-DFSReport -PeopleDFS $PeopleDFS -ProfileDFS $ProfileDFS -NewSAMAccountName $NewSAMAccountName
+      }
+      elseif ($XMA.Ispresent){
+      #TODO: To discuss OneDrive as an alternative solution
+      }
 
       # Report to CSV
       <# Here we save each report to a separate file#>
@@ -353,7 +358,7 @@ function Process-OnBoarding01 {
       $global:UserDFSReport | ConvertFrom-Csv | Export-Csv $UserDFSReportCSV -Force -NoTypeInformation
       }
       elseif ($XMA.Ispresent){
-      #FIXME: What to do for XMA user DFS?
+      #TODO: To discuss OneDrive as an alternative solution
       }
       #endregion
 
@@ -362,8 +367,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUIuDALEyEU7xUu3TXYZFdRGNZ
-# AhCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUQ0x1OoDI66BIOINp9ZImuuqU
+# WUegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -430,11 +435,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU7cyLlMe5OACTWTK9PFzKqW3zN7cwDQYJKoZI
-# hvcNAQEBBQAEggEAox5xI4SLfA1MmrOPevRHcOPHm5q0GjsVtghrnzms9F3tkLDR
-# 0IkOg/r4wRHGmQ93W143eHItJRf/FB/6z7lDMjZK/Ox8o9sXTSP6VnGjlbB7Ij3A
-# 6mw8HEro/6pYn/0g+ZJ3GWW5jerGkM7aM6YN1HcQJNLCiP1rAuYf78RATqydE4gI
-# ZlDbPxWprY8PoLxn31w+R6gi7xNgWPS+RY88/kLQ2fuAUVmzElWfSW2GZsLpBpoj
-# Z1Fa61Z1MI/g8c14nx+JUaMvqzY4pZV+odm2wIqd7R2wW0+ZQWz7PmgSL9FZ9rNJ
-# pMGe0tdC2Yeh57AKA040toqhcwiKVxlc4ElHeA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUG1Jji+rPq29HLKp4YV3bh9/ND5owDQYJKoZI
+# hvcNAQEBBQAEggEAkMnyQDZR5NHNDvRJF25HJtfse3WECF1cNV13arWDJaexj9wH
+# 5GV4zqyH71/J43WFbii/MKyH4E1HHsj4KnE1lGsSIt5xPM3f6SffU1k97H7lOAo7
+# /GPT4SLjw6SAYrLEvrdssagQj0VjYAwBDGoo+vismGlV/u+mNFq0ADEpGbRRgKei
+# 5Cp/ex/ZZthj9LsU578afzQBSWTfL4o4biqvhLAiPHsa2XwPTfG48fQl5/+3SFhi
+# DY2NGavDwUU/QSq/nyzpUgKgLJu8vAGHT8esRnM87Lc5ru6eMM5ElG2C+EBUobgO
+# /sj/uj8JpJlQoVUL44n06oMQ3pNUouLQG7RLGw==
 # SIG # End signature block

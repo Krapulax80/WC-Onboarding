@@ -17,7 +17,7 @@ $PROFDFS = (Get-DFSNFolder -Path $ProfileDFS).Path
 
 # Display Report
 Write-Host # separator line
-$timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] -  (SUMMARY - DFS) DFS changes [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
+$timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] -  (SUMMARY - DFS) Created user share [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
 Write-Host  "People DFS for [$NewSAMAccountName]             : $PPLDFS" ; $Obj | Add-Member -MemberType NoteProperty -Name "PeopleDFSPath" -Value $PPLDFS
 Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj | Add-Member -MemberType NoteProperty -Name "ProfileDFSPath" -Value $PROFDFS
 
@@ -35,8 +35,8 @@ Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvmWOoiY+YQ9sLaCkAIqXhCKd
-# T1OgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlVkuuhplN/PHZYn/URret521
+# OI6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -103,11 +103,11 @@ Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj 
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUMhcBdDqfg6P95/OaBD3kfHjaBMkwDQYJKoZI
-# hvcNAQEBBQAEggEA26Bahp+5KoaQamP14gdDQTgs4aNJeGudRHczDhhloSafOYFx
-# 84fbNPUAI232+G5YHSBdUdjISZSDNzVHqSquQcZMbRKicvA4kwRqVouB2KWnQ6uG
-# coLu7RFTM3iczKhrHoyERjpiKAAtS3i64Xx5LKgJWzBEL1PxFIHvzN0TeU9bH8Rx
-# wGF+NLLop+vH97+5JtrbslBA+esGDzqlpxMS9qbWnGint8RZflliKk7sQlxcX07d
-# 0kHZwpFABrWBkuoIIOVJ8i5hmdwC5U+MuyA+mx7UD7cmwkFN6zN29I8VvMWTHZGV
-# yKWNB3FVqpIwRaFyKNM+7HaeSk8N91bTEJILCw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUrtMSRmore3/l/aQ4OBubsFs0GH8wDQYJKoZI
+# hvcNAQEBBQAEggEAIJi9MLdonPE+9BT4CRSGgqgsVD3piBHVyNlv1ZocmW3RneLA
+# JmN08KwQh3n9gSAjmOOHFeLbWNAIG8DwdJRNm3jC41d+fJPLEwkaAuhTB0gYe2Eu
+# kKcd6iG0HevtamCWvnQm1bueRHe7MJEGgV1iX62L8v+bTkXZ36gqwiTWIUSDfQAS
+# 6Z/btkT7x4SDA6oLJbDRh5KMXswCr749dPTIVBtICmH3C5m4kr9NcOL/n1nbcOof
+# qieDtBueKl7SLWB+G9oHo4OBdmaRFAJOC1I5x0pJckuslniGFYL6GziHW9ls6di5
+# McwnEpFZGVVHPCecgY4OsKnKnJG2y/Ur82Q85w==
 # SIG # End signature block

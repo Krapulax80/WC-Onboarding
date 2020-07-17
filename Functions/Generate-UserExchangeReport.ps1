@@ -5,6 +5,7 @@
          $NewSAMAccountName,
         [Parameter(Mandatory=$true)] [string]
          $Flag,
+         $SystemDomain,
         [Parameter(Mandatory=$true)] [pscredential]
          $AAD_Credential,
         [Parameter(Mandatory=$true)] [pscredential]
@@ -21,9 +22,16 @@
           Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
         }
         do {
+             if($SystemDomain -match "xma.co.uk"){
+            $delay = 180
+            } elseif ($SystemDomain -match "westcoast.co.uk") {
+            $delay = 120
+            } else {
+            $delay = 120
+            }
             [void] ($FreshMailbox = Get-mailbox $NewSAMAccountName -ErrorAction SilentlyContinue | Select-Object  *)
-            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in 30 second!" -ForegroundColor Yellow
-            Start-Sleep 30
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in $delay second!" -ForegroundColor Yellow
+            Start-Sleep $delay
         }
         until ($FreshMailbox)
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Found mailbox of [$NewSAMAccountName]. Continuing"
@@ -60,8 +68,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk++tCiXJdp8pa1TsulVzlmGf
-# 05OgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/iRI5Kv+w/4cBVTZjZzC6nl0
+# G2agggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -128,11 +136,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU4C6qtU31+X/S7K8Iemoax3hPDMswDQYJKoZI
-# hvcNAQEBBQAEggEAMCqQzjdtJIWenu0G5OP7HcKIlH3akqxE9m1wlN0Uu1TczjEf
-# PIBM16THRV/Mi/7IMGWHQOBc6qZga03EPyzy67ZswX54EpMOxnLWVsfdAy7NLx8z
-# l/mvu9jrSpGGih5Ps+WAn0w/DkHMOSo23mTodXv7Ukq7FrjQpDhe05TuCSfl6kZT
-# G+TfWkZCwAawOgEVyyvULe59NeqA5l1UzwLOXbx/ohJn2ONIULMeuStg8cVij+lB
-# 2MICCEiAOxUqLTBX3krYOSCHhM0QUtxmwYoMtS0VFoFCv5piu9E4ZC0/KHum8CIu
-# fuBNQ0uNHHi9kq6IAnNaO8twdh+FzKLmOH87SQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUaSscl+z5ys+t5Gs3W0yDiqiUAJEwDQYJKoZI
+# hvcNAQEBBQAEggEAKAOO1I8noFv/BKAs9PQK7tYixxdfIjKLeLSoO+2tiY6VB4Wo
+# VZw2Ttd0jyxHrSHmY1eVyiPXp1hRJqgY7xs5f2mc65cC/ohm5Ubao2+NAySzEOVE
+# vznw8cDQRMvimQ4z+VeQ3JGaUjyv8VmSc+Ly9ktqcDn3JVkynCC2m3iX1QY7Ypz0
+# /dg+1DvMqkFNyHB3Llr4BtW7ISFNscvmK9jvPU6FOml79sBQzJEOHagsYKZneNct
+# ZaVSvJymtj5x12/MaQ5v3pP+T22gfCNg3vVwE/McHm1sYB41HqSSXrb156nZd+xy
+# zQn70bApGX4CSSffpXerXrzaflER124W5OTSCQ==
 # SIG # End signature block
