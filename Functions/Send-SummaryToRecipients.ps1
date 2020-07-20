@@ -1,24 +1,94 @@
-function Generate-InputReport {
+function Send-SummaryToRecipients {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
-        [Object]
-        $CSVImport
+        [Parameter(Mandatory=$true)] [Object]
+        $recipients,
+        $ADReport,
+        $DFSReport,
+        $ExchangeReport,
+        [Parameter(Mandatory=$false)] [String]
+        $ADReportCSV,
+        $ExchangeReportCSV,
+        $DFSReportCSV,
+        [Parameter(Mandatory=$true)] [String]
+        $NewDisplayName,
+        $SmtpServer,
+        $ReportSender
     )
 
-    $global:InputReport =
-    $CSVImport |
-    Get-Member -MemberType NoteProperty |
-    Select-Object @{name='Name';expression={$_.name}},
-                  @{name='Value';expression={$CSVImport.($_.name)}} |
-     ConvertTo-Csv
+$TextEncoding = [System.Text.Encoding]::UTF8
+$EmailSubject = "New user created -  $NewDisplayName"
+
+$attachments = @()
+$attachments += $ADReportCSV
+$attachments += $ExchangeReportCSV
+if($DFSReport){
+    $attachments += $DFSReportCSV
+}
+
+
+# Email body formating
+  $head = @'
+<style>
+BODY{background-color:lightgrey;}
+TABLE{border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse;}
+TH{border-width: 1px;padding: 0px;border-style: solid;border-color: black;}
+TD{border-width: 1px;padding: 0px;border-style: solid;border-color: black;}
+</style>
+'@
+
+
+    #Send the email to all recipient
+    foreach ($line in $recipients) {
+    $recipient = $line.recipient
+
+        # Construct the Summary Email Body
+        $EmailBody =
+            "
+                <font face= ""Century Gothic"">
+                Dear $recipient,
+                <p> We have created the following user: <span style=`"color:blue`">" + " $NewDisplayName " + "</span> <br>
+
+                <br>
+                "
+        $EmailBody += "<p> AD Report: <br>
+        "
+
+        $EmailBody += $ADReport | ConvertTo-Html -head $head | Out-String
+
+        $EmailBody += "<p> Mailbox Report: <br>
+        "
+
+        $EmailBody += $ExchangeReport | ConvertTo-Html -head $head | Out-String
+
+        $EmailBody += "<p> DFS report: <br>
+        "
+
+        $EmailBody += $DFSReport | ConvertTo-Html -head $head | Out-String
+
+        $EmailBody +=
+            "   <br>
+
+                <p> Please refer to the attachments for the details of the user account.  <br>
+
+                <p> Thank you. <br>
+                <p>Regards, <br>
+                Westcoast Group IT
+                </P>
+                </font>
+            "
+
+        #Send email
+        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $recipient -subject $EmailSubject -Attachments $attachments -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding #-ErrorAction SilentlyContinue
+    }
+
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUkkBkKHYIwfT1fxGgWcXsnGHn
-# 0NagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuV/U9q99xGS9JYQMDs2qit+1
+# hWegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -85,11 +155,11 @@ function Generate-InputReport {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUOjoZSc/U4Npvujho7kZz7Nqs6t8wDQYJKoZI
-# hvcNAQEBBQAEggEAnqbKX+JKRpRNI89MS54ZcHsJZS01jdXjBlcnz2+eltpWp7hB
-# 7I8hS902du4cqOpyamgrpHJSwlsB+AtkiZJvFhsF4ot5qRpmt8mb//K8pildm0wy
-# 6kH+8r91HcaMzxLY04jy+mFk6+2ieXOpj4I0mnyfGpie+/NQGZIsl6pHlQE6J8wx
-# 78lIpg1k97BxluOn2EvCTcdeef2pcOBTVzDWnFF7DF/ut+5DmzXANBGN/t2OI2kG
-# C4b105svHRZ75MK91hY9HQ1PvY63x6EYTPCUwQYQqzZkxj4QljVsQofUd+walUes
-# XA8ARTT/Tcm79TyftoJTN/pgyH1NRZTRVu4oJQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU67yKWTpUenXnn1tTa/xKW5WZA7QwDQYJKoZI
+# hvcNAQEBBQAEggEA19MM+pJtA00XO13hZL6ZyxKFhq4tGAR3dmL2Ih54q/iWKq7Y
+# hN6GbeyJDUrZ7l8MLTDEtlSpJLF0faw50BM8TaRSpZVtLGB687/UYSE4qryd9vYB
+# tAkMhgP1AwnGkcimEwOxzfRKEC+viQcy0ufxMxMSF1FHFbNGIv0vWb39QuSEvv8h
+# zJ+hXo+owoxoc+FjE8m2XyeeJ4dTA8z7w2LVq6M7Bp7hZ1inXlXouinnQDi86hLt
+# jdkKx+Oodhj4SrSRpoqi4NEwXSUOQeNloGjZDXgV7SLyLVXQ1WJhJu2FlPvHil2R
+# cFwqxku2J6dz4hBrlUzshu0Q4Dp3xTFndhswgg==
 # SIG # End signature block

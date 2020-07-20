@@ -11,6 +11,7 @@ function Process-OnBoarding01 {
     [Parameter(Mandatory=$true)] [string]$Today,
     [Parameter(Mandatory=$true)] [string]$Manager,
     [Parameter(Mandatory=$true)] [object]$config,
+    [Parameter(Mandatory=$true)] [object]$recipients,
     [Parameter(Mandatory=$false)] [switch]$NoJBA
   )
 
@@ -40,9 +41,10 @@ function Process-OnBoarding01 {
       $RDSDiskFileServer = $config.RDSDiskFileServer ; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
       $StarterOU = $config.StarterOU
       $DFSHost = $config.DFSHost ; $DFSHost = $DFSHost + "." + $SystemDomain
+      $SmtpServer = $config.SMTPServer
 
-      $SmtpServer = "mail.westcoast.co.uk"
-      $ReportSender = "newstarter@westcoast.co.uk"
+
+      $ReportSender = "newstarter" + "@" + $SystemDomain
 
     #region WESTCOAST
     if ($Westcoast.IsPresent){
@@ -351,16 +353,25 @@ function Process-OnBoarding01 {
 
       # Report to CSV
       <# Here we save each report to a separate file#>
-      #Exchange
-      $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_AD_report.csv"
-      $global:UserADReport | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force -NoTypeInformation
       #AD
+      $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_AD_report.csv"
+
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving AD report to [$UserADReportCSV]"
+
+      $global:UserADReportConverted | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force -NoTypeInformation
+      #Exchange
       $UserExchangeReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_Exchange_report.csv"
-      $global:UserExchangeReport | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force -NoTypeInformation
+
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving EXCHANE report to [$UserExchangeReportCSV]"
+
+      $global:UserExchangeReportConverted | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force -NoTypeInformation
       #DFS
       if ($Westcoast.IsPresent) {
       $UserDFSReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_DFS_report.csv"
-      $global:UserDFSReport | ConvertFrom-Csv | Export-Csv $UserDFSReportCSV -Force -NoTypeInformation
+
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving DFS report to [$UserExchangeReportCSV]"
+
+      $global:UserDFSReportConverted | ConvertFrom-Csv | Export-Csv $UserDFSReportCSV -Force -NoTypeInformation
       }
       elseif ($XMA.Ispresent){
       #TODO: To discuss OneDrive as an alternative solution
@@ -371,15 +382,32 @@ function Process-OnBoarding01 {
 
     #region EMAIL PASSWORD TO LINE MANAGER
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  password of [$NewSAMAccountName] to [$Manager]"
+
     Send-PasswordToManager -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential
+      #endregion
+
+    #region EMAIL SUMMARY TO SERVICEDESK
+    if ($Westcoast.IsPresent) {
+
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending AD, Exchange and DFS reports on [$NewSAMAccountName] account"
+
+    Send-SummaryToRecipients -recipients $recipients -NewDisplayName $NewDisplayName -SmtpServer $SmtpServer -ReportSender $ReportSender -ADReportCSV $UserADReportCSV -ExchangeReportCSV $UserExchangeReportCSV -DFSReportCSV $UserDFSReportCSV -ADReport $global:UserADReport -DFSReport $global:UserDFSReport -ExchangeReport $global:UserExchangeReport
+
+    } elseif ($XMA.Ispresent){
+
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending AD and Exchange reports on [$NewSAMAccountName] account"
+
+    Send-SummaryToRecipients -recipients $recipients -NewDisplayName $NewDisplayName -SmtpServer $SmtpServer -ReportSender $ReportSender -ADReport $UserADReportCSV -ExchangeReport $UserExchangeReportCSV -ADReport $global:UserADReport -ExchangeReport $global:UserExchangeReport #-DFSReport $UserDFSReportCSV -DFSReport $global:UserDFSReport  #TODO: Not valid for XMA currently
+
+    }
       #endregion
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZLWhSRlen0s9/Y7Tn9aTkP9z
-# OASgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUH7DVmuRguiEhiAyxlFQFludX
+# hOigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -446,11 +474,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUg5YMurrFFx8E/ZlaW6CtKJeItcswDQYJKoZI
-# hvcNAQEBBQAEggEAd+NRg9UhX3AjE6GiMUa7b1pMjxoZOrqjXtk1dFBR61tPxNHE
-# bfh4hi1OuaTJefF9cN87ZC4zbmPN1YRApDa0NAlCP6Yyl81V6lVShqPixo4fM7bl
-# FIjhRuTkf01WxddpEZiJO5CcVzwu33WkqmoLbAT5Zuhjsg2SeBlF1txTZdIZTeYY
-# DKLdt75sp8z63pMX4cX55zDLbNasS9XwQ5mJgzs7hNRBlYUL8tBPRFwZxemNnJ7o
-# kkLkQkoeB68WMvVqV84rAIbrkPe8fTxkKPXi9pD1+spqgVmm0rJhqI4ohyF+t+dz
-# JMNxcTkzVX1zeSmbjCQImEKloTRdvGn0+jlRaA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUikgQ6MZ24LF45+onT4SB19Fu+OUwDQYJKoZI
+# hvcNAQEBBQAEggEAjlAJjpl5lcWv1PY5xzeTR4uYu94eV4HKACtKASeFtg3vLq7U
+# 7NjsOdjQz+raAlR3pWuX3l4gYLv1KFZKjJSiY0V7e/4GvRlwenCnSkZCH07L7UNu
+# 24M3/YjyPKX6shEGT3tMRgaH7yQIr793cf/YAdSdPKDjYJkLJeVQ6v+xRoD5hmcn
+# 1EfcvBPpvAE/LqF07uh9vQ/Ny12GtajjumbkAiE/PxniAEHW0h2wWDqjBOX0PxSS
+# s9C+bPF7qiULZNRmaCcijI6uW4SDIFkmg46Iz/xkBJsAJMZgZcnoYjujDRBtwug1
+# H5Fan4k24Xjy55wOCx1JPsWrOuYAweDQNj4FNA==
 # SIG # End signature block

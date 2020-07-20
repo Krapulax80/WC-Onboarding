@@ -47,7 +47,11 @@
   Write-Host #separator line
    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 OF THE ONBOARDING PROCESS STARTED." -BackgroundColor Black
 
-  # Process each (.csv) files in the input folder.
+  # Load the recipient file
+  $recipientCSV = ".\" + $ConfigFolder + "\" + "recipients.csv"
+  $recipients = Import-Csv $recipientCSV
+
+  # Load each (.csv) files in the input folder.
   foreach ($I in $Inputfiles){
   $CSVImport = Import-CSV $($I.Fullname)
 
@@ -70,18 +74,20 @@
       # Run against each line
         # Pipe, if the workdomain is WestCoast
         if ($Domain -match "WestCoast"){
-        $configCSV = ".\" + $ConfigFolder + "\westcoast.csv"
+        # Load the config file
+        $configCSV = ".\" + $ConfigFolder + "\" + "westcoast.csv"
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config
+        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients
         Write-Host
         }
         # Pipe, if the workdomain is XMA
         elseif ($Domain -match "XMA"){
-        $configCSV = ".\" + $ConfigFolder + "\xma.csv"
+        # Load the config file
+        $configCSV = ".\" + $ConfigFolder + "\" + "xma.csv"
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config
+        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients
         Write-Host
         }
         # Pipe, if the domain is not within the expected values
@@ -97,7 +103,8 @@
 
     #Report on the input file
     $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
-    Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
+    $CSVImport | Export-Csv $InputReport -Force
+    #Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
     #TODO:Report on misc actions (DFS,Licensing,etc.)
 
   # Finally, discard the processed original input file
@@ -118,8 +125,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJxJTu8NrD6tU36qHAzA2Ntcr
-# mBegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8dxBvpRmy4O12203IZi3DjwG
+# P2GgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -186,11 +193,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUsfwFqwDWA6LfXkt5zpgHxdWUyawwDQYJKoZI
-# hvcNAQEBBQAEggEAZc4JftGzLMD/I/xNLnp7YBxZS9MtEvemZFGn3zVZYutDAEJY
-# 9rjEv4DpdY2doEoWMpEBtufyBrCGxifiP9y3AB7ri6kDDVNON8M+HCF7d0jy41N9
-# pXOSe9yXX+m/lG5dHLXp2jvVdW8BpQmrDtY27bTjLKoSXWUL0gljpbGs1NlWViVV
-# b2leAZ0Yq6SCSOVAbWmuA2CCPsfrlslQ4dOoxaUzn2wROsBxRMCABfgSxpiuk73o
-# MzDgdz89+zr+feFoOZYwysFQNctRjMz3w9q3/xhenZu2+i4gqelqxz8IMRJmZLFx
-# xZlBProLPnZ4hovUpu6UfIVMgD6wWc/k018FEA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU4cDyOqZFp/n+KG8U1coZr9osj3swDQYJKoZI
+# hvcNAQEBBQAEggEADcAta45+4WlCtnJd6oqRBInzBZnnuQqzhSOMXTLjpLGBcGo3
+# VVvspZ1kosNjVTpaelElFBh2s56zbMcXKWrc4/TeCp6LpufCZRH/RrqteW9CcorO
+# G21sbSGdoX6WY1QIAYF31jTv6YrpHzZtBCmHIpfoSXL5mY4EFiHwFvZbL7xK8OQM
+# +r4UnIf8SkBbInX3uNAjKml/BKjpd6KUpAWCYqoKZl5z/lBszF/K7iIi11OHEWqz
+# 3M8j3JMszLGMeqboXFW+dm64YecOlo/odl5Q0IqpPHgeVuScHWoVGAFgauJSZcE6
+# b1IWZcQOK1fofo67st5xVE2ruBWeifJUMJieIw==
 # SIG # End signature block

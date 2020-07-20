@@ -49,15 +49,17 @@
         Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)" ; $Obj | Add-Member -MemberType NoteProperty -Name PrimarySMTPAddress -Value $($FreshMailbox.PrimarySMTPAddress)
         $x = 1
         foreach ($EmailAddress in $($FreshMailbox.EmailAddresses)){
+        if ($EmailAddress -notlike "X500*"){ # filter out technical addresses
         $Name = "AdditionalEmail" + "[" + $x + "]"
         Write-Host "$Name               : $EmailAddress" ; $Obj | Add-Member -MemberType NoteProperty -Name $Name -Value $EmailAddress
         $x++
+        }
         }
         $FreshAccount = $FreshMailbox = $null
 
       # Generate CSV report
         $global:UserExchangeReport += $Obj
-        $global:UserExchangeReport =
+        $global:UserExchangeReportConverted =
           $global:UserExchangeReport |
           Get-Member -MemberType NoteProperty |
           Select-Object @{name='Name';expression={$_.name}},
@@ -68,8 +70,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/iRI5Kv+w/4cBVTZjZzC6nl0
-# G2agggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEAhKo32l/DpUfXBet+EuhUAi
+# yrqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -136,11 +138,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUaSscl+z5ys+t5Gs3W0yDiqiUAJEwDQYJKoZI
-# hvcNAQEBBQAEggEAKAOO1I8noFv/BKAs9PQK7tYixxdfIjKLeLSoO+2tiY6VB4Wo
-# VZw2Ttd0jyxHrSHmY1eVyiPXp1hRJqgY7xs5f2mc65cC/ohm5Ubao2+NAySzEOVE
-# vznw8cDQRMvimQ4z+VeQ3JGaUjyv8VmSc+Ly9ktqcDn3JVkynCC2m3iX1QY7Ypz0
-# /dg+1DvMqkFNyHB3Llr4BtW7ISFNscvmK9jvPU6FOml79sBQzJEOHagsYKZneNct
-# ZaVSvJymtj5x12/MaQ5v3pP+T22gfCNg3vVwE/McHm1sYB41HqSSXrb156nZd+xy
-# zQn70bApGX4CSSffpXerXrzaflER124W5OTSCQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUpJDAFWojIFYk9C9dzFCgpL1xngUwDQYJKoZI
+# hvcNAQEBBQAEggEAtq/gPmFHy1fG/UpDOts3Rc71p10S/VNxBimmjhFSUWk/8LDD
+# Iu2fIZ5RSSirCjrcV2gsR+Y4WYYeUu41IPe/Y7PFWpIVcSXTLnSmr/CzXlx3EvAA
+# miiX63VhYENviW2YGdhPrBJlV8RNXjD0QZ8ONSd2m7pXuPHegcjwENSEx1c7HwmE
+# j5tn6RRmGCoiIeiX5axSvh0rN3T6tOh0nh28/t6EX7lm9WNOzlrDj+m8Si7vFUA/
+# zK969E9pqJJw55mxIXpuToWzLwaU7haYcKheKzN0E8MWO586Pc4EPCPHb1MlkBU0
+# QWZQcbGvL5E3m8UmyvVx4x4jlJlUVY49GeKvqQ==
 # SIG # End signature block

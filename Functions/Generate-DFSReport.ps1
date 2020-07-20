@@ -23,7 +23,7 @@ Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj 
 
       # Generate CSV report
         $global:UserDFSReport += $Obj
-        $global:UserDFSReport =
+        $global:UserDFSReportConverted =
           $global:UserDFSReport |
           Get-Member -MemberType NoteProperty |
           Select-Object @{name='Name';expression={$_.name}},
@@ -35,8 +35,8 @@ Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlVkuuhplN/PHZYn/URret521
-# OI6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUXEuTLazV6hS6sStjKje2e9Tl
+# 5MqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -103,11 +103,11 @@ Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj 
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUrtMSRmore3/l/aQ4OBubsFs0GH8wDQYJKoZI
-# hvcNAQEBBQAEggEAIJi9MLdonPE+9BT4CRSGgqgsVD3piBHVyNlv1ZocmW3RneLA
-# JmN08KwQh3n9gSAjmOOHFeLbWNAIG8DwdJRNm3jC41d+fJPLEwkaAuhTB0gYe2Eu
-# kKcd6iG0HevtamCWvnQm1bueRHe7MJEGgV1iX62L8v+bTkXZ36gqwiTWIUSDfQAS
-# 6Z/btkT7x4SDA6oLJbDRh5KMXswCr749dPTIVBtICmH3C5m4kr9NcOL/n1nbcOof
-# qieDtBueKl7SLWB+G9oHo4OBdmaRFAJOC1I5x0pJckuslniGFYL6GziHW9ls6di5
-# McwnEpFZGVVHPCecgY4OsKnKnJG2y/Ur82Q85w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/8f3CpWU5zS+mjPfQvnOJ6OSD/EwDQYJKoZI
+# hvcNAQEBBQAEggEAFtZv3e+msSmux6r7FNA7dsSkZyuAz8zVPlmtfzgPZXOgVcUe
+# WCAeAtcSystVFJ6TvLGp51mTxxJhJ3uzSwvPnpecoDI90Gf8a/gUbKvFjOSTkEpe
+# VuoZJxfCD1DMltgQb4J1FZJpQALcFwfINFvgRn7Jzsi8zG/PUs2KwZYJ/cOtW0iQ
+# tHXSiudLZVw5FtA4PKjRXTfYa9VQdeo++vrtefRdKFZqbxNdkjXltLNeRk7r4n3d
+# ryWcaosHCHtZEHrYhtfKTmL4ePKsm5KoECWcArOPpkPUCKt13aakO+FZz883L1yA
+# xHn9SeEszY/9gAcMgqMJj2/WahOLJ9zDXWMo8Q==
 # SIG # End signature block
