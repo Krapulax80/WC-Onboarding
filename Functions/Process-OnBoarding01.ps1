@@ -389,11 +389,11 @@ function Process-OnBoarding01 {
 
     if ($Westcoast.IsPresent) {
 
-    Send-PasswordToManager -WestCoast -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
+    Send-PasswordToManager -WestCoast -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy
 
     } elseif ($XMA.Ispresent){
 
-    Send-PasswordToManager -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy
+    Send-PasswordToManager -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
 
     }
 
@@ -419,8 +419,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuz2+YreLdKSneJlznOOsaybP
-# 0AugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFx+dIiLZPsNjliXAAcqmXFji
+# hQ+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -487,11 +487,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU9XcA+ACl1DBay6k2+1mx+iD9xRQwDQYJKoZI
-# hvcNAQEBBQAEggEAwtR+tYPjLOgqp7U8vAMtcjW06O30djH/lPxYJGrHQ+I53/0E
-# AIDLml6BYwnZCdsDU1yuB3yFEWuIOWHn/ySuaCWwBxnio+s7TObtLl5iSdLK7XI3
-# jKUcsTzBEeZRnYWukVO4rz2y0wjARmDzVn+SQJgyWtHNKdx0utuc35ZSxSUuHpbt
-# Z87peNfAMrdxDvPtZeBzxl3x89JxN4Kr1G3jE5qmwH3U+EMw03ERIJ/PZPy2T/wd
-# ysCHPwD03S72wDrksxB4HT8hJbtQTyw1Hdlt6uhmBD7nTGstI/XQxMknLjL5HdwL
-# g+8g11V2esU0o6A4dG8CcVRX9P1S9sUM+sveAA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUUFJaD7rS2co2NknrYvPTiUK/JI4wDQYJKoZI
+# hvcNAQEBBQAEggEAmA1kIC4+TOR2rBzpJ/hQlI5huiQMJ6sqUw9iDAWi+YSU7EqI
+# Zmf6h1/7HECT3H5nSNeheaBWgObaQUSGOuxVjd7dHtIm2sbeYUqAEXmh+5d3kHv1
+# sNnipt1N3suKt6gWi2UphX7mOTf2p+QxvIWI83WANnTTLZvNh/QylOPkCQwYdorE
+# ozPH/z+FD57i1bydOG6NqB+8E7JlNfDhESMEtGRsUvAhhV9b9p0dd+w7JrwM0ywK
+# Atwu9vKm1HFToTqXhMDl0YXjiypXpZcH729zZz1tLR/NUgo6DLBUwvqUroW3B0Wy
+# am9XyHJa87oTYRDwfsM16ceOXx9J6YNrvGszDA==
 # SIG # End signature block

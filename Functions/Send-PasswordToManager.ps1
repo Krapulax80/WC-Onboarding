@@ -18,6 +18,7 @@ param (
     $AD_Credential,
     [Parameter(Mandatory=$false)] [switch]
     $WestCoast,
+    [Parameter(Mandatory=$false)] [switch]
     $XMA
 
 
@@ -48,9 +49,9 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
             </li>
             </ul>
 
-            <p> As this information is not stored by IT, please ensure to keep this email. In case of any issues please contact the <a href='https://westcoast.atlassian.net/'>Service Desk</a>  <br>
+            <p> As this information is not stored by IT, please ensure to keep this email! In case of any issues please contact the <a href='https://westcoast.atlassian.net/'>Service Desk</a> ! <br>
 
-            <p> Please find the computer usage policy <a href='$ComputerUsagePolicy'>here</a>  <br>
+            <p> Please also find the computer usage policy <a href='$ComputerUsagePolicy'>here</a> ! <br>
 
             <p> Thank you. <br>
             <p>Regards, <br>
@@ -72,8 +73,8 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU+CwIXlavBCVIOoSyZH3V12f1
-# xxagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZBdA1AJlo7724wIUUYeKA/rp
+# BYKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -140,11 +141,11 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUdoLNwlY+/zHO+scEnkHsc3L2cCIwDQYJKoZI
-# hvcNAQEBBQAEggEAHLz9df5ugNigYbLwx2KQynQWPLrHGd91R1tP25Tq9Pr0zU5D
-# BvOkvrBPxcZlBX6wJQyXspdO6lFqKSOBiQgBTWp/Bm7UAQMB9jI4EYtJX44x1pL0
-# uwfs4sACpYopEyq9kyhQxMQeibx/ZS5WAYKlFMD5dOfGDGu2bM9TDIJfmENr68Dm
-# wZoPQPVgSP+xW9OncS2pS4zpG0qbnkIWAkIWWFB2UIxzkKr5IBxaIHFKZ2rMzJfz
-# M9+GOD6YCxaEPGe1WLOUc7LUnGUPKmTU1N8+x2zUJ0ToCpNQINOz/ZDNBPqA31cr
-# PpBhnGzQvOSmTVjsCMrSqjz0vCttp0H2PnNtlA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUYtvhoZv8A5mMkCCUrHuAoxnb+EEwDQYJKoZI
+# hvcNAQEBBQAEggEAbTRw5s2ip6NYAFayPZEKJItwy9EvhmotwfoVq575CEGitC5S
+# k07NKcC6g4fr/tP8ordrsLC5ESN7f4U+sO5qJROe+HkRL/UQFuokxrCdG8fQpga2
+# FfYkzuTQRFOrx5E03MIdBprstxWh2fML/EIh90g3gDCZ8LbEf7o0w4yC/xQC/AID
+# Pi+KVdEq4Z6xWtuQtcFWvLVAgB+sORMC9JR9LkF+2xVFWIAfpSNrmcQcPMK9eJN0
+# Nkpucw6ioZpkALsht6iC/9W86JDFKQ1Ros3xINOXRXUHxFlo8zmuEgFCa3uIf80/
+# HYNmkxkiPyS7EAAgR2jVHpQw6BV39MT7/gWzew==
 # SIG # End signature block
