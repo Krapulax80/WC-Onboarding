@@ -11,8 +11,15 @@ param (
     $SmtpServer,
     $ReportSender,
     $DC,
+    $ComputerUsagePolicy,
+    [Parameter(Mandatory=$false)] [string]
+    $MFAGuide,
     [Parameter(Mandatory=$true)] [PSCredential]
-    $AD_Credential
+    $AD_Credential,
+    [Parameter(Mandatory=$false)] [switch]
+    $WestCoast,
+    $XMA
+
 
 )
 
@@ -43,6 +50,8 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 
             <p> As this information is not stored by IT, please ensure to keep this email. In case of any issues please contact the <a href='https://westcoast.atlassian.net/'>Service Desk</a>  <br>
 
+            <p> Please find the computer usage policy <a href='$ComputerUsagePolicy'>here</a>  <br>
+
             <p> Thank you. <br>
             <p>Regards, <br>
             Westcoast Group IT
@@ -51,15 +60,20 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
         "
 
     #Send email
-    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding #-ErrorAction SilentlyContinue
+    if ($WestCoast.IsPresent) {
+    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  #-Attachments $MFAGuide -ErrorAction SilentlyContinue
+    } elseif ($XMA.IsPresent) {
+    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding -Attachments $MFAGuide #-ErrorAction SilentlyContinue
+    }
+
 
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvehSJFTm7jwpiv4U6uVHOtZ0
-# KZSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU+CwIXlavBCVIOoSyZH3V12f1
+# xxagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -126,11 +140,11 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUu5VL+4cEECs/XxZJAQVlaJmf6HUwDQYJKoZI
-# hvcNAQEBBQAEggEAV2qk/0D8FP28Vge+OjrLg0eq+U+fp7AamMIbuwrH1LtmDrtW
-# 8RazZHH/ZCHTGWYbrGshDXYl/EIzFZNsHheiNaCsDllOZXuF/r5OuxOm0hBnlGNG
-# 0CVyOt3EsPzDmP9cv6gC7gLYc4fYKbqRMkV4yb1wf1LLoM8aS9G4RpIA8YIln27j
-# kpOOVkedUiCWIC0Y/l16hdSbpB/lb/48rbKKD9dGavWr6KZaKrECwHcAVAQiDduG
-# kOMZUXSG+zspjdoKF015JJx4bsehBLteH/ZMSkFVUEuqBqJcoP00/HEeltbkkWnz
-# 2REL1h8ZUV9AfAOw7dKKq6VbuymPIRoO3mktHQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUdoLNwlY+/zHO+scEnkHsc3L2cCIwDQYJKoZI
+# hvcNAQEBBQAEggEAHLz9df5ugNigYbLwx2KQynQWPLrHGd91R1tP25Tq9Pr0zU5D
+# BvOkvrBPxcZlBX6wJQyXspdO6lFqKSOBiQgBTWp/Bm7UAQMB9jI4EYtJX44x1pL0
+# uwfs4sACpYopEyq9kyhQxMQeibx/ZS5WAYKlFMD5dOfGDGu2bM9TDIJfmENr68Dm
+# wZoPQPVgSP+xW9OncS2pS4zpG0qbnkIWAkIWWFB2UIxzkKr5IBxaIHFKZ2rMzJfz
+# M9+GOD6YCxaEPGe1WLOUc7LUnGUPKmTU1N8+x2zUJ0ToCpNQINOz/ZDNBPqA31cr
+# PpBhnGzQvOSmTVjsCMrSqjz0vCttp0H2PnNtlA==
 # SIG # End signature block

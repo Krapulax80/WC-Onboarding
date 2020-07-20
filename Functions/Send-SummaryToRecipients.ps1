@@ -4,8 +4,8 @@ function Send-SummaryToRecipients {
         [Parameter(Mandatory=$true)] [Object]
         $recipients,
         $ADReport,
-        $DFSReport,
-        $ExchangeReport,
+        # $DFSReport,
+        # $ExchangeReport,
         [Parameter(Mandatory=$false)] [String]
         $ADReportCSV,
         $ExchangeReportCSV,
@@ -22,7 +22,7 @@ $EmailSubject = "New user created -  $NewDisplayName"
 $attachments = @()
 $attachments += $ADReportCSV
 $attachments += $ExchangeReportCSV
-if($DFSReport){
+if($DFSReportCSV){
     $attachments += $DFSReportCSV
 }
 
@@ -56,15 +56,15 @@ TD{border-width: 1px;padding: 0px;border-style: solid;border-color: black;}
 
         $EmailBody += $ADReport | ConvertTo-Html -head $head | Out-String
 
-        $EmailBody += "<p> Mailbox Report: <br>
-        "
+        # $EmailBody += "<p> Mailbox Report: <br>
+        # "
 
-        $EmailBody += $ExchangeReport | ConvertTo-Html -head $head | Out-String
+        # $EmailBody += $ExchangeReport | ConvertTo-Html -head $head | Out-String
 
-        $EmailBody += "<p> DFS report: <br>
-        "
+        # $EmailBody += "<p> DFS report: <br>
+        # "
 
-        $EmailBody += $DFSReport | ConvertTo-Html -head $head | Out-String
+        # $EmailBody += $DFSReport | ConvertTo-Html -head $head | Out-String
 
         $EmailBody +=
             "   <br>
@@ -87,8 +87,8 @@ TD{border-width: 1px;padding: 0px;border-style: solid;border-color: black;}
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuV/U9q99xGS9JYQMDs2qit+1
-# hWegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUkqUEZulN4XMI5fPYfFQPVx/D
+# uiGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -155,11 +155,11 @@ TD{border-width: 1px;padding: 0px;border-style: solid;border-color: black;}
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU67yKWTpUenXnn1tTa/xKW5WZA7QwDQYJKoZI
-# hvcNAQEBBQAEggEA19MM+pJtA00XO13hZL6ZyxKFhq4tGAR3dmL2Ih54q/iWKq7Y
-# hN6GbeyJDUrZ7l8MLTDEtlSpJLF0faw50BM8TaRSpZVtLGB687/UYSE4qryd9vYB
-# tAkMhgP1AwnGkcimEwOxzfRKEC+viQcy0ufxMxMSF1FHFbNGIv0vWb39QuSEvv8h
-# zJ+hXo+owoxoc+FjE8m2XyeeJ4dTA8z7w2LVq6M7Bp7hZ1inXlXouinnQDi86hLt
-# jdkKx+Oodhj4SrSRpoqi4NEwXSUOQeNloGjZDXgV7SLyLVXQ1WJhJu2FlPvHil2R
-# cFwqxku2J6dz4hBrlUzshu0Q4Dp3xTFndhswgg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUR3zqFJ+eZ3+B5we3MGRXmSf2JbUwDQYJKoZI
+# hvcNAQEBBQAEggEAyyx3kB29nfP1gdqPuBErD9uZFqgrxjPa7C7syqbyePkCVbxh
+# 7ZVUZXRuivb3xmVeVlY205BJf9kPA1p9LdsnUlXnRJwCvcihYNv60dpb/RwfOt0h
+# feMDSgerrqYs0pfA8jK65JBgGkbXHZ7/0/sjMl/z3EQmBLlf4ECWDwu+t9Qu1BcD
+# MpKEsDoheYbedTRa/t3yY+XgN9dBjbkYf1bkvUNt45gkV6NLJvkBR4AwRjS/ThAE
+# OfU4EKYCKNAfs3tQ9chrnV8WJV0OTGfgEWRBxMInS1EDKpIUwlcubspq/VcLADR1
+# dEi660GOqaL8VzttbfKOomGKhc8i1on+HEE18A==
 # SIG # End signature block
