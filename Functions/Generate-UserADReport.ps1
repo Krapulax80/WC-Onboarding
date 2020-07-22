@@ -28,7 +28,7 @@
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - (SUMMARY - ACTIVE DIRECTORY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
         Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)" ; $Obj | Add-Member -MemberType NoteProperty -Name SAMAccountName -Value $($FreshAccount.SAMAccountName)
         # Write-Host "Password            : $NewPassword"; $Obj | Add-Member -MemberType NoteProperty -Name Password -Value $NewPassword
-        #TODO: Send the password to the new starter's manager instead of the service desk (request from Janet)
+        #TODO: COMPLETED - Send the password to the new starter's manager instead of the service desk (request from Janet)
         Write-Host "UserPrincipalName   : $($FreshAccount.UserPrincipalName)" ; $Obj | Add-Member -MemberType NoteProperty -Name UserPrincipalName -Value $($FreshAccount.UserPrincipalName)
         Write-Host "First Name          : $($FreshAccount.GivenName)" ; $Obj | Add-Member -MemberType NoteProperty -Name FirstName -Value $($FreshAccount.GivenName)
         Write-Host "Last Name           : $($FreshAccount.SurName)" ; $Obj | Add-Member -MemberType NoteProperty -Name LastName -Value $($FreshAccount.SurName)
@@ -59,8 +59,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUgG0QPDPSf/v6vDWBiuQhZWXI
-# HwegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfX8rAlzb2Wzp6H1a8pEAyTuO
+# tOmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -127,11 +127,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUP0L5MVRdhykTSY65xoi460XMWSkwDQYJKoZI
-# hvcNAQEBBQAEggEAAmGJw6gVzdptuMW3eCYJ/hWNH5FSOWdgHDPsfC7uatsXGOOz
-# IymQwPP+k5Pxzn4FM3UdXClszE7uzla/vxmbbuy45A+XswO66LANzONlopoBThH1
-# 9q2lpjtrICuHyDEr2qAOrdP5qsl3EbQcYpfrYYElBNZNweH5XQmbiuI/IoB9oL17
-# 79GAKbFpkpvUe81U5yz1k3FguiFREPnccxlCRQgWFpGuW5h/HmBtZBIsJPDEkIc7
-# 01l+z4BucH9MUCTidLpGpjJ18Pf/0Bm9YQC0/3l9V7sIInUA/bO+cWh1J42VC+sn
-# whcpZP/iip5B/S8ZpmBGmjMlzoxa9/5s2P90mQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUGOD4axptPGC78XfNvxp2dXQx60EwDQYJKoZI
+# hvcNAQEBBQAEggEAPsVkRrJIFPLbIJJUit4TgCENRbHnmHQtYsaXHv0VRtvx++qv
+# kVI1qbWmxWqja9hNrGbHt18voQ8ed4nyfkQwl82hq+c/PlqovVtjGUO/VG1lg/DN
+# zvAXVT9d5g/7YC7wKPzFagu3aVpApuIuUkVkM4P/9tp88UedCyNN4lLjx9kjoDhr
+# Y21pG7ymPOdYny+XJ4wuqIltALk4iSkpafqt26gc4cEpqG08wWKSHZJxmTzQasg+
+# sHJ2GjraX86gmA3IPye7728maPQJUTa/wCtCKuca+7vjSSjmsfSrJQY2PnUXDOmQ
+# EpRJ4cuTQSD3mFh3SGwp11idWERuFNZRzjamBA==
 # SIG # End signature block

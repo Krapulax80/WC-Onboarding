@@ -62,7 +62,7 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 
     #Send email
     if ($WestCoast.IsPresent) {
-    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  #-Attachments $MFAGuide -ErrorAction SilentlyContinue
+    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  -Attachments $MFAGuide # -ErrorAction SilentlyContinue
     } elseif ($XMA.IsPresent) {
     Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding -Attachments $MFAGuide #-ErrorAction SilentlyContinue
     }
@@ -73,8 +73,8 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZBdA1AJlo7724wIUUYeKA/rp
-# BYKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUokS0kAOVgFyHPe133TkfTfjY
+# dbOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -141,11 +141,11 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUYtvhoZv8A5mMkCCUrHuAoxnb+EEwDQYJKoZI
-# hvcNAQEBBQAEggEAbTRw5s2ip6NYAFayPZEKJItwy9EvhmotwfoVq575CEGitC5S
-# k07NKcC6g4fr/tP8ordrsLC5ESN7f4U+sO5qJROe+HkRL/UQFuokxrCdG8fQpga2
-# FfYkzuTQRFOrx5E03MIdBprstxWh2fML/EIh90g3gDCZ8LbEf7o0w4yC/xQC/AID
-# Pi+KVdEq4Z6xWtuQtcFWvLVAgB+sORMC9JR9LkF+2xVFWIAfpSNrmcQcPMK9eJN0
-# Nkpucw6ioZpkALsht6iC/9W86JDFKQ1Ros3xINOXRXUHxFlo8zmuEgFCa3uIf80/
-# HYNmkxkiPyS7EAAgR2jVHpQw6BV39MT7/gWzew==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU0JEwZ5jUn6mVktlrA8O9r1uDlXMwDQYJKoZI
+# hvcNAQEBBQAEggEAw0HMc7qu47yD0B+ng94PMquI8q31AYEd5C5WIrARWydcTikR
+# snau/5RcmnhyXSQ3bPF1LmS/yrBCZ0mJeJnb50pLYEnsSTGrYFkxPVyNjMuRJke3
+# 4ZihxgQz3EiPyVAuX9EtQmwT8mprX5pb74kpqXQWzY5ychjTkka2cbs2LzUA39th
+# OnIcmyTUIb94pYHKt5qmvqjmGVpDlKXU9NpwbA2tK+7Q7QbdND6vjC/3rVAj2Mry
+# e4xaYl1oUpC0wjttPujVCrycHYBTrBkz1WR5shD8KKfORt7f8GJlc1YwRjuNJt1v
+# am2BdMWKTL4zqLAuwZIe9aZOJNE6kbX80uoEsg==
 # SIG # End signature block

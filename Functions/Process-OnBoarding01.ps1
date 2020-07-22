@@ -387,16 +387,7 @@ function Process-OnBoarding01 {
     #region EMAIL PASSWORD TO LINE MANAGER
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  password of [$NewSAMAccountName] to [$Manager]"
 
-    if ($Westcoast.IsPresent) {
-
-    Send-PasswordToManager -WestCoast -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy
-
-    } elseif ($XMA.Ispresent){
-
     Send-PasswordToManager -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
-
-    }
-
       #endregion
 
     #region EMAIL SUMMARY TO SERVICEDESK
@@ -419,8 +410,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFx+dIiLZPsNjliXAAcqmXFji
-# hQ+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmjeSfYCgILxGfLxzp/C0hak/
+# k7egggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -487,11 +478,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUUFJaD7rS2co2NknrYvPTiUK/JI4wDQYJKoZI
-# hvcNAQEBBQAEggEAmA1kIC4+TOR2rBzpJ/hQlI5huiQMJ6sqUw9iDAWi+YSU7EqI
-# Zmf6h1/7HECT3H5nSNeheaBWgObaQUSGOuxVjd7dHtIm2sbeYUqAEXmh+5d3kHv1
-# sNnipt1N3suKt6gWi2UphX7mOTf2p+QxvIWI83WANnTTLZvNh/QylOPkCQwYdorE
-# ozPH/z+FD57i1bydOG6NqB+8E7JlNfDhESMEtGRsUvAhhV9b9p0dd+w7JrwM0ywK
-# Atwu9vKm1HFToTqXhMDl0YXjiypXpZcH729zZz1tLR/NUgo6DLBUwvqUroW3B0Wy
-# am9XyHJa87oTYRDwfsM16ceOXx9J6YNrvGszDA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUEQy53Jn1vEQNAlFMfrCQjYnPxO0wDQYJKoZI
+# hvcNAQEBBQAEggEArTbtpaGUrWy0uTtWNVXRqlHLdOWkzmLWWGju9E/JnsdiS102
+# haQ2Y2Bl6bDdozzts8bUnXJ2Ls77sJ5giV1At1OPdPotRHHRDzPKQOg6xiLeByjz
+# tRe0LmQVGob8o5DlZNciFhFrCuLLouGfZCKAYpiwSAI0Yl0TEc/8nBW44XnROQyB
+# nyKiQVZ2YI5JH3lHDNVyK/4QdjAgk5EMdtflC3s9dRKoTKy8sRbDj+/i6WpuMmm1
+# 9yHCSPRrMLOEFIHm0too/fwtGRaE6zsZz9SJyks4+aL2Wpjcz9xaXiQKENMb129D
+# ijZdl/tnxhbkJlUhri78mnebPeEDEQOcvOdmnQ==
 # SIG # End signature block

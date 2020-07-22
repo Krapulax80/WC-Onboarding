@@ -18,14 +18,14 @@ function Add-ToTemplatesGroups {
       catch {
           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
       }
-      #TODO: Add outcome of the group addition
+
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsFfxjkNJrlz7hC1kFxDXlgjN
-# qVWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUplwXqFsBGgbicH12z7gYott6
+# q7agggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +92,11 @@ function Add-ToTemplatesGroups {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUK8eE9T+T8J3J0sqlwJvQ5ufsy/YwDQYJKoZI
-# hvcNAQEBBQAEggEAzTbanuVpGDGrmc04+EYXhUgT0kYao0HkslFSqnAZKr9aRaKa
-# 98EM6EXmbM1w030v99dcVqkOOaDdsvheQDOETal1tkCClB3S1t7asTdOvPQIaBa9
-# SeLbOKevLauY/wNEq6THkJmwOhFulByYK+WD6IxC0ln/aAx1/0NS5yoC0KOITQ/y
-# Wzt95mM5Lvq7HW7iQZt+e6U9J7BvH66KzbzgJL+1IlTQdGmE5VqWvgGmw88d23UT
-# TaAC3aJi/IwckpZV7WZtaXxkFqtZ0ROVAWy/i/UK6Rf13SG0UaRTUwRf5C8z3IUN
-# zqpKrz8WUJoWMr7m2atXIN9f8Yn8SseJnMeCjw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU0ZFX6A39kQkLhrvFD0jPwVe3htQwDQYJKoZI
+# hvcNAQEBBQAEggEAT5xIw3893hT0c+f8Djo85/fdYbrCCdmBH/gheojYfwnczPNw
+# oUWPOTySDsVnV/wA6CoN6joP8XXLcoavC0m5QHh7RwN+SXRhhYyZBcq54wy4p2Tm
+# ZAaR71SXYmYMk/StT3UKEDUlc3XeId+KfqlAfcCnGK7prkmyF+MTnNodr9X+FwT+
+# xP8/j6WoC8Qh3J8COpSaINlbEkk5LJjoaJXDB8rhF6E9ZpecIhsXLDCO42cLe6z5
+# d5OspkZbj7mUZB6d8TtOUyXkQBFLVJMGdTgo8VMV5c37Tet8Kw1rhd6+j19CqIZx
+# hqUxNwlxvSH513X6+vDmQHPfx3yyuK+ZiOCS4w==
 # SIG # End signature block

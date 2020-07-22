@@ -105,7 +105,6 @@
     $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" +  ($I.Name -replace ".csv","_PROCESSED.csv")
     $CSVImport | Export-Csv $InputReport -Force
     #Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
-    #TODO:Report on misc actions (DFS,Licensing,etc.)
 
   # Finally, discard the processed original input file
   #Remove-Item -Path $($I.Fullname) -Force #-Whatif
@@ -125,8 +124,8 @@
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8dxBvpRmy4O12203IZi3DjwG
-# P2GgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7BMoGfwP8n7L20bnA/ZOMOIH
+# wR6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -193,11 +192,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU4cDyOqZFp/n+KG8U1coZr9osj3swDQYJKoZI
-# hvcNAQEBBQAEggEADcAta45+4WlCtnJd6oqRBInzBZnnuQqzhSOMXTLjpLGBcGo3
-# VVvspZ1kosNjVTpaelElFBh2s56zbMcXKWrc4/TeCp6LpufCZRH/RrqteW9CcorO
-# G21sbSGdoX6WY1QIAYF31jTv6YrpHzZtBCmHIpfoSXL5mY4EFiHwFvZbL7xK8OQM
-# +r4UnIf8SkBbInX3uNAjKml/BKjpd6KUpAWCYqoKZl5z/lBszF/K7iIi11OHEWqz
-# 3M8j3JMszLGMeqboXFW+dm64YecOlo/odl5Q0IqpPHgeVuScHWoVGAFgauJSZcE6
-# b1IWZcQOK1fofo67st5xVE2ruBWeifJUMJieIw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUsZr2zfxKCaL86nD2eh3w8Caupn8wDQYJKoZI
+# hvcNAQEBBQAEggEAemEASvEZPrckTJAKJTo74UCcdSCCtPDYMefHUnzSG8wSl4Q+
+# rzQm3/P8zle/GBxLyosbPqqSb2qegDfFiDNc6KUCEH0+1jYVQEGy8Na7gb5BVOEO
+# GCqFPzkaF9NmZyW2i5+jkBzft5mumfWeWPdxOuMfjeTYXKh8vZMtcOofyVs6oTLo
+# rTzYrT3aWG4vKI5iWW8GgrT12+6+chvsBdc40TgN0S4MtntUQDlw7qfuYfbK/boR
+# KhTVFxmRIHjHlJ2EriZchR7i1tFmO25iOKXjr/+6dUxdJ3SQHLC1tEfEtr85OGg3
+# WrY46dT3cso9nK7T7ENsu8haXFbk4QygRzWSQg==
 # SIG # End signature block
