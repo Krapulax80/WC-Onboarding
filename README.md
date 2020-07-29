@@ -39,8 +39,8 @@ The script meant to be called as a scheduled task using Powershell. It is possib
 
 ### Active Directory
 
-- first the script will collect the basic AD parameters of the user (SAMAccountName, UserPrincipalName, etc.) and a few other AD-specific values (for example alternative proxy/smtp addresses); the logic shuld take care for duplicates, so for example if john.smith SAM is already taken, the user should get john.smith1 as his SAM. This will also affect UPN and other names. if the john.smith1 is also taken, john.smith2 will be used, ect.
-- once all the name values, employee ID, etc. is unique, the script will create a new AD object; most of the settings will come from the provided template user
+- first the script will collect the basic AD parameters of the user (SAMAccountName, UserPrincipalName, etc.) and a few other AD-specific values (for example alternative proxy/smtp addresses); the logic should take care for duplicates, so for example if john.smith SAM is already exists, the user should get john.smith1 as his SAM. This will also affect UPN and other names; also it will continue increasing the number, if for example john.smith1, john.smith2 is existing, etc.
+- once all the name values, employee ID, etc. are unique, the script will create a new AD object; most of the settings will come from the provided template user
 - the script then going to configure this object:
   - it will set the manager of the new user to match to the template account
     - it will provide JBA Access (a custom program relying on a custom AD attribute) to the user
