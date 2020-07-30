@@ -1,21 +1,21 @@
 function Process-OnBoarding01 {
   [CmdletBinding()]
   param(## Domain selector
-    [Parameter(Mandatory=$true , ParameterSetName="WestCoast")] [switch]$Westcoast,
-    [Parameter(Mandatory=$true , ParameterSetName="XMA")] [switch]$XMA,
-    [Parameter(Mandatory=$true)] [string]$FirstName,
-    [Parameter(Mandatory=$true)] [string]$LastName,
-    [Parameter(Mandatory=$true)] [string]$EmployeeID,
-    [Parameter(Mandatory=$true)] [string]$TemplateName,
-    [Parameter(Mandatory=$true)] [string]$OutputFolder,
-    [Parameter(Mandatory=$true)] [string]$Today,
-    [Parameter(Mandatory=$true)] [string]$Manager,
-    [Parameter(Mandatory=$true)] [object]$config,
-    [Parameter(Mandatory=$true)] [object]$recipients,
-    [Parameter(Mandatory=$false)] [switch]$NoJBA
+    [Parameter(Mandatory = $true , ParameterSetName = "WestCoast")] [switch]$Westcoast,
+    [Parameter(Mandatory = $true , ParameterSetName = "XMA")] [switch]$XMA,
+    [Parameter(Mandatory = $true)] [string]$FirstName,
+    [Parameter(Mandatory = $true)] [string]$LastName,
+    [Parameter(Mandatory = $true)] [string]$EmployeeID,
+    [Parameter(Mandatory = $true)] [string]$TemplateName,
+    [Parameter(Mandatory = $true)] [string]$OutputFolder,
+    [Parameter(Mandatory = $true)] [string]$Today,
+    [Parameter(Mandatory = $true)] [string]$Manager,
+    [Parameter(Mandatory = $true)] [object]$config,
+    [Parameter(Mandatory = $true)] [object]$recipients,
+    [Parameter(Mandatory = $false)] [switch]$NoJBA
   )
 
-      <#
+  <#
       # Internal use only: this is only for updating the passwords used for the script
       Create-Credential -WestCoast -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
       Create-Credential -WestCoast -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -PasswordUpdate
@@ -28,390 +28,398 @@ function Process-OnBoarding01 {
 
   # DOMAIN SELECTION
 
-    # Variables based on the WC/XMA config file
-      $SystemDomain = $config.SystemDomain
-      $DomainNetBIOS = $config.DomainNetBIOS
-      $AADSyncServer = $config.AADSyncServer ; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-      $ExchangeServer = $config.ExchangeServer ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-      $HybridServer = $config.HybridServer ; $HybridServer = $HybridServer + "." + $SystemDomain
-      $OnpremisesMRSProxyURL = $config.OnpremisesMRSProxyURL + "." + $SystemDomain
-      $EOTargetDomain = $config.EOTargetDomain
-      $PeopleFileServer = $config.PeopleFileServer ; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-      $ProfileFileServer = $config.ProfileFileServer ; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-      $RDSDiskFileServer = $config.RDSDiskFileServer ; $RDSDiskFileServer = $RDSDiskFileServer  + "." + $SystemDomain
-      $StarterOU = $config.StarterOU
-      $DFSHost = $config.DFSHost ; $DFSHost = $DFSHost + "." + $SystemDomain
-      $SmtpServer = $config.SMTPServer
+  # Variables based on the WC/XMA config file
+  $SystemDomain = $config.SystemDomain
+  $DomainNetBIOS = $config.DomainNetBIOS
+  $AADSyncServer = $config.AADSyncServer ; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
+  $ExchangeServer = $config.ExchangeServer ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
+  $HybridServer = $config.HybridServer ; $HybridServer = $HybridServer + "." + $SystemDomain
+  $OnpremisesMRSProxyURL = $config.OnpremisesMRSProxyURL + "." + $SystemDomain
+  $EOTargetDomain = $config.EOTargetDomain
+  $PeopleFileServer = $config.PeopleFileServer ; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
+  $ProfileFileServer = $config.ProfileFileServer ; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
+  $RDSDiskFileServer = $config.RDSDiskFileServer ; $RDSDiskFileServer = $RDSDiskFileServer + "." + $SystemDomain
+  $StarterOU = $config.StarterOU
+  $DFSHost = $config.DFSHost ; $DFSHost = $DFSHost + "." + $SystemDomain
+  $SmtpServer = $config.SMTPServer
 
-      $ComputerUsagePolicy = $config.ComputerUsagePolicy
-      if ($config.MFAGuide){
-      $MFAGuide = $config.MFAGuide
-      }
+  $ComputerUsagePolicy = $config.ComputerUsagePolicy
+  if ($config.MFAGuide) {
+    $MFAGuide = $config.MFAGuide
+  }
 
-      $ReportSender = "newstarter" + "@" + $SystemDomain
+  $ReportSender = "newstarter" + "@" + $SystemDomain
 
-    #region WESTCOAST
-    if ($Westcoast.IsPresent){
-      # Credentials for WC
-      Create-Credential -WestCoast -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
-      Create-Credential -WestCoast -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
-      Create-Credential -WestCoast -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
-      # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
-      #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
-      $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
-    }
-    #endregion
-    #region XMA
-    elseif ($XMA.IsPresent){
-      # Credentials for XMA
-      Create-Credential -XMA -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
-      Create-Credential -XMA -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
-      Create-Credential -XMA -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
-      # Domain Controller for XMA
-      $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
-    }
-    #endregion
-    #region (INVALID WORK DOMAIN DEFINED)
-    else {
-      Write-Host -ForeGroundColor Red "Bad domain."; Break
-    }
-    #endregion
+  #region WESTCOAST
+  if ($Westcoast.IsPresent) {
+    # Credentials for WC
+    Create-Credential -WestCoast -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+    Create-Credential -WestCoast -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+    Create-Credential -WestCoast -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+    # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
+    #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
+    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
+  }
+  #endregion
+  #region XMA
+  elseif ($XMA.IsPresent) {
+    # Credentials for XMA
+    Create-Credential -XMA -AD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+    Create-Credential -XMA -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+    Create-Credential -XMA -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
+    # Domain Controller for XMA
+    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
+  }
+  #endregion
+  #region (INVALID WORK DOMAIN DEFINED)
+  else {
+    Write-Host -ForeGroundColor Red "Bad domain."; Break
+  }
+  #endregion
 
   ## ACTIVE DIRECTORY
 
-    #region Construct the new user account's PARAMETERS
+  #region Construct the new user account's PARAMETERS
 
-    # Capitalise first and last name of the NEW user account
-    $TextInfo = (Get-Culture).TextInfo
-    $FirstName = $TextInfo.ToTitleCase($FirstName)
-    $LastName = $TextInfo.ToTitleCase($LastName)
+  # Capitalise first and last name of the NEW user account
+  $TextInfo = (Get-Culture).TextInfo
+  $FirstName = $TextInfo.ToTitleCase($FirstName)
+  $LastName = $TextInfo.ToTitleCase($LastName)
 
-    # Collect details of the TEMPLATE  user account
-    if (Get-ADUser -Filter {SAMAccountName -eq $TemplateName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) {
+  # Collect details of the TEMPLATE  user account
+  if (Get-ADUser -Filter { SAMAccountName -eq $TemplateName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) {
     $TemplateUser = Get-ADUser $TemplateName -Properties * -Server $DC -Credential $AD_Credential
-    } else { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - User $TemplateName not found." -ForegroundColor Red }
+  }
+  else { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - User $TemplateName not found." -ForegroundColor Red }
 
-    # Construct parent OU of the TEMPLATE user account
-    $TemplateAccountOU = ($TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),",'' } }).path
+  # Construct parent OU of the TEMPLATE user account
+  $TemplateAccountOU = ($TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),", '' } }).path
 
-    # Conutry code of the TEMPLATE account
-    $UsageLocation = $TemplateUser.extensionAttribute6 # Country code
+  # Conutry code of the TEMPLATE account
+  $UsageLocation = $TemplateUser.extensionAttribute6 # Country code
 
-    # Declare the USER DOMAIN
-    $UserDomain = ($TemplateUser.UserPrincipalName).Split("\@")[1]
+  # Declare the USER DOMAIN
+  $UserDomain = ($TemplateUser.UserPrincipalName).Split("\@")[1]
 
-    # Generate various names for the NEW user account
-    $NewUserPrincipalName = $FirstName + "." + $LastName + "@" + $UserDomain
-    $NewSAMAccountName = $FirstName + "." +  $LastName
-      if ($NewSAMAccountName.Length -gt 20) { # Truncate pre-2000 name to 20 characters, if longer, to prevent errors
-      $NewSAMAccountName = $NewSAMAccountName.substring(0,20)
-      }
+  # Generate various names for the NEW user account
+  $NewUserPrincipalName = $FirstName + "." + $LastName + "@" + $UserDomain
+  $NewSAMAccountName = $FirstName + "." + $LastName
+  if ($NewSAMAccountName.Length -gt 20) {
+    # Truncate pre-2000 name to 20 characters, if longer, to prevent errors
+    $NewSAMAccountName = $NewSAMAccountName.substring(0, 20)
+  }
 
-    # Create new password for the NEW user account
-    Add-Type -AssemblyName System.Web
-    $NewPassword = [System.Web.Security.Membership]::GeneratePassword(12,4)
+  # Create new password for the NEW user account
+  Add-Type -AssemblyName System.Web
+  $NewPassword = [System.Web.Security.Membership]::GeneratePassword(12, 4)
 
-    # Check if the SAM Account Name  already exists. If it does, create a unique one
-    if(! (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique."
-    } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Yellow
-      Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
-      $NewSAMAccountName = $global:NewSAMAccountName
-    }
+  # Check if the SAM Account Name  already exists. If it does, create a unique one
+  if (! (Get-ADUser -Filter { SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ) {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique."
+  }
+  else {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Yellow
+    Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
+    $NewSAMAccountName = $global:NewSAMAccountName
+  }
 
-    # Derivative names created from the SAM Account Name (these should make these guranteed unique, however we will double check this just in case)
-    $NewUserPrincipalName = $NewSAMAccountName + "@" + $UserDomain
-    $NewRemoteRoutingAddress = $NewSAMAccountName  + "@" + $EOTargetDomain
-    $NewDisplayName = $NewSAMAccountName -replace "\."," "
+  # Derivative names created from the SAM Account Name (these should make these guranteed unique, however we will double check this just in case)
+  $NewUserPrincipalName = $NewSAMAccountName + "@" + $UserDomain
+  $NewRemoteRoutingAddress = $NewSAMAccountName + "@" + $EOTargetDomain
+  $NewDisplayName = $NewSAMAccountName -replace "\.", " "
 
-    # Check if the UPN already exists. If it does, create a unique one
-    if(!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique."
-   } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Yellow
-      Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
-      $NewUserPrincipalName = $global:NewUserPrincipalName
-    }
+  # Check if the UPN already exists. If it does, create a unique one
+  if (!(Get-ADUser -Filter { UserPrincipalName -eq $NewUserPrincipalName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )) {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique."
+  }
+  else {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Yellow
+    Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
+    $NewUserPrincipalName = $global:NewUserPrincipalName
+  }
 
-    # Check if Employee ID already exists. If it does, create a unique one
-    if (($EmployeeID.gettype()).Name -notlike "String"){
-        $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
-    }
-    if(!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )){
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique."
-    } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Yellow
-      Create-UniqueEmployeeID -EmployeeID $EmployeeID
-      $EmployeeID = $EmployeeID
-    }
+  # Check if Employee ID already exists. If it does, create a unique one
+  if (($EmployeeID.gettype()).Name -notlike "String") {
+    $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
+  }
+  if (!(Get-ADUser -Filter { EmployeeID -eq $EmployeeID } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )) {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique."
+  }
+  else {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Yellow
+    Create-UniqueEmployeeID -EmployeeID $EmployeeID
+    $EmployeeID = $global:EmployeeID
+  }
 
-    #endregion
+  #endregion
 
-    #region Create and configure the NEW USER ACCOUNT
+  #region Create and configure the NEW USER ACCOUNT
 
-      # Run the creation function
-      Create-NewUserObject -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -FirstName $FirstName -StarterOU $StarterOU -LastName $LastName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
+  # Run the creation function
+  Create-NewUserObject -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -FirstName $FirstName -StarterOU $StarterOU -LastName $LastName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
 
-      # Check, if the template had a MANAGER. If yes, assign the new account to this manager
-      Add-Manager -Manager $Manager -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  # Check, if the template had a MANAGER. If yes, assign the new account to this manager
+  Add-Manager -Manager $Manager -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
-      # Unless specifically said otherwise, assign JBA ACCESS to the account
-      Add-JBAAccess -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  # Unless specifically said otherwise, assign JBA ACCESS to the account
+  Add-JBAAccess -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
-      # Assign EMPLOYEE ID to the new user account
-      Add-EmployeeID -EmployeeID $EmployeeID -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  # Assign EMPLOYEE ID to the new user account
+  Add-EmployeeID -EmployeeID $EmployeeID -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
-      # Assign HOLIDAY ENTITLEMENT to the new account
-      if ($HolidayEntitlement){
-      Add-HolidayEntitlement -HolidayEntitlement $HolidayEntitlement -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
-      }
+  # Assign HOLIDAY ENTITLEMENT to the new account
+  if ($HolidayEntitlement) {
+    Add-HolidayEntitlement -HolidayEntitlement $HolidayEntitlement -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  }
 
-      # Set the START DATE of the account. (This is purely administrative, account can be used ASAP!)
-      if ($EmployeeStartDate){
-      Add-StartDate -EmployeeStartDate $EmployeeStartDate -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
-      }
+  # Set the START DATE of the account. (This is purely administrative, account can be used ASAP!)
+  if ($EmployeeStartDate) {
+    Add-StartDate -EmployeeStartDate $EmployeeStartDate -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  }
 
-      # Set the END/EXPIRATION DATE of the account. (Account will stop working after it expired!)
-      if ($EmployeeEndDate){
-      Add-EndDate -EmployeeEndDate $EmployeeEndDate -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
-      }
+  # Set the END/EXPIRATION DATE of the account. (Account will stop working after it expired!)
+  if ($EmployeeEndDate) {
+    Add-EndDate -EmployeeEndDate $EmployeeEndDate -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  }
 
-      # Select the releavant CONTRACT TYPE of the new AD user
-      if ($ContractType)
-      {
-      Add-ContractType -ContractType $ContractType -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
-      }
+  # Select the releavant CONTRACT TYPE of the new AD user
+  if ($ContractType) {
+    Add-ContractType -ContractType $ContractType -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  }
 
-      # Mirror ALL GROUP MEMBERSHIP of the template account to the new user
-      Add-ToTemplatesGroups -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  # Mirror ALL GROUP MEMBERSHIP of the template account to the new user
+  Add-ToTemplatesGroups -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
-      # MOVE the new user account to the same OU as the template account
-      Move-ToTemplatesOU -TemplateAccountOU $TemplateAccountOU -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+  # MOVE the new user account to the same OU as the template account
+  Move-ToTemplatesOU -TemplateAccountOU $TemplateAccountOU -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
-    #endregion
+  #endregion
 
-    ## AD Syncronisation
-    <# This syncornisation is needed in order for exchange to be aware of the existance of the new account, so mailbox can be created
+  ## AD Syncronisation
+  <# This syncornisation is needed in order for exchange to be aware of the existance of the new account, so mailbox can be created
     #>
 
-    #region SYNC
-    Get-ADSync -DC $DC -AD_Credential $AD_Credential
-    Start-Sleep 30 # allow AD sync to finish
-    #endregion
+  #region SYNC
+  Get-ADSync -DC $DC -AD_Credential $AD_Credential
+  Start-Sleep 30 # allow AD sync to finish
+  #endregion
 
   ## EXCHANGE
-    #region Construct mailbox's PARAMETERS
+  #region Construct mailbox's PARAMETERS
 
   # Construct the secondary SMTP ADDRESS
-  $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0,1) + "@" + $UserDomain
+  $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0, 1) + "@" + $UserDomain
 
   # Check if the SECONDARY SMTP ALREADY EXISTS. If it does, create a unique one
   if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is unique."
-    } else {
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForeGroundColor Yellow
-      Create-UniqueSMTP -SMTP $secondarySMTP
-      $secondarySMTP = $global:secondarySMTP
-    }
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP [$secondarySMTP] is unique."
+  }
+  else {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForeGroundColor Yellow
+    Create-UniqueSMTP -SMTP $secondarySMTP
+    $secondarySMTP = $global:secondarySMTP
+  }
 
   # Set the new secondary SMTP on the AD object
-     try {
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] "
-      Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP)} -Server $DC -Credential $AD_Credential # this is done in AD
-     }
-     catch {
-           $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
-     }
+  try {
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] "
+    Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP) } -Server $DC -Credential $AD_Credential # this is done in AD
+  }
+  catch {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
+  }
 
-     # (For non-UK users only)
-    # For non-UK users set the primary SMTP to their relevant COUNTRY DOMAIN (eg. westcoast.ie)
-      if ($UserDomain -ne $Systemdomain){
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Non-UK user detected. Modifying SMTP addresses."
-          #Create old (ToRemove) SMTP and new (ToAdd) SMTP
-      $NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
-      $OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
-      $NewSEcondarySMTP = $OldPrimarySMTP -replace "SMTP:","smtp:"
-        #Update primary SMTP if needed
-        Set-ADUser $NewSAMAccountName -remove @{ProxyAddresses=$OldPrimarySMTP} -Server $DC -Credential $AD_Credential
-        Set-ADUser $NewSAMAccountName -add @{ProxyAddresses=$NewPrimarySMTP} -Server $DC -Credential $AD_Credential
-        Set-ADUser $NewSAMAccountName -add @{ProxyAddresses=$NewSEcondarySMTP} -Server $DC -Credential $AD_Credential
-        # Update mail address if needed
-        Set-ADUser -Identity $NewSAMAccountName -Replace @{mail=($NewSAMAccountName + "@" + $UserDomain)} -Server $DC -Credential $AD_Credential
-    }
-     #endregion
+  # (For non-UK users only)
+  # For non-UK users set the primary SMTP to their relevant COUNTRY DOMAIN (eg. westcoast.ie)
+  if ($UserDomain -ne $Systemdomain) {
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Non-UK user detected. Modifying SMTP addresses."
+    #Create old (ToRemove) SMTP and new (ToAdd) SMTP
+    $NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
+    $OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
+    $NewSEcondarySMTP = $OldPrimarySMTP -replace "SMTP:", "smtp:"
+    #Update primary SMTP if needed
+    Set-ADUser $NewSAMAccountName -remove @{ProxyAddresses = $OldPrimarySMTP } -Server $DC -Credential $AD_Credential
+    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewPrimarySMTP } -Server $DC -Credential $AD_Credential
+    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewSEcondarySMTP } -Server $DC -Credential $AD_Credential
+    # Update mail address if needed
+    Set-ADUser -Identity $NewSAMAccountName -Replace @{mail = ($NewSAMAccountName + "@" + $UserDomain) } -Server $DC -Credential $AD_Credential
+  }
+  #endregion
 
-    #region Create the NEW MAILBOX
+  #region Create the NEW MAILBOX
 
-    # If the template user was Office365 user
-      if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match "onmicrosoft.com" ) {
-      Create-OnlineMailbox -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
-        $Flag = "online"
-      } else {
+  # If the template user was Office365 user
+  if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match "onmicrosoft.com" ) {
+    Create-OnlineMailbox -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
+    $Flag = "online"
+  }
+  else {
     # If the template was on-prem user
-      Create-OnPremMailbox -EOTargetDomain $EOTargetDomain -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
-      $Flag = "onprem"
-     }
-    #endregion
+    Create-OnPremMailbox -EOTargetDomain $EOTargetDomain -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
+    $Flag = "onprem"
+  }
+  #endregion
 
   ## AD & AAD Syncronisation
   <# This syncornisation is needed in order for AAD to be aware of the new AD account so that it can be licensed
   #>
-    #region SYNC
-    Get-ADSync -DC $DC -AD_Credential $AD_Credential
-    Start-Sleep 30 # allow AD sync to finish
-    Get-AADSync -AD_Credential $AD_Credential
-    #endregion
+  #region SYNC
+  Get-ADSync -DC $DC -AD_Credential $AD_Credential
+  Start-Sleep 30 # allow AD sync to finish
+  Get-AADSync -AD_Credential $AD_Credential
+  #endregion
 
   ## MICROSOFT ONLINE SERVICES
 
-      #region CONNECT to MSOnline
-      Connect-MSOnline -AAD_Credential $AAD_Credential -SystemDomain $SystemDomain
-      #endregion
+  #region CONNECT to MSOnline
+  Connect-MSOnline -AAD_Credential $AAD_Credential -SystemDomain $SystemDomain
+  #endregion
 
-      #region Gather LICENSE LIST from the template user
-      $licenseassigned = $null = $licenseunasigned
-        #Only do this, if the template has license
-        if (Get-MsolUser -UserPrincipalName $TemplateUser.UserPrincipalName -ErrorAction SilentlyContinue){
-          #Get licenses of the Template account (some are excluded, as they are assigned from AD groups)
-          $LicenseSKUs = ((Get-MsolUser -UserPrincipalName $TemplateUser.UserPrincipalName -ErrorAction SilentlyContinue).Licenses).AccountSkuid #| Where-Object { ($_ -notlike "*ENTERPRISEPACK") -and ($_ -notlike "*ATP_ENTERPRISE") }
-        }
-      #endregion
+  #region Gather LICENSE LIST from the template user
+  $licenseassigned = $null = $licenseunasigned
+  #Only do this, if the template has license
+  if (Get-MsolUser -UserPrincipalName $TemplateUser.UserPrincipalName -ErrorAction SilentlyContinue) {
+    #Get licenses of the Template account (some are excluded, as they are assigned from AD groups)
+    $LicenseSKUs = ((Get-MsolUser -UserPrincipalName $TemplateUser.UserPrincipalName -ErrorAction SilentlyContinue).Licenses).AccountSkuid #| Where-Object { ($_ -notlike "*ENTERPRISEPACK") -and ($_ -notlike "*ATP_ENTERPRISE") }
+  }
+  #endregion
 
-      #region Wait for the new account to APPEAR IN MSONLINE (AAD)
-          do {
-          $MSOLACCPresent = $null
-            # Delay between each check. Increased for XMA to avoid spam.
-            if($SystemDomain -match "xma.co.uk"){
-            $delay = 180
-            } elseif ($SystemDomain -match "westcoast.co.uk") {
-            $delay = 120
-            } else {
-            $delay = 120
-            }
-          $MSOLACCPresent = Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction Ignore
-          if (!($MSOLACCPresent))
-          {
-            $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for [$NewUserPrincipalName] to syncronise to Microsoft Online ... (next check is in $delay seconds)" -ForegroundColor Yellow
-            Start-Sleep -Seconds $delay
-          }
-          }
-          until($MSOLACCPresent)
-          $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution"
-      #endregion
+  #region Wait for the new account to APPEAR IN MSONLINE (AAD)
+  do {
+    $MSOLACCPresent = $null
+    # Delay between each check. Increased for XMA to avoid spam.
+    if ($SystemDomain -match "xma.co.uk") {
+      $delay = 180
+    }
+    elseif ($SystemDomain -match "westcoast.co.uk") {
+      $delay = 120
+    }
+    else {
+      $delay = 120
+    }
+    $MSOLACCPresent = Get-MsolUser -UserPrincipalName $NewUserPrincipalName -ErrorAction Ignore
+    if (!($MSOLACCPresent)) {
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for [$NewUserPrincipalName] to syncronise to Microsoft Online ... (next check is in $delay seconds)" -ForegroundColor Yellow
+      Start-Sleep -Seconds $delay
+    }
+  }
+  until($MSOLACCPresent)
+  $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution"
+  #endregion
 
-    #region LICENSING the new user
-       # When the user account is present, assign licensed to it to match the template (minus the licenses that come from groups)
-       # Location is always GB
-        [void] (Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation)
-        # Assign each licenses of the template account to the new user
-        if ($LicenseSKUs){
-          foreach ($LicenseSKU in $LicenseSKUs){
-            Get-MSOLUserLicensed -LicenseSKU $LicenseSKU -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
-          }
-        }
-      #endregion
+  #region LICENSING the new user
+  # When the user account is present, assign licensed to it to match the template (minus the licenses that come from groups)
+  # Location is always GB
+  [void] (Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation)
+  # Assign each licenses of the template account to the new user
+  if ($LicenseSKUs) {
+    foreach ($LicenseSKU in $LicenseSKUs) {
+      Get-MSOLUserLicensed -LicenseSKU $LicenseSKU -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
+    }
+  }
+  #endregion
 
   ## DISTRIBUTED FILE SYSTEM
 
-    #region DFS PARAMETERS
-      if ($Westcoast.IsPresent) {
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Starting File server / DFS configuration"
-        $PeopleTargetPath = "\\$PeopleFileServer\PEOPLE$\$NewSAMAccountName"
-        $ProfileTargetPath = "\\$ProfileFileServer\PROFILES$\$NewSAMAccountName"
-        $PeopleDFS = "\\$SystemDomain\PEOPLE\$NewSAMAccountName"
-        $ProfileDFS = "\\$SystemDomain\PROFILES\$NewSAMAccountName"
-      }
-      elseif ($XMA.Ispresent){
+  #region DFS PARAMETERS
+  if ($Westcoast.IsPresent) {
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Starting File server / DFS configuration"
+    $PeopleTargetPath = "\\$PeopleFileServer\PEOPLE$\$NewSAMAccountName"
+    $ProfileTargetPath = "\\$ProfileFileServer\PROFILES$\$NewSAMAccountName"
+    $PeopleDFS = "\\$SystemDomain\PEOPLE\$NewSAMAccountName"
+    $ProfileDFS = "\\$SystemDomain\PROFILES\$NewSAMAccountName"
+  }
+  elseif ($XMA.Ispresent) {
 
-      }
-    #endregion
+  }
+  #endregion
 
-    #region PROVISION DFS
-    if ($Westcoast.IsPresent) {
+  #region PROVISION DFS
+  if ($Westcoast.IsPresent) {
     Create-NewDFS -NewSAMAccountName $NewSAMAccountName -PeopleDFS $PeopleDFS -PeopleTargetPath $PeopleTargetPath -ProfileDFS $ProfileDFS -ProfileTargetPath $ProfileTargetPath # -DFSHost $DFSHost -AD_Credential $AD_Credential
-    }
-    elseif ($XMA.Ispresent){
-      #TODO: To discuss OneDrive as an alternative solution
-    }
-    #endregion
+  }
+  elseif ($XMA.Ispresent) {
+    #TODO: To discuss OneDrive as an alternative solution
+  }
+  #endregion
 
   ## USER REPORTING
 
-    #region USER REPORT
+  #region USER REPORT
 
-      # Report to display
-      <# Here we create the report object, and at the same time display this for the user who is running the script.#>
-      Write-Host # separator line
-      #Exchange
-      Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -SystemDomain $SystemDomain -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
-      #AD
-      Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential -NewPassword $NewPassword
-      #DFS
-      if ($Westcoast.IsPresent) {
-      Generate-DFSReport -PeopleDFS $PeopleDFS -ProfileDFS $ProfileDFS -NewSAMAccountName $NewSAMAccountName
-      }
-      elseif ($XMA.Ispresent){
-      #TODO: To discuss OneDrive as an alternative solution
-      }
+  # Report to display
+  <# Here we create the report object, and at the same time display this for the user who is running the script.#>
+  Write-Host # separator line
+  #Exchange
+  Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -SystemDomain $SystemDomain -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
+  #AD
+  Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential -NewPassword $NewPassword
+  #DFS
+  if ($Westcoast.IsPresent) {
+    Generate-DFSReport -PeopleDFS $PeopleDFS -ProfileDFS $ProfileDFS -NewSAMAccountName $NewSAMAccountName
+  }
+  elseif ($XMA.Ispresent) {
+    #TODO: To discuss OneDrive as an alternative solution
+  }
 
-      # Report to CSV
-      <# Here we save each report to a separate file#>
-      #AD
-      $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_AD_report.csv"
+  # Report to CSV
+  <# Here we save each report to a separate file#>
+  #AD
+  $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" + ($NewSAMAccountName -replace "\.", "_") + "_AD_report.csv"
 
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving AD report to [$UserADReportCSV]"
+  $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving AD report to [$UserADReportCSV]"
 
-      $global:UserADReportConverted | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force -NoTypeInformation
-      #Exchange
-      $UserExchangeReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_Exchange_report.csv"
+  $global:UserADReportConverted | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force -NoTypeInformation
+  #Exchange
+  $UserExchangeReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" + ($NewSAMAccountName -replace "\.", "_") + "_Exchange_report.csv"
 
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving EXCHANGE report to [$UserExchangeReportCSV]"
+  $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving EXCHANGE report to [$UserExchangeReportCSV]"
 
-      $global:UserExchangeReportConverted | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force -NoTypeInformation
-      #DFS
-      if ($Westcoast.IsPresent) {
-      $UserDFSReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" +  ($NewSAMAccountName -replace "\.","_") + "_DFS_report.csv"
+  $global:UserExchangeReportConverted | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force -NoTypeInformation
+  #DFS
+  if ($Westcoast.IsPresent) {
+    $UserDFSReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" + ($NewSAMAccountName -replace "\.", "_") + "_DFS_report.csv"
 
-      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving DFS report to [$UserDFSReportCSV]"
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving DFS report to [$UserDFSReportCSV]"
 
-      $global:UserDFSReportConverted | ConvertFrom-Csv | Export-Csv $UserDFSReportCSV -Force -NoTypeInformation
-      }
-      elseif ($XMA.Ispresent){
-      #TODO: To discuss OneDrive as an alternative solution
-      }
-      #endregion
+    $global:UserDFSReportConverted | ConvertFrom-Csv | Export-Csv $UserDFSReportCSV -Force -NoTypeInformation
+  }
+  elseif ($XMA.Ispresent) {
+    #TODO: To discuss OneDrive as an alternative solution
+  }
+  #endregion
 
   ## EMAILING
 
-    #region EMAIL PASSWORD TO LINE MANAGER
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  password of [$NewSAMAccountName] to [$Manager]"
+  #region EMAIL PASSWORD TO LINE MANAGER
+  $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  password of [$NewSAMAccountName] to [$Manager]"
 
-    Send-PasswordToManager -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
-      #endregion
+  Send-PasswordToManager -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
+  #endregion
 
-    #region EMAIL SUMMARY TO SERVICEDESK
-    if ($Westcoast.IsPresent) {
+  #region EMAIL SUMMARY TO SERVICEDESK
+  if ($Westcoast.IsPresent) {
 
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending AD, Exchange and DFS reports on [$NewSAMAccountName] account"
 
     Send-SummaryToRecipients -recipients $recipients -NewDisplayName $NewDisplayName -SmtpServer $SmtpServer -ReportSender $ReportSender -ADReportCSV $UserADReportCSV -ExchangeReportCSV $UserExchangeReportCSV -DFSReportCSV $UserDFSReportCSV -ADReport $global:UserADReport #-DFSReport $global:UserDFSReport -ExchangeReport $global:UserExchangeReport
 
-    } elseif ($XMA.Ispresent){
+  }
+  elseif ($XMA.Ispresent) {
 
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending AD and Exchange reports on [$NewSAMAccountName] account"
 
     Send-SummaryToRecipients -recipients $recipients -NewDisplayName $NewDisplayName -SmtpServer $SmtpServer -ReportSender $ReportSender -ADReportCSV $UserADReportCSV -ExchangeReport $UserExchangeReportCSV -ADReport $global:UserADReport #-ExchangeReport $global:UserExchangeReport -DFSReport $UserDFSReportCSV -DFSReport $global:UserDFSReport  #TODO: Not valid for XMA currently
 
-    }
-      #endregion
+  }
+  #endregion
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmjeSfYCgILxGfLxzp/C0hak/
-# k7egggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUo4YNbHPX7if/VBfrDBFvCVi2
+# LgugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -478,11 +486,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUEQy53Jn1vEQNAlFMfrCQjYnPxO0wDQYJKoZI
-# hvcNAQEBBQAEggEArTbtpaGUrWy0uTtWNVXRqlHLdOWkzmLWWGju9E/JnsdiS102
-# haQ2Y2Bl6bDdozzts8bUnXJ2Ls77sJ5giV1At1OPdPotRHHRDzPKQOg6xiLeByjz
-# tRe0LmQVGob8o5DlZNciFhFrCuLLouGfZCKAYpiwSAI0Yl0TEc/8nBW44XnROQyB
-# nyKiQVZ2YI5JH3lHDNVyK/4QdjAgk5EMdtflC3s9dRKoTKy8sRbDj+/i6WpuMmm1
-# 9yHCSPRrMLOEFIHm0too/fwtGRaE6zsZz9SJyks4+aL2Wpjcz9xaXiQKENMb129D
-# ijZdl/tnxhbkJlUhri78mnebPeEDEQOcvOdmnQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU22ymUhOP+BYbVRXGpP1KxyLexrYwDQYJKoZI
+# hvcNAQEBBQAEggEAqVRilGtLET/DcqBoycrrJVf/LXXCNSsDHZiApaxanxEq9hA8
+# fxChyYcKkdX6/mmWxBPM78bZvubwTaQ8TY+lq/9t6cBUkRfcuS5oScIREPtXDqE6
+# tlvWut1nt3KUumJnBfElsfUYQOew6HeLBpZ1NZDcceiygTqjCbILJcVC/stsYPNP
+# 5a7qINz1Q5m0uoGcQIYXfZ2YjVPpNRG7oSkklvkAfIQXw+cWHkJ1TmNPI/VlPYlx
+# ZWYfTvOXUdxzTG10XSUDUVRpY4apBmZgRGFY0YgAVQL7H7yOLJjx0S2ux5ICY1rf
+# XwmOBqHY6OBybDATpCBSHvBQpcKaUxRs469XtA==
 # SIG # End signature block
