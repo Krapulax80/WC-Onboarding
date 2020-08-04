@@ -3,6 +3,9 @@ param (
 )
 # This is the script wrapper that should be called for the execution.
 
+## SET ERROR ACTION PREFERENCE FOR CONSISTENCY
+$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+
 ## CLEAR PREVIOUS ERRORS
 $Error.clear()
 
@@ -33,11 +36,12 @@ foreach ($f in $functions) {
 }
 # Transcript START
 $TranscriptFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
-$ErrorFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+$ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
 #      Start-Transcript -Path $TranscriptFile
 
-# Create today folder
+# Create today folders
 $Today = Get-date -Format ddMM
+[void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
 [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
 
 ## ONBOARDING PROCESS -
@@ -122,8 +126,8 @@ foreach ($I in $Inputfiles) {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPNcxz1euvSjOYM+XVyFZbYvf
-# iaGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUi0pz4aR4RghPGPLXHl+9VHXw
+# 6N2gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -190,11 +194,11 @@ foreach ($I in $Inputfiles) {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUY1MCfKBg/CrbMtNlYKzQ3x4MiZEwDQYJKoZI
-# hvcNAQEBBQAEggEAtnSIZBtaO/4R2WO/D0W2zcycJCiOXf9s9F0URBK+NfCoD/mv
-# 9vgCq2KNCJJyaF6FtLs92rVclgFeHY21S1Joq/2viVY0TQKOeQ663IuRCK8CImgK
-# 5EIOvKKsBOkCjObMDF8GEP3qOtGuSChH65aEn2D5I5eCG8z1iKInv8Ie72Y7nG7h
-# 9zczUhdLc3GDv8H5tRUDTYneKnnlXsauG9iooYuksOT8w9BzeUXqm4lcNVItn3Jr
-# 4qZXGjJtvafKArly7ZgRphxgEgVAvgmDnQNsGy9/9c/CPXpcnIz+/0MY8kj1PIEY
-# QgLnx18NTi7iO85pMV1qMiHh5z7Xnpesz7n4PA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUfMX+5JIQ/lyH5DkgdEr8enxnejYwDQYJKoZI
+# hvcNAQEBBQAEggEAYtuesQdgQya+ADVWFfErwsM4fEmGOugH/DV5MyPE137zU3L0
+# x/jC/hMHGxVv2+6J323hJ1ojwHbV6Y9u5wsgEJOGpQOBt+iFeY1ZMyD2685rdMD3
+# jB9i4/8mhoV9RKwwuEXjwtSXfxuE08rv7GFtcaupKFqPnPqONHAGlv4xN7J1Buvo
+# UIk4CVWxiVgwKQ1UMIA2C54FmFWJBnbBX5M1206ZMuoHrrafoSE6cn1Bgmym72am
+# bKE02m7ywZ4kxmVTbsMQTo6N2uMboUzMxEl3+xsMYAC3RqVfAHj3ZcYIRWVynpbW
+# QFnM0eXn6os0X1XKaWzfWv9WEz3xgoPpq/xy9g==
 # SIG # End signature block
