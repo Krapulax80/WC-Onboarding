@@ -1,116 +1,123 @@
+<#
+.SYNOPSIS
+  Short description
+.DESCRIPTION
+  Long description
+.EXAMPLE
+  Example of how to use this cmdlet
+.EXAMPLE
+  Another example of how to use this cmdlet
+#>
+
+[cmdletbinding(SupportsShouldProcess = $True)]
 [CmdletBinding()]
 param (
 )
-# This is the script wrapper that should be called for the execution.
-
-## SET ERROR ACTION PREFERENCE FOR CONSISTENCY
-$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
-
-## CLEAR PREVIOUS ERRORS
-$Error.clear()
-
-## SET UP THE ENVIRONMENT
-# Module importing
-Import-Module PSWriteColor -Verbose:$false
-Import-Module ActiveDirectory -Verbose:$false
-Import-Module ExchangeOnlineManagement -Verbose:$false
-# Collect work folders (names)
-$FunctionFolder = "Functions"
-$InputFolder = "Input"
-$OutputFolder = "Output"
-$ConfigFolder = "Config"
-$LogFolder = "Logs"; #$LogFolder = "$global:CurrentPath\$LogFolder"
-# Establish script location
-$CurrentPath = $null
-$global:CurrentPath = Split-Path -parent $PSCommandPath
-Set-Location $global:CurrentPath
-# Import input files to work on
-$Inputfiles = Get-ChildItem .\$InputFolder | Where-Object { $_.Name -like "*.csv" }
-# Import functions to work with
-$functions = Get-ChildItem .\$FunctionFolder
-foreach ($f in $functions) {
-  #Write-Host -ForegroundColor Cyan "Importing function $f"
-  if ($f -match ".ps1") {
-    . .\$FunctionFolder\$f
+  
+begin {  
+  ## SET ERROR ACTION PREFERENCE FOR CONSISTENCY
+  $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+  ## CLEAR PREVIOUS ERRORS
+  $Error.clear()
+  # Module importing
+  Import-Module PSWriteColor -Verbose:$false
+  Import-Module ActiveDirectory -Verbose:$false
+  Import-Module ExchangeOnlineManagement -Verbose:$false
+  # Collect work folders (names)
+  $FunctionFolder = "Functions"
+  $InputFolder = "Input"
+  $OutputFolder = "Output"
+  $ConfigFolder = "Config"
+  $LogFolder = "Logs"; #$LogFolder = "$global:CurrentPath\$LogFolder"
+  # Establish script location
+  $CurrentPath = $null
+  $global:CurrentPath = Split-Path -parent $PSCommandPath
+  Set-Location $global:CurrentPath
+  # Import input files to work on
+  $Inputfiles = Get-ChildItem .\$InputFolder | Where-Object { $_.Name -like "*.csv" }
+  # Import functions to work with
+  $functions = Get-ChildItem .\$FunctionFolder
+  foreach ($f in $functions) {
+    #Write-Host -ForegroundColor Cyan "Importing function $f"
+    if ($f -match ".ps1") {
+      . .\$FunctionFolder\$f
+    }
+  }
+  # Transcript START
+  $TranscriptFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+  $ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+  Start-Transcript -Path $TranscriptFile
+  # Create today folders
+  $Today = Get-date -Format ddMM
+  [void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
+  [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
+}
+  
+process {
+  ## ONBOARDING PROCESS -
+  # Announce start of the process
+  Write-Host #separator line
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 OF THE ONBOARDING PROCESS STARTED." -BackgroundColor Black
+  # Load the recipient file
+  $recipientCSV = ".\" + $ConfigFolder + "\" + "recipients.csv"
+  $recipients = Import-Csv $recipientCSV
+  # Load each (.csv) files in the input folder.
+  foreach ($I in $Inputfiles) {
+    $CSVImport = Import-CSV $($I.Fullname)
+    # Process each line of the CSV
+    foreach ($Line in $CSVImport) {
+      # Construct variables from the line contents
+      $Domain = $FirstName = $LastName = $EmployeeID = $TemplateName = $HolidayEntitlement = $EmployeeStartDate = $null
+      $Domain = $Line.Domain
+      $FirstName = $Line.FirstName
+      $LastName = $Line.LastName
+      $EmployeeID = $Line.EmployeeID
+      $TemplateName = $Line.TemplateName
+      $HolidayEntitlement = $Line.HolidayEntitlement
+      $EmployeeStartDate = $Line.StartDate
+      $EmployeeEndDate = $Line.EndDate
+      $ContractType = $Line.ContractType
+      $Manager = $Line.Manager
+      # Run against each line
+      # Pipe, if the workdomain is WestCoast
+      if ($Domain -match "WestCoast") {
+        # Load the config file
+        $configCSV = ".\" + $ConfigFolder + "\" + "westcoast.csv"
+        $config = Import-Csv $configCSV
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
+        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients
+        Write-Host
+      }
+      # Pipe, if the workdomain is XMA
+      elseif ($Domain -match "XMA") {
+        # Load the config file
+        $configCSV = ".\" + $ConfigFolder + "\" + "xma.csv"
+        $config = Import-Csv $configCSV
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
+        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients
+        Write-Host
+      }
+      # Pipe, if the domain is not within the expected values
+      else {
+        # # Manual feedback
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is invalid. Valid options are 'WESTCOAST and XMA'. " -ForegroundColor Red
+      }
+    }
+    # Reporting
+    Write-Host # separator line
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host  "[$timer] - Generating reports of the script run" -ForegroundColor Yellow
+    #Report on the input file
+    $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" + ($I.Name -replace ".csv", "_PROCESSED.csv")
+    #Remove the input file, now we processed it.
+    Remove-Item $($I.Fullname) -Force -ErrorAction SilentlyContinue
+    $CSVImport | Export-Csv $InputReport -Force
+    #Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
+    # Finally, discard the processed original input file
+    #Remove-Item -Path $($I.Fullname) -Force #-Whatif    
   }
 }
-# Transcript START
-$TranscriptFile = ".\" + $LogFolder + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
-$ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
-#      Start-Transcript -Path $TranscriptFile
-
-# Create today folders
-$Today = Get-date -Format ddMM
-[void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
-[void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
-
-## ONBOARDING PROCESS -
-# Announce start of the process
-Write-Host #separator line
-$timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 OF THE ONBOARDING PROCESS STARTED." -BackgroundColor Black
-
-# Load the recipient file
-$recipientCSV = ".\" + $ConfigFolder + "\" + "recipients.csv"
-$recipients = Import-Csv $recipientCSV
-
-# Load each (.csv) files in the input folder.
-foreach ($I in $Inputfiles) {
-  $CSVImport = Import-CSV $($I.Fullname)
-
-  # Process each line of the CSV
-  foreach ($Line in $CSVImport) {
-
-    # Construct variables from the line contents
-    $Domain = $FirstName = $LastName = $EmployeeID = $TemplateName = $HolidayEntitlement = $EmployeeStartDate = $null
-    $Domain = $Line.Domain
-    $FirstName = $Line.FirstName
-    $LastName = $Line.LastName
-    $EmployeeID = $Line.EmployeeID
-    $TemplateName = $Line.TemplateName
-    $HolidayEntitlement = $Line.HolidayEntitlement
-    $EmployeeStartDate = $Line.StartDate
-    $EmployeeEndDate = $Line.EndDate
-    $ContractType = $Line.ContractType
-    $Manager = $Line.Manager
-
-    # Run against each line
-    # Pipe, if the workdomain is WestCoast
-    if ($Domain -match "WestCoast") {
-      # Load the config file
-      $configCSV = ".\" + $ConfigFolder + "\" + "westcoast.csv"
-      $config = Import-Csv $configCSV
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-      Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients
-      Write-Host
-    }
-    # Pipe, if the workdomain is XMA
-    elseif ($Domain -match "XMA") {
-      # Load the config file
-      $configCSV = ".\" + $ConfigFolder + "\" + "xma.csv"
-      $config = Import-Csv $configCSV
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-      Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients
-      Write-Host
-    }
-    # Pipe, if the domain is not within the expected values
-    else {
-      # # Manual feedback
-      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is invalid. Valid options are 'WESTCOAST and XMA'. " -ForegroundColor Red
-    }
-  }
-
-  # Reporting
-  Write-Host # separator line
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host  "[$timer] - Generating reports of the script run" -ForegroundColor Yellow
-
-  #Report on the input file
-  $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" + ($I.Name -replace ".csv", "_PROCESSED.csv")
-  $CSVImport | Export-Csv $InputReport -Force
-  #Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
-
-  # Finally, discard the processed original input file
-  #Remove-Item -Path $($I.Fullname) -Force #-Whatif
-
+  
+end {
   # Transcript STOP
   #Stop-Transcript
   #Error logging
@@ -118,7 +125,6 @@ foreach ($I in $Inputfiles) {
   else { "[INFO] NO ERRORS DURING SCRIPT RUN" | Out-File $ErrorFile } # also send errors to a file
   #TODO: Check error logging
   #FIXME: Prevent error buildup
-
   # And cleanup the variables
   Variable-Cleanup -ErrorAction Ignore
 }
@@ -126,8 +132,8 @@ foreach ($I in $Inputfiles) {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUyfo9VUol6GEzmGUs31/F2jr5
-# 8jmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU09l/OGOfqYyqjBrgxvpzPfb3
+# 29KgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -194,11 +200,11 @@ foreach ($I in $Inputfiles) {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUUVGJTirzV2FwS0OKIS+vHy/a9DgwDQYJKoZI
-# hvcNAQEBBQAEggEAU/FvUarLcJ48LKUCPGcdjKfMDODa3Nt4AvNPKXFGfUPiUVPb
-# XZNV7vHSWRPlfbm/NuYQzLptgnq9U9Hs0xEICyiJdh2pgRmMwIGi+4tMLObldYBu
-# u9PYGOzY4u/iP+LdcDNDpKtP22wH6/OWsqzzof48e+QX4rQaLssQMvLIApTTpl/3
-# SemG5C4I+KYMf+Y0sArGyaMI7FTJoCoJyZlyvvVKHiqqyYRkxgL6JnYLgMt7lfOq
-# 1RKXXogoG9vTyysQr42WcF4SkMV/iPXB4JaAFUl0tjMcv33hjqV1VUEfpTysernS
-# DppNnoqNKaQsVj2XPJXLM+eT51MA1FEiHKWqtg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUj1wMcoicXwVhW5DtOSJDpabPf/wwDQYJKoZI
+# hvcNAQEBBQAEggEAku6jZoEOlhhIlolRB5XoII/+0lAjnaVrJyGy92F2IFjBW8ao
+# 7fWPac/inNAC/1hRaD4so4UqBqHi0wt3uU2+FQkcxzQoc218UAjWZ6/kT7fMr5cH
+# 6l2wfG2yQxYj1Ja8K5X37xoM29JxTxbgT4iQpe9NtXAVSTVua2PzlWtEDTWOFuAw
+# 1W5UQgnh2qlg4XLdYqAoT+Q2beIg7cDdC0iYjBZCWrIdvcmhLR0ipSphO/Ih5Izs
+# y/V8N5eHFs2Ia3rZeWHfLTdL401fZj1bttyE125XD7+aqfXPPgcY7LDZVweHUnJH
+# oRF6GwanyLts2AJPcjC6vy+RJO8QN7LU3gq/Eg==
 # SIG # End signature block
