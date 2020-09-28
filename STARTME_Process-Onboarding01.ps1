@@ -43,14 +43,14 @@ begin {
       . .\$FunctionFolder\$f
     }
   }
-  # Transcript START
-  $TranscriptFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
-  $ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
-  Start-Transcript -Path $TranscriptFile
   # Create today folders
   $Today = Get-date -Format ddMM
   [void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
   [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
+  # Transcript START
+  $TranscriptFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+  $ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+  Start-Transcript -Path $TranscriptFile
 }
   
 process {
@@ -128,12 +128,11 @@ end {
   # And cleanup the variables
   Variable-Cleanup -ErrorAction Ignore
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU09l/OGOfqYyqjBrgxvpzPfb3
-# 29KgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUevEKhIOt0moZ0CsYP/P39kq8
+# 2K+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -200,11 +199,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUj1wMcoicXwVhW5DtOSJDpabPf/wwDQYJKoZI
-# hvcNAQEBBQAEggEAku6jZoEOlhhIlolRB5XoII/+0lAjnaVrJyGy92F2IFjBW8ao
-# 7fWPac/inNAC/1hRaD4so4UqBqHi0wt3uU2+FQkcxzQoc218UAjWZ6/kT7fMr5cH
-# 6l2wfG2yQxYj1Ja8K5X37xoM29JxTxbgT4iQpe9NtXAVSTVua2PzlWtEDTWOFuAw
-# 1W5UQgnh2qlg4XLdYqAoT+Q2beIg7cDdC0iYjBZCWrIdvcmhLR0ipSphO/Ih5Izs
-# y/V8N5eHFs2Ia3rZeWHfLTdL401fZj1bttyE125XD7+aqfXPPgcY7LDZVweHUnJH
-# oRF6GwanyLts2AJPcjC6vy+RJO8QN7LU3gq/Eg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUoJEoCTpy2y2phZqQY0AHHNvJ1aowDQYJKoZI
+# hvcNAQEBBQAEggEAZuLWO6+MgmvDS3vcGb2T4yJUXhGOXsaU+WTYSVjFOoZdXcRR
+# nkHZbLHEIB0t9KbpgOLsPgBh0skn4vS6x3hsDG04PCpw3s+pch5GZsuGH8ANLOVl
+# Vok4TAl6qIR6kfLkm+sB7d8hUJ6DBxFOTZwOnGsa5lg3TFimEU314l7aRbFVRUKw
+# xWN4cxe4LTk07G4o+aX5CsFMci4jlGDmnw/CJd6B4xe/bF1qdc+4ASKjPcQXuGU4
+# NKuQsBDt5bVHMCQ59LjxZfb49EzI4e0hY61lsAAQDdJ/tTkWyAE+G1IhqJ7xt8JL
+# dc7iBRtm5wlUgrf92KAcGc9O8mcuI4bSd0NbhQ==
 # SIG # End signature block
