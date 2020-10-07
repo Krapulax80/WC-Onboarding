@@ -1,16 +1,16 @@
 function Create-NewDFS {
-[CmdletBinding()]
-param (
-    [Parameter(Mandatory=$true)] [String]
-    $NewSAMAccountName,
-    $PeopleDFS,
-    $PeopleTargetPath,
-    $ProfileDFS,
-    $ProfileTargetPath#,
-    # $DFSHost,
-    # [Parameter(Mandatory=$true)] [pscredential]
-    # $AD_Credential
-)
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)] [String]
+        $NewSAMAccountName,
+        $PeopleDFS,
+        $PeopleTargetPath,
+        $ProfileDFS,
+        $ProfileTargetPath#,
+        # $DFSHost,
+        # [Parameter(Mandatory=$true)] [pscredential]
+        # $AD_Credential
+    )
 
     # #Create the physical folders
     # if (!(Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue)){
@@ -23,21 +23,27 @@ param (
     #START
     
     # Create PEOPLE DFS folder
-    if (Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] already exists" -ForegroundColor Yellow
-    } else { # otherwise it is not existing yet
-    [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
-    [void] (New-DFSNFolder -Path $PeopleDFS -State Online -TargetPath $PeopleTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
+    if (Get-DFSNFolderTarget -Path $PeopleDFS -ErrorAction Ignore) {
+        # if the folder exists
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$PeopleDFS] already exists" -ForegroundColor Yellow
+    }
+    else {
+        # otherwise it is not existing yet
+        [void] (New-Item -Path $PeopleTargetPath -ItemType Directory -Force)
+        [void] (New-DFSNFolder -Path $PeopleDFS -State Online -TargetPath $PeopleTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$PeopleDFS] does not exist - creating"
     }
 
     # Create PROFILE DFS folder
-    if (Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction SilentlyContinue){ # if the folder exists
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] already exists" -ForegroundColor Yellow
-    } else { # otherwise it is not existing yet
-    [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
-    [void] (New-DFSNFolder -Path $ProfileDFS -State Online -TargetPath $ProfileTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
+    if (Get-DFSNFolderTarget -Path $ProfileDFS -ErrorAction Ignore) {
+        # if the folder exists
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] already exists" -ForegroundColor Yellow
+    }
+    else {
+        # otherwise it is not existing yet
+        [void] (New-Item -Path $ProfileTargetPath -ItemType Directory -Force)
+        [void] (New-DFSNFolder -Path $ProfileDFS -State Online -TargetPath $ProfileTargetPath -TargetState Online -ReferralPriorityClass globalhigh )
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - DFS folder [$ProfileDFS] does not exist - creating"
     }
 
 }
@@ -45,8 +51,8 @@ param (
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUm04D9yvAa2pFhuaidkvSH/JC
-# b96gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUngXfJCZKTebnxw445WmkTXBK
+# uoOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -113,11 +119,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUlYKKIjcHkpMD2W4ye+UyhbbAQ7AwDQYJKoZI
-# hvcNAQEBBQAEggEAFBWW6YwrBwIAa94lTh4Pe0TKQTYXfjUAFMIGLJdRNAvlQjic
-# Q0r9LBTSI/nYy1FKXS3HNPPtVTvos9dLFDInUhVKkDXJRJTBZwxoW9TaelKVj9SU
-# K1gRehN1pL+JNZtOpNk/iLXpasZbYW14LzRn7Civj4fdC1J6mTStHUD+IGsIB0F/
-# MAE61aS4ZIBLHcRJZjL1psS6/9SfGPEspjCfuubJHA2koML/2jH+o6G1TBo5CXSc
-# UBYaQNihg9zic8B7hiUjwP8tI7W+7gOsgHn6Nmz11tW3eG8NP1fEyuEOwIyV7QnF
-# VNIUaVyE6TiXaqcnvq1xL0aARsVT7HcTB+pvGg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUd0QJ+DJ4evvTdhCBvskSbxnA+/cwDQYJKoZI
+# hvcNAQEBBQAEggEA8B35r2xTjjADDsvMfskE1MsAf1WbOQ31GH7mQLs2wZHPuklY
+# GN8UyUFbtaGhS5l9UOw2KPCwwgzRrF+17POwJ44SX+6sCIKOGkDvrzYPgtasslw+
+# m14CnBRoE7oalzN2NpraxONASu0pTlKDM3hgbYqNLziLoODBj96k9vZWTjyLSyxF
+# fsYrrmokmydJPnJk4QhCuo0cTUY5UdckBimM6r6IR+b7KojC90M+DiNLVlkodYUP
+# 3AhIVQ0S55I5NR5GW4Db5Nm04zo8jvY16Rj+yWfQOagMXNcJePLCzqDQKTgWXXBO
+# Ahgi2wW3VPz1rypxBgJI06KEatzcgPXELR7JPA==
 # SIG # End signature block

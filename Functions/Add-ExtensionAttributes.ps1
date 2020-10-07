@@ -1,81 +1,46 @@
-function Generate-UserExchangeReport {
-  [CmdletBinding()]
-  param (
-    [Parameter(Mandatory = $true)] [string]
-    $NewSAMAccountName,
-    [Parameter(Mandatory = $true)] [string]
-    $Flag,
-    $SystemDomain,
-    [Parameter(Mandatory = $true)] [pscredential]
-    $AAD_Credential,
-    [Parameter(Mandatory = $true)] [pscredential]
-    $Exchange_Credential
-  )
+function Add-ExtensionAttributes {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)] [psobject]
+        $TemplateUser,
+        [Parameter(Mandatory=$true)] [string]
+        $NewSAMAccountName,
+        $DC,
+        [Parameter(Mandatory=$true)] [pscredential]
+        $AD_Credential
+    )
 
-  #region USER REPORT
-  # Gather mailbox report
-  if ($Flag -match "online") {
-    Get-PSSession | Remove-PSSession
-    Connect-OnlineExchange -AAD_Credential $AAD_Credential
-  }
-  elseif ($Flag -match "onprem") {
-    Get-PSSession | Remove-PSSession
-    Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
-  }
-  do {
-    if ($SystemDomain -match "xma.co.uk") {
-      $delay = 180
-    }
-    elseif ($SystemDomain -match "westcoast.co.uk") {
-      $delay = 120
-    }
-    else {
-      $delay = 120
-    }
-    [void] ($FreshMailbox = Get-mailbox $NewSAMAccountName -ErrorAction SilentlyContinue | Select-Object  *)
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in $delay second!" -ForegroundColor Yellow
-    Start-Sleep $delay
-  }
-  until ($FreshMailbox)
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Found mailbox of [$NewSAMAccountName]. Continuing"
+    
+        $companyCodeAttribute = $TemplateUser.extensionAttribute5
+        if ($companyCodeAttribute){
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting company code [$companyCodeAttribute] on [$NewSAMAccountName]"
+            Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute5 = $companyCodeAttribute } -Server $DC -Credential $AD_Credential
+        } else {
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Warning "[$timer] - Template user had no company code (extensionattribute5). Can not configure this  on [$NewSAMAccountName]"
+        }
 
-  # Create report object
-  $global:UserExchangeReport = $null
-  $global:UserExchangeReport = @()
-  $Obj = $null ; $Obj = New-Object -TypeName PSObject
+        $countryCodeAttribute = $TemplateUser.extensionAttribute6
+        if ($companyCodeAttribute){
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting country code  [$countryCodeAttribute] on [$NewSAMAccountName]"
+            Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute6 = $countryCodeAttribute } -Server $DC -Credential $AD_Credential
+        } else {
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Warning "[$timer] - Template user had no country code (extensionattribute6). Can not configure this  on [$NewSAMAccountName]"            
+        }
 
+        $companyCodeShortAttribute = $TemplateUser.extensionAttribute7
+        if ($companyCodeAttribute){
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Setting Country Code  [$companyCodeShortAttribute] on [$NewSAMAccountName]"
+            Set-ADUser -Identity $NewSAMAccountName -Add @{ extensionAttribute7 = $companyCodeShortAttribute } -Server $DC -Credential $AD_Credential  
+        } else {
+            $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Warning "[$timer] - Template user had no (short) company code (extensionattribute7). Can not configure this  on [$NewSAMAccountName]"             
+        }
 
-  # Display report
-  Write-Host # separator line
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] -  (SUMMARY - EXCHANGE) Created mailbox [$($FreshMailbox.DisplayName)]:" -ForegroundColor Magenta
-  Write-Host "Mailbox Name        : $($FreshMailbox.Name)" ; $Obj | Add-Member -MemberType NoteProperty -Name MailboxName -Value $($FreshMailbox.Name)
-  Write-Host "Primary Address     : $($FreshMailbox.PrimarySMTPAddress)" ; $Obj | Add-Member -MemberType NoteProperty -Name PrimarySMTPAddress -Value $($FreshMailbox.PrimarySMTPAddress)
-  $x = 1
-  foreach ($EmailAddress in $($FreshMailbox.EmailAddresses)) {
-    if ($EmailAddress -notlike "X500*") {
-      # filter out technical addresses
-      $Name = "AdditionalEmail" + "[" + $x + "]"
-      Write-Host "$Name               : $EmailAddress" ; $Obj | Add-Member -MemberType NoteProperty -Name $Name -Value $EmailAddress
-      $x++
-    }
-  }
-  $FreshAccount = $FreshMailbox = $null
-
-  # Generate CSV report
-  $global:UserExchangeReport += $Obj
-  $global:UserExchangeReportConverted =
-  $global:UserExchangeReport |
-  Get-Member -MemberType NoteProperty |
-  Select-Object @{name = 'Name'; expression = { $_.name } },
-  @{name = 'Value'; expression = { ($($global:UserExchangeReport)).($_.name) } } |
-  ConvertTo-Csv
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUSIdznTCaeBSKu2KhZg1FHT9Q
-# etCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpC0cUDafoRJIBPNdr0RvvP9C
+# gnGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -142,11 +107,11 @@ function Generate-UserExchangeReport {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUNCHvMXylCEzi/6zwIgMETKGvAZAwDQYJKoZI
-# hvcNAQEBBQAEggEA1ZVI8qXhWPAHRPlwA3+3/sBQyXpTi0sQlg0E5cwNFBdtiwIc
-# ooebwHWrV3f1z5rmLZhKrMbbL4aZUBE2zlQoRL+R6OKg1ZwYM+ncfASqqfnzC337
-# IMVSdL2A6oMYBH9vvZqwGF3ROrvKI41PTv5ufg52S67Ug76HwTtNujj00291AcXL
-# 9EdgM8kW71tLv9UQfaqc9Q97POPsuAwsSCfXiLifoPsz9F6CXY3ZrY/6TCslWMVA
-# kYRkb07eDMhKKhK+4wMhOMSenBSYlNIARQigfz0E5Hd4qm2l5BSv1xjxNPKiEGtC
-# cx37fOGnXQR9Z1tJuchpQramAszOE/UZ3Sp4Vw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUgYQKszhHqVsuOKth0eo3zmmn0dowDQYJKoZI
+# hvcNAQEBBQAEggEAy9wuI5c1RAPgJEeFaIxpDahXFMticwIHfyrtjuessIGYDMeH
+# dzdnJvZEB8QaQa+vpC2LKNACpvLU2vxrwv6i3dXKMBBsf2ax6uv6QnhqYI/jrXgz
+# o/W6myZaDvNIEuLEn5tUdybOs9wjN1jmAzUhIWKfGT1P0gTeafpmoSZAdtUUkVup
+# VoJrYfVcz/Y1lym+jEf6kn8NdUEOnC+GNgokf/ouuRyI615qQBwWoOVlbUVnty/y
+# DLY43PaRfy1CE2fdc18B0OHNsY411/jmWHeoxR/Wt1s38HwAQZOtjADfYHADo0DD
+# UP12Nj7kIY3ls1TqJDDuj3Zad8+ibZzxtyPSbA==
 # SIG # End signature block

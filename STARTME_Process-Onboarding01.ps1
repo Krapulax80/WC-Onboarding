@@ -44,7 +44,7 @@ begin {
     }
   }
   # Create today folders
-  $Today = Get-date -Format ddMM
+  $Today = Get-date -Format yyyyMMdd
   [void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
   [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
   # Transcript START
@@ -131,8 +131,8 @@ end {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUevEKhIOt0moZ0CsYP/P39kq8
-# 2K+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUka75TeGfEWzQXUEPTGhB1akR
+# OxigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -199,11 +199,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUoJEoCTpy2y2phZqQY0AHHNvJ1aowDQYJKoZI
-# hvcNAQEBBQAEggEAZuLWO6+MgmvDS3vcGb2T4yJUXhGOXsaU+WTYSVjFOoZdXcRR
-# nkHZbLHEIB0t9KbpgOLsPgBh0skn4vS6x3hsDG04PCpw3s+pch5GZsuGH8ANLOVl
-# Vok4TAl6qIR6kfLkm+sB7d8hUJ6DBxFOTZwOnGsa5lg3TFimEU314l7aRbFVRUKw
-# xWN4cxe4LTk07G4o+aX5CsFMci4jlGDmnw/CJd6B4xe/bF1qdc+4ASKjPcQXuGU4
-# NKuQsBDt5bVHMCQ59LjxZfb49EzI4e0hY61lsAAQDdJ/tTkWyAE+G1IhqJ7xt8JL
-# dc7iBRtm5wlUgrf92KAcGc9O8mcuI4bSd0NbhQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUe+HSyXYuapVCYN4NYedsEe92V1owDQYJKoZI
+# hvcNAQEBBQAEggEAGWBnq2ylrIgrwdSk5guW96mbJrXzQK3j4QomZURtsbMheR65
+# piJb6NehxaNFJA3nHSQNgm2GtKynu58v3p3kmGKyhxsERVmepG4jKh1ov5OiFuJq
+# OYeHMS0/yXZo7d1cLsRNfrS5XRBzWFaFZOUNbUlDiyvhsG0W+Y0mBgtWF3HL0crz
+# FCbtXQvdGVkwL2llHL0IDAK7K7C6EP4srxt9ku5C5BWtx29G+1y9f/1WjWHSaEBd
+# CBC9pC3EpQzdDmVpSXF6x+Qi7xrxsUfC16qQVH5mQqCef2C9TCrz+z/6zuTKUzr+
+# qRHCunlCftEZhacKKFgePpOjIBVHayodjxJsEg==
 # SIG # End signature block

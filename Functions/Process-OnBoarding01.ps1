@@ -187,6 +187,9 @@ function Process-OnBoarding01 {
     Add-ContractType -ContractType $ContractType -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
   }
 
+  # Add various extension attributes
+  Add-ExtensionAttributes -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
+
   # Mirror ALL GROUP MEMBERSHIP of the template account to the new user
   Add-ToTemplatesGroups -TemplateUser $TemplateUser -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential
 
@@ -418,8 +421,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUo4YNbHPX7if/VBfrDBFvCVi2
-# LgugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuIpMLCQiuYITglBT/3R5pD+9
+# tAmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -486,11 +489,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU22ymUhOP+BYbVRXGpP1KxyLexrYwDQYJKoZI
-# hvcNAQEBBQAEggEAqVRilGtLET/DcqBoycrrJVf/LXXCNSsDHZiApaxanxEq9hA8
-# fxChyYcKkdX6/mmWxBPM78bZvubwTaQ8TY+lq/9t6cBUkRfcuS5oScIREPtXDqE6
-# tlvWut1nt3KUumJnBfElsfUYQOew6HeLBpZ1NZDcceiygTqjCbILJcVC/stsYPNP
-# 5a7qINz1Q5m0uoGcQIYXfZ2YjVPpNRG7oSkklvkAfIQXw+cWHkJ1TmNPI/VlPYlx
-# ZWYfTvOXUdxzTG10XSUDUVRpY4apBmZgRGFY0YgAVQL7H7yOLJjx0S2ux5ICY1rf
-# XwmOBqHY6OBybDATpCBSHvBQpcKaUxRs469XtA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU9SlfifWCo3zXg80955CbnVvPzoAwDQYJKoZI
+# hvcNAQEBBQAEggEA3IkLtLev+noYChV8mDS47Uq2+7WfS/njNCANFCz3u0lNTNYq
+# eAajvoeZmVSna7PLYe2zeZpP1U1/7CrCfOMbphpyfzcpTWmQQI4vjBrJWgzmQYth
+# BX2fHecihmoFVtweTP+9vG89WEGHCKKqRI0qo3a+EoARwKfup0UVu+H50ayd9WdV
+# JnIXDqwtQoVsGt8uCdDgzZWVDhej8e08Pzb6H20WWHcLxy6T8fD2AZ8uDS7YDlMc
+# e3QM7UmugUZcSupZs1AyZj2bTkvvBNPmZnOFJNK1lHz67z7LQdPfHMkVeAXXx8Ee
+# 1dV4deodRSSS1GpT2eB3CC5j5HTNK65YQqLc3Q==
 # SIG # End signature block

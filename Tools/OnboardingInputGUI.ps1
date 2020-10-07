@@ -483,7 +483,7 @@ begin {
         UserPrincipalName: $($FName.text + "." + $LName.text + "@" + $global:WorkDomain + ".co.uk")`n
         Employee ID: $($EmpID.text)`n
         -----------------------------------------------
-        SETTINS
+        SETTINGS
         -----------------------------------------------
         (template will be used for cloning; `n
         manager will be added as the manager `n
@@ -760,7 +760,7 @@ process {
         })
 
     $PickEndDate.Add_Click( {
-            $global:SelectedStartDate = StartDatePicker
+            # $global:SelectedStartDate = StartDatePicker
             $global:SelectedEndDate = EndDatePicker
         })        
 
@@ -831,8 +831,8 @@ end {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULiiSoo77wc/Nj8bdS2czFDFv
-# V8+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUgosgaaQ6lgS7e66ArBvvdXZf
+# MfWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -899,11 +899,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU8OaaDxYJs+FHZ0Sd80ssYnq5jPUwDQYJKoZI
-# hvcNAQEBBQAEggEApHhjWI1aD2nyWRQhD8p3DwfNnhRPOg1RcHwwSnLoTpBhedQM
-# ik5M7LjqqeX4l1m3+GVJFc6WYGHG5N8Iy4lmf3KzR2+ECpbFUpYv/P4pObuIYc9c
-# Igc6txoPTeRF/i5jyRh/60dEbuiiSpm9glp3CK9OVc75AOKZSELt0Ig4LL2V4Lho
-# 7S10jEvlqIXR9ro3tssUp0KoQoE0B66lKm1JGN51S9lC88D9YHzpQMdf49I6iT4y
-# 3gRU9rGK4CsRuI9EldKqw9sEdmVuSwQCJfsiI8EM/B36mIJWqy8Oycmra6h28y5e
-# UzgKfjEPjXWzrYJiIuEvk/2RCY3P8Za5c2rwZg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUBCXcC5Mh9Fxz3kSAApsLaxhj4skwDQYJKoZI
+# hvcNAQEBBQAEggEAxKsVZLG9lUE8scf1IwyvHcfk2ICs98dpIOCJq8k44T0hfuDG
+# sJn8s5sJ+sHpmBLik3e+lex/TTOzqffdofXbV1Z3yg1KkhOACu08NHBFe/3te275
+# WGBenG0rVHrk9i2dA0mQxMJrglBZWWfzzSviQMYGO13G/eBuEUXKBN3YacY7dLKK
+# e6tv44j2LA9e1YwMb18ThrFWxUis7XqxBc/UbNSTI/ouZ8CnT1mPSdj0u28AWvAe
+# ImXgNmM3/uhERqq8CD4Ask85KOIT7GIwVtUjKYdnFaKF8gswZ1mFhtj/L9qGjXe1
+# Y8m9gA9zv5NS0V0YR5YFrN2VliXUxKDQry0pVw==
 # SIG # End signature block
