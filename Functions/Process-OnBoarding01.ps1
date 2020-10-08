@@ -83,6 +83,8 @@ function Process-OnBoarding01 {
 
   # Capitalise first and last name of the NEW user account
   $TextInfo = (Get-Culture).TextInfo
+  $FirstName = $FirstName.ToLower()
+  $LastName = $LastName.ToLower()
   $FirstName = $TextInfo.ToTitleCase($FirstName)
   $LastName = $TextInfo.ToTitleCase($LastName)
 
@@ -111,7 +113,7 @@ function Process-OnBoarding01 {
 
   # Create new password for the NEW user account
   Add-Type -AssemblyName System.Web
-  $NewPassword = [System.Web.Security.Membership]::GeneratePassword(12, 4)
+  $NewPassword = [System.Web.Security.Membership]::GeneratePassword(10, 2)
 
   # Check if the SAM Account Name  already exists. If it does, create a unique one
   if (! (Get-ADUser -Filter { SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ) {
@@ -421,8 +423,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuIpMLCQiuYITglBT/3R5pD+9
-# tAmgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUkbfS9zLKogrLXtUGLs+7k8Mi
+# roqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -489,11 +491,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU9SlfifWCo3zXg80955CbnVvPzoAwDQYJKoZI
-# hvcNAQEBBQAEggEA3IkLtLev+noYChV8mDS47Uq2+7WfS/njNCANFCz3u0lNTNYq
-# eAajvoeZmVSna7PLYe2zeZpP1U1/7CrCfOMbphpyfzcpTWmQQI4vjBrJWgzmQYth
-# BX2fHecihmoFVtweTP+9vG89WEGHCKKqRI0qo3a+EoARwKfup0UVu+H50ayd9WdV
-# JnIXDqwtQoVsGt8uCdDgzZWVDhej8e08Pzb6H20WWHcLxy6T8fD2AZ8uDS7YDlMc
-# e3QM7UmugUZcSupZs1AyZj2bTkvvBNPmZnOFJNK1lHz67z7LQdPfHMkVeAXXx8Ee
-# 1dV4deodRSSS1GpT2eB3CC5j5HTNK65YQqLc3Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU6m5ko5Py6V612ycCFKpi0CkOhzIwDQYJKoZI
+# hvcNAQEBBQAEggEAhFv0c6He85HPIQ179tdxuc7wlfLjkoAQKi8MuE8W5GNLygFp
+# Zt5S0AVNM9XmkqAHAs//1C1kkYZ1jdQSi5geZNaRQPUG+mh1+E6Q8gRt6H+kqQ/u
+# u2TanNSUFS4eEUbcofJzFlFj6UFa/J77GXzY3CrNadrT4AoqlnBlvYpZDQUOClAR
+# 65bgof9dbsdmjsqcJhviSBMpJ2mZWdKzh0vL8RfuTM0OAJee9/L4JUn4h5q/OA5+
+# Drbhbu7gdLFFMgQDE7KfMgqTF2q8XN7zvynZWBG1pT4N5P35mahmXkX4VJIWRBYa
+# /KsGunq9O/ONAIPURjLdi33YSMI7p4BQzpz2Sg==
 # SIG # End signature block
