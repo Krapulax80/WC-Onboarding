@@ -1,31 +1,31 @@
 
-function Send-PasswordToManager  {
-[CmdletBinding()]
-param (
-    [Parameter(Mandatory=$true)] [string]
-    $Manager,
-    $NewPassword,
-    $NewSAMAccountName,
-    $NewDisplayName,
-    $SystemDomain,
-    $SmtpServer,
-    $ReportSender,
-    $DC,
-    $ComputerUsagePolicy,
-    [Parameter(Mandatory=$false)] [string]
-    $MFAGuide,
-    [Parameter(Mandatory=$true)] [PSCredential]
-    $AD_Credential,
-    [Parameter(Mandatory=$false)] [switch]
-    $WestCoast,
-    [Parameter(Mandatory=$false)] [switch]
-    $XMA
+function Send-PasswordToManager {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)] [string]
+        $Manager,
+        $NewPassword,
+        $NewSAMAccountName,
+        $NewDisplayName,
+        $SystemDomain,
+        $SmtpServer,
+        $ReportSender,
+        $DC,
+        $ComputerUsagePolicy,
+        [Parameter(Mandatory = $false)] [string]
+        $MFAGuide,
+        [Parameter(Mandatory = $true)] [PSCredential]
+        $AD_Credential,
+        [Parameter(Mandatory = $false)] [switch]
+        $WestCoast,
+        [Parameter(Mandatory = $false)] [switch]
+        $XMA
 
 
-)
+    )
 
-$TextEncoding = [System.Text.Encoding]::UTF8
-$EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the email."
+    $TextEncoding = [System.Text.Encoding]::UTF8
+    $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the email."
 
     #Find manager's email address
     $MangerEmail = (Get-ADUser $Manager -Properties EmailAddress -Server $DC -Credential $AD_Credential).EmailAddress
@@ -33,7 +33,7 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 
     #Construct Password Email Body
     $EmailBody =
-        "
+    "
             <font face= ""Century Gothic"">
             Dear $MangerDisplayName,
             <p> We have created the following user: <span style=`"color:blue`">" + " $NewDisplayName " + "</span> <br>
@@ -62,9 +62,10 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 
     #Send email
     if ($WestCoast.IsPresent) {
-    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  -Attachments $MFAGuide # -ErrorAction SilentlyContinue
-    } elseif ($XMA.IsPresent) {
-    Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding -Attachments $MFAGuide #-ErrorAction SilentlyContinue
+        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  -Attachments $MFAGuide # -ErrorAction SilentlyContinue
+    }
+    elseif ($XMA.IsPresent) {
+        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding -Attachments $MFAGuide #-ErrorAction SilentlyContinue
     }
 
 
@@ -73,8 +74,8 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUokS0kAOVgFyHPe133TkfTfjY
-# dbOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUue6dJaXq9S/erLXsWnxh+fzf
+# RhegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -141,11 +142,11 @@ $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU0JEwZ5jUn6mVktlrA8O9r1uDlXMwDQYJKoZI
-# hvcNAQEBBQAEggEAw0HMc7qu47yD0B+ng94PMquI8q31AYEd5C5WIrARWydcTikR
-# snau/5RcmnhyXSQ3bPF1LmS/yrBCZ0mJeJnb50pLYEnsSTGrYFkxPVyNjMuRJke3
-# 4ZihxgQz3EiPyVAuX9EtQmwT8mprX5pb74kpqXQWzY5ychjTkka2cbs2LzUA39th
-# OnIcmyTUIb94pYHKt5qmvqjmGVpDlKXU9NpwbA2tK+7Q7QbdND6vjC/3rVAj2Mry
-# e4xaYl1oUpC0wjttPujVCrycHYBTrBkz1WR5shD8KKfORt7f8GJlc1YwRjuNJt1v
-# am2BdMWKTL4zqLAuwZIe9aZOJNE6kbX80uoEsg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5o4JpUragJwgwPfLbq2UVT/IMiAwDQYJKoZI
+# hvcNAQEBBQAEggEAYQ9wNbnmS1gCd2PezmUDCxt7mQW0TrdBlUn+VKuocJbVOKkV
+# OuAoWH2dFPjbseu48ADk2cSTxyB/f1acQQ3xSzXggsNbmFf/1ngCb4ZJJ3DxjOOJ
+# 9FPS1dmeTw8GYuLDylPEBPL/TS4cB5j9QP4R0VA+51IGmMG0cp104pEk8IcVkqJd
+# 1vofVKz0D2xvcYgyLIGRvqx6FSz2DkyxChBORpTpGUnZd5ynFdaZhRV9H/Jor/re
+# la6/tHHI8GPJKxM5QT1gDTgKRmUA7YI6ZlpCNawzs3gF17oRhb9JXz+mIlUOOCg/
+# vbtPdLyJJqv47J95zjmmRAzzTEXe/Q13pd/b0g==
 # SIG # End signature block

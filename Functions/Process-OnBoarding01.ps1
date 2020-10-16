@@ -225,30 +225,6 @@ function Process-OnBoarding01 {
     $secondarySMTP = $global:secondarySMTP
   }
 
-  # Set the new secondary SMTP on the AD object
-  try {
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] "
-    Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP) } -Server $DC -Credential $AD_Credential # this is done in AD
-  }
-  catch {
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
-  }
-
-  # (For non-UK users only)
-  # For non-UK users set the primary SMTP to their relevant COUNTRY DOMAIN (eg. westcoast.ie)
-  if ($UserDomain -ne $Systemdomain) {
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Non-UK user detected. Modifying SMTP addresses."
-    #Create old (ToRemove) SMTP and new (ToAdd) SMTP
-    $NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
-    $OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
-    $NewSEcondarySMTP = $OldPrimarySMTP -replace "SMTP:", "smtp:"
-    #Update primary SMTP if needed
-    Set-ADUser $NewSAMAccountName -remove @{ProxyAddresses = $OldPrimarySMTP } -Server $DC -Credential $AD_Credential
-    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewPrimarySMTP } -Server $DC -Credential $AD_Credential
-    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewSEcondarySMTP } -Server $DC -Credential $AD_Credential
-    # Update mail address if needed
-    Set-ADUser -Identity $NewSAMAccountName -Replace @{mail = ($NewSAMAccountName + "@" + $UserDomain) } -Server $DC -Credential $AD_Credential
-  }
   #endregion
 
   #region Create the NEW MAILBOX
@@ -263,7 +239,7 @@ function Process-OnBoarding01 {
     Create-OnPremMailbox -EOTargetDomain $EOTargetDomain -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
     $Flag = "onprem"
   }
-  #endregion
+  #endregion 
 
   ## AD & AAD Syncronisation
   <# This syncornisation is needed in order for AAD to be aware of the new AD account so that it can be licensed
@@ -348,6 +324,49 @@ function Process-OnBoarding01 {
   }
   #endregion
 
+  #region NON-UK mailboxes
+  # Set the new secondary SMTP on the AD object
+  try {
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName] "
+    Set-ADUser $NewSAMAccountName -Add @{ ProxyAddresses = ($secondarySMTP) } -Server $DC -Credential $AD_Credential # this is done in AD
+  }
+  catch {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Failed to add secondary SMTP [$secondarySMTP] added on [$NewSAMAccountName]" -ForegroundColor Red
+  }
+
+  # (For non-UK users only)
+  # For non-UK users set the primary SMTP to their relevant COUNTRY DOMAIN (eg. westcoast.ie)
+  if ($UserDomain -ne $Systemdomain) {
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Non-UK user detected. Modifying SMTP addresses."
+    #Create old (ToRemove) SMTP and new (ToAdd) SMTP
+    $NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
+    $OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
+    $NewSecondarySMTP = $OldPrimarySMTP -replace "SMTP:", "smtp:"
+    #Update primary SMTP if needed
+    Set-ADUser $NewSAMAccountName -remove @{ProxyAddresses = $OldPrimarySMTP } -Server $DC -Credential $AD_Credential
+    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewPrimarySMTP } -Server $DC -Credential $AD_Credential
+    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewSecondarySMTP } -Server $DC -Credential $AD_Credential
+    # Update mail address if needed
+    Set-ADUser -Identity $NewSAMAccountName -Replace @{mail = ($NewSAMAccountName + "@" + $UserDomain) } -Server $DC -Credential $AD_Credential
+    Set-ADUser -Identity $NewSAMAccountName -EmailAddress ($NewSAMAccountName + "@" + $UserDomain) -Server $DC -Credential $AD_Credential
+
+    Write-Host #lazy line break
+    Write-Host "___________________________________________________"
+    Write-Host #lazy line break
+    Write-Host "Final mailbox parameters:" -ForegroundColor Cyan
+    Start-Sleep -Seconds 5
+    Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential | Select-Object Name, UserPrincipalName, mail, EmailAddress, proxyaddresses | Format-List
+    Write-Host "___________________________________________________"
+    Write-Host #lazy line break
+  }
+  #endregion
+
+  #region SYNC
+  Get-ADSync -DC $DC -AD_Credential $AD_Credential
+  Start-Sleep 30 # allow AD sync to finish
+  Get-AADSync -AD_Credential $AD_Credential
+  #endregion
+
   ## USER REPORTING
 
   #region USER REPORT
@@ -423,8 +442,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUkbfS9zLKogrLXtUGLs+7k8Mi
-# roqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYJ4pzVg3qKaYSKEJu7BSq4oC
+# c5WgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -491,11 +510,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU6m5ko5Py6V612ycCFKpi0CkOhzIwDQYJKoZI
-# hvcNAQEBBQAEggEAhFv0c6He85HPIQ179tdxuc7wlfLjkoAQKi8MuE8W5GNLygFp
-# Zt5S0AVNM9XmkqAHAs//1C1kkYZ1jdQSi5geZNaRQPUG+mh1+E6Q8gRt6H+kqQ/u
-# u2TanNSUFS4eEUbcofJzFlFj6UFa/J77GXzY3CrNadrT4AoqlnBlvYpZDQUOClAR
-# 65bgof9dbsdmjsqcJhviSBMpJ2mZWdKzh0vL8RfuTM0OAJee9/L4JUn4h5q/OA5+
-# Drbhbu7gdLFFMgQDE7KfMgqTF2q8XN7zvynZWBG1pT4N5P35mahmXkX4VJIWRBYa
-# /KsGunq9O/ONAIPURjLdi33YSMI7p4BQzpz2Sg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1NA0OXg+sTmr8xR3Dr+V22RicAcwDQYJKoZI
+# hvcNAQEBBQAEggEAp+dZ+DHjLPoNThd3RFiIOrDfOYSj11vRiN/HnEolbGxMgXDO
+# 9v6O5QsMkpS+J/TibAOUnYFxq8CVl6H3FPSSBmVzyYJ8XXUiEJ/9pGYFoJmpFv80
+# anae+VxedFY796wS00ifeOQUu/XdPCF3CfwD2dyLK5tXteD0w+wDQsfT5qg8qPCq
+# 89So3IDj3xv5nXmqGU5qBBmhjWPdiJemPmboHhUR0nNLJFxX5t4QlD5K329rLMHm
+# svqx8Em2AF6AFoMdhbdus4r2eA86mqt+E3+0jO3nvA/PNg0vXi80txkIRv9hlj0z
+# rH1ozMRSC9t437Af5GwOWz741mZzJKiWG0Zv9g==
 # SIG # End signature block

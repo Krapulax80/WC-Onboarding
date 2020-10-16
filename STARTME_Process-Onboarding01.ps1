@@ -45,8 +45,8 @@ begin {
   }
   # Create today folders
   $Today = Get-date -Format yyyyMMdd
-  [void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
-  [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction SilentlyContinue)
+  [void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction Ignore)
+  [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction Ignore)
   # Transcript START
   $TranscriptFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
   $ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
@@ -109,7 +109,7 @@ process {
     #Report on the input file
     $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" + ($I.Name -replace ".csv", "_PROCESSED.csv")
     #Remove the input file, now we processed it.
-    Remove-Item $($I.Fullname) -Force -ErrorAction SilentlyContinue
+    Remove-Item $($I.Fullname) -Force -ErrorAction Ignore
     $CSVImport | Export-Csv $InputReport -Force
     #Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
     # Finally, discard the processed original input file
@@ -131,8 +131,8 @@ end {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUka75TeGfEWzQXUEPTGhB1akR
-# OxigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmw6pbdiZ+R0K/KeFXNx9i8/L
+# XJygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -199,11 +199,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUe+HSyXYuapVCYN4NYedsEe92V1owDQYJKoZI
-# hvcNAQEBBQAEggEAGWBnq2ylrIgrwdSk5guW96mbJrXzQK3j4QomZURtsbMheR65
-# piJb6NehxaNFJA3nHSQNgm2GtKynu58v3p3kmGKyhxsERVmepG4jKh1ov5OiFuJq
-# OYeHMS0/yXZo7d1cLsRNfrS5XRBzWFaFZOUNbUlDiyvhsG0W+Y0mBgtWF3HL0crz
-# FCbtXQvdGVkwL2llHL0IDAK7K7C6EP4srxt9ku5C5BWtx29G+1y9f/1WjWHSaEBd
-# CBC9pC3EpQzdDmVpSXF6x+Qi7xrxsUfC16qQVH5mQqCef2C9TCrz+z/6zuTKUzr+
-# qRHCunlCftEZhacKKFgePpOjIBVHayodjxJsEg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5ZOPMFubnGKwQ7W97ufwvEIs1CMwDQYJKoZI
+# hvcNAQEBBQAEggEAUilSUTZC2LOY/FKvXlACTL9xNdtKXL+pBAPZG0WhU5SYfCta
+# p4lvbJP+ioe6gO/qCthM/jfTIO5RkWs56usafwOGcl+NO14UT0VmHn/h5Xym98yg
+# urMSZA0j3J2xNaUf+D0CLU95HZYZHElcS8tW30rhWT2x+p0mqrOFoDMjUiAFe65v
+# 3J4Y2punzar2o8SrLJ+1h+WopJmPJmsf51KnzuShzWZSmRw/lP2b91ZI+N4SBKUA
+# 6Z98yvvUH3SAWb82Jonc+Ku7iacgrSELYsC83Z8lZ3amRltDI1i9Gjz6OiitZMP6
+# 1AbOGQ4vdW+0ABa+onXZVNYM0gOHsjsb4nNUjg==
 # SIG # End signature block

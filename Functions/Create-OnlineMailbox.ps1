@@ -1,25 +1,28 @@
 function Create-OnlineMailbox {
-[CmdletBinding()]
-param (
-        [Parameter(Mandatory=$true)] [string]
-        $NewRemoteRoutingAddress,
-        $NewSAMAccountName,
-        $NewUserPrincipalName,
-        [Parameter(Mandatory=$true)] [pscredential]
-        $Exchange_Credential
-)
+        [CmdletBinding()]
+        param (
+                [Parameter(Mandatory = $true)] [string]
+                $NewRemoteRoutingAddress,
+                $NewSAMAccountName,
+                $NewUserPrincipalName,
+                [Parameter(Mandatory = $true)] [pscredential]
+                $Exchange_Credential
+        )
 
-       Get-PSSession | Remove-PSSession
+        Get-PSSession | Remove-PSSession
         Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
         [void](Enable-RemoteMailbox -Identity $NewSAMAccountName -RemoteRoutingAddress $NewRemoteRoutingAddress)
+        # if ($UserDomain -ne $Systemdomain) {
+        #         Set-RemoteMailbox  -Identity $NewSAMAccountName -EmailAddressPolicyEnabled $false
+        # }
         $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it." -ForegroundColor Yellow
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUDKNsNDnO5Q8w1ZWWTHblDr5Y
-# PlagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvYFziMAnzQFfqDeOsNu6Ov07
+# nZugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -86,11 +89,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUO4uBwx24K49e9WBViYvaiu3G+r4wDQYJKoZI
-# hvcNAQEBBQAEggEA533UlenLR8FSBUgIwfCS/FOMj5YwUsZV5J4J3tE5sD+OefhA
-# e7BdsZ6/KcRxK0ooAgGXu4PlcmumA2os/2g/u7kOsWEvzbf65yldGnRnYk3demTA
-# U2oXRxMeDDPp7Vyy7nIaCctvQzzk91LKH7Jug35MYPJwPwkjy99qkMtK6ZPNaQMz
-# wQJ5K+NOZoLTSTRrBxtiJAYt/xX60+8pOa84vyorCiM+lhPGRxtCKvnt5FTJZLlU
-# AET6WGiqp1YJiw4Q2iKe0MZDzWzIKCOCiM+ENtNX2shXWQ72ztP+GEw5M7QA6JFa
-# V+ahDNmiAFYz8DLZiGRZG+a6JYPCeAWu8e15Cw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUMNxWv1Uncagpg2O7lOTar1GcltQwDQYJKoZI
+# hvcNAQEBBQAEggEAEJj/NOiZZaGzvneUDRyTid4quV8XC6qAZdhlcglJ3d2a4mLO
+# lX5bSgZ4C96yUIdA3YsD0Ts5sVXRECai4kRPxRjxo5j/zaHocF/HRoMgIPqeahwF
+# Abb4u0zj3jLOiFnadTfOq1QYvVG4qTYmWySzGt/1bOlInyM/eDa2DFuI9kuzy1U/
+# YzcCXNoaYBZ1MAwkIjgsDEtl7RcyX7RpwYEXHwhXCBSfx18FPAWmiy2T5cQeHGQO
+# UbJ6UPHk375uV8KHwyWHtH1+pnauM1nTht5FLRb+NkitaRiQ0nvSTEHJv0cpTT+B
+# 9ZQkwuvoYV7C8h24EcxERRqzzNox61AYgnDl8w==
 # SIG # End signature block

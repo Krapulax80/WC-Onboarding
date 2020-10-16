@@ -1,58 +1,58 @@
 function Create-NewUserObject {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true)] [psobject]
-        $TemplateUser,
-        [Parameter(Mandatory=$true)] [string]
-        $NewSAMAccountName,
-        $NewDisplayName,
-        $FirstName,
-        $StarterOU,
-        $LastName,
-        $NewUserPrincipalName,
-        $DC,
-        [Parameter(Mandatory=$true)] [pscredential]
-        $AD_Credential
-    )
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory = $true)] [psobject]
+    $TemplateUser,
+    [Parameter(Mandatory = $true)] [string]
+    $NewSAMAccountName,
+    $NewDisplayName,
+    $FirstName,
+    $StarterOU,
+    $LastName,
+    $NewUserPrincipalName,
+    $DC,
+    [Parameter(Mandatory = $true)] [pscredential]
+    $AD_Credential
+  )
 
-    # Define the NEW AD OBJECT
-      $params = @{
-      'SamAccountName'         = $NewSAMAccountName;
-      'Instance'               = $TemplateUser.DistinguishedName;
-      'DisplayName'            = $NewDisplayName;
-      'GivenName'              = $FirstName;
-      'Path'                   = $StarterOU;
-      'SurName'                = $LastName;
-      #'PasswordNeverExpires' = $password_never_expires;
-      #'CannotChangePassword' = $cannot_change_password;
-      'Description'            = "NEW STARTER - Created by " + ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) + " at " + (Get-Date -Format G); # description entry to help identify, who set the account up
-      'Enabled'                = $true;
-      'UserPrincipalName'      = $NewUserPrincipalName;
-      'AccountPassword'        = (ConvertTo-SecureString -AsPlainText $NewPassword -Force);
-      'ChangePasswordAtLogon'  = $true;
-      'Title'                  = $TemplateUser.title; # Job title. This is taken from the $TemplateUser
-      'Department'             = $TemplateUser.Department; # Department. This is taken from the $TemplateUser
-      'Company'                = $TemplateUser.Company; # Company. This is taken from the $TemplateUser
-      'Office'                 = $TemplateUser.Office; # Office. This is taken from the $TemplateUser
-      }
+  # Define the NEW AD OBJECT
+  $params = @{
+    'SamAccountName'        = $NewSAMAccountName;
+    'Instance'              = $TemplateUser.DistinguishedName;
+    'DisplayName'           = $NewDisplayName;
+    'GivenName'             = $FirstName;
+    'Path'                  = $StarterOU;
+    'SurName'               = $LastName;
+    #'PasswordNeverExpires' = $password_never_expires;
+    #'CannotChangePassword' = $cannot_change_password;
+    'Description'           = "NEW STARTER - Created by " + ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) + " at " + (Get-Date -Format G); # description entry to help identify, who set the account up
+    'Enabled'               = $true;
+    'UserPrincipalName'     = $NewUserPrincipalName;
+    'AccountPassword'       = (ConvertTo-SecureString -AsPlainText $NewPassword -Force);
+    'ChangePasswordAtLogon' = $true;
+    'Title'                 = $TemplateUser.title; # Job title. This is taken from the $TemplateUser
+    'Department'            = $TemplateUser.Department; # Department. This is taken from the $TemplateUser
+    'Company'               = $TemplateUser.Company; # Company. This is taken from the $TemplateUser
+    'Office'                = $TemplateUser.Office; # Office. This is taken from the $TemplateUser
+  }
 
-      # Create the NEW USER ACCOUNT
-      New-ADUser -Name $NewDisplayName @params -Server $DC -Credential $AD_Credential -Erroraction Stop #-Whatif
+  # Create the NEW USER ACCOUNT
+  New-ADUser -Name $NewDisplayName @params -Server $DC -Credential $AD_Credential -Erroraction Stop #-Whatif
 
-      # Wait for the NEW USER appear in AD
-      do {
-        $Userfound = (Get-ADUser -Filter {SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Configuring account [$NewSAMAccountName] - please wait."
-        Start-Sleep -Seconds 15
-      } until ($Userfound)
+  # Wait for the NEW USER appear in AD
+  do {
+    $Userfound = (Get-ADUser -Filter { SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Configuring account [$NewSAMAccountName] - please wait."
+    Start-Sleep -Seconds 15
+  } until ($Userfound)
 
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFwL5cK7/oIyrXLRABkjX/W8E
-# YAKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpdcnpnqnrWKpT8RG0IckNObJ
+# 1zqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -119,11 +119,11 @@ function Create-NewUserObject {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDTvSl5ihohGyN0JAAdKkzDgXLOowDQYJKoZI
-# hvcNAQEBBQAEggEAfCnxnT1h9bOvNiLBkP1mMHXtdlcMj/YXTVLRV1O0xzZ1Xvmn
-# Xqpi0I+fwVzp4yKNPC3650/+lOkceE9zlVtW8HJxKexVSziAW8EMwRNwZYIghqEN
-# HO+CpmZXD05wO8FyImbr9k7yUyPQGl6S5Tw0HXXZbWE7ADEvmJDxN+AzaxbEY3Mt
-# z/xj4+TTM/NxQtz/PFwyBX1xT6Az+InG1YxoUpeOGm1KaWcgl12dg2nQW8Ein1x/
-# Pnam7nAbrNiCfMFzZf1fBuFBejpcTDg9KHO/E2UUeMEYO1Jee3YvsL24LutNt3vf
-# ZaP5paMbeuDRLJjx21zlE9fGu91fN1lkxoIAyA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUqNrskWwzOLgqJ/sUrv+naiFBgmwwDQYJKoZI
+# hvcNAQEBBQAEggEA8MORGrGT5dkc1Y+1Ss6jKbn9EWVtDfocAfxSN3f9FMPPx9p1
+# prEKfqKYr+KH6qOeUgFUat30+MNzyaD2m8pGpkg8FGIc9O2l749jpBZojjiEBNwx
+# 2fjXQQJd/4KXHTS9+2u0c+8dfgd8MW2mAtG0I8nnFC5yZAPf8ZMtN2qVGXaB7OsM
+# 1+bhhlAKYDZOBBagHXaCU/0jHoUkNr2Rp+04isJhNyoE1E9YEAuqfBL9mpTi+8w1
+# BJvsgDYS8ZGpH3NKtIQ8cDQnli5jaK5j8HyYN01BXxUmjGqHo3o8v6fBGgiED2Hp
+# 8JNPor4HtSmgWdln5g4bbrjlJWU8sBpxFxgzTg==
 # SIG # End signature block

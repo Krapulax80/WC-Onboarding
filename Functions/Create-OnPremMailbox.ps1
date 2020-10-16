@@ -1,26 +1,29 @@
 function Create-OnPremMailbox {
-[CmdletBinding()]
-param (
-        [Parameter(Mandatory=$true)] [string]
-        $EOTargetDomain,
-        $NewSAMAccountName,
-        $NewUserPrincipalName,
-        [Parameter(Mandatory=$true)] [pscredential]
-        $Exchange_Credential
-)
-       Get-PSSession | Remove-PSSession
+        [CmdletBinding()]
+        param (
+                [Parameter(Mandatory = $true)] [string]
+                $EOTargetDomain,
+                $NewSAMAccountName,
+                $NewUserPrincipalName,
+                [Parameter(Mandatory = $true)] [pscredential]
+                $Exchange_Credential
+        )
+        Get-PSSession | Remove-PSSession
         Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
         [void](Enable-Mailbox -Identity $NewSAMAccountName ) # create the mailbox
         [void](Enable-Mailbox -Identity $NewSAMAccountName -RemoteArchive -ArchiveDomain $EOTargetDomain) # places the archive in the cloud
         #Feedback
+        # if ($UserDomain -ne $Systemdomain) {
+        #         Set-ailbox  -Identity $NewSAMAccountName -EmailAddressPolicyEnabled $false
+        # }
         $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - On-prem mailbox created for [$NewUserPrincipalName]. Archive is in the cloud."
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJbB9DDAsxUshR3xGU0mrAJ4E
-# ZNqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmfZfYewOVYhiEW/0BYgqX81y
+# mM2gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -87,11 +90,11 @@ param (
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUsO3recloLhRRYdN2PexpsEVTQJQwDQYJKoZI
-# hvcNAQEBBQAEggEAS+7TXMA/rFqejBDSo8tveS7mvSaiq6/gHkKwXget/weYvwGv
-# xpu6y9oZhIYiw1O+DwaglnSdlZARWJhCkQEbhOCDlpzotS5CGPQ8J9ZqfYmES856
-# j9q4WT/fzdhn98KQHXnAMvGp5IpWAIu08vGCOVezRz3dFo29QdF16rT7i965JRkt
-# BPq5RlFNTgnxIx9s94Rxs8JtkzKACyDdbMCa/58f+ND5xjCWML68SKFMHkZBiUqM
-# GZcHC2dNThoF56Y6v5T4hKM4NidvoMWURmlsnTvlmxNA5ogMcvtiNv74e5/2nGAS
-# l6dZPoLVFH0t6foN+/4/zY3OWWCwMYVDXJdlzg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUJnYsbsgBpRQrgiS3oEHVZbhECdUwDQYJKoZI
+# hvcNAQEBBQAEggEAj6NzRBATakkKcFBXi4+ZcqH+28xbztxKAARvCE0bwDaL9/QO
+# dYXHc9wnv1EPxa9OcGW+Fn40D2VbasZAPGKZ+a4F0984bhmArHJTF9t3NJ5NkGCg
+# gnrYjPg62SWFmMmFRB3c5T/ttU1P+rOMZ42qJgHIbVoirfcUpEgG97kkYeVX6q+p
+# 3h7TSeIgLEO9hk/W9LbgLzkAlIQEllhGQgHok466piKKgGx4ednmYwSTcSItajgu
+# 1MiIoHWxhPTa8AMcWpRvfH+1CvP9qQT7j5F/ASl4I2rJ6EcXsSR+KR39ih4JzjzV
+# 5n2HSMdwkkMahKUGyARu2RqZnVdXZ8RiKg+QaQ==
 # SIG # End signature block
