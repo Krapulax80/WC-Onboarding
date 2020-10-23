@@ -1,31 +1,68 @@
-function Connect-MSOnline {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [PSCredential]
-        $AAD_Credential,
+<#
+.SYNOPSIS
+    Short description
+.DESCRIPTION
+    Long description
+.EXAMPLE
+    Example of how to use this cmdlet
+.EXAMPLE
+    Another example of how to use this cmdlet
+#>
+function Sync-ExchangeGuid {
+    [cmdletbinding(SupportsShouldProcess = $True)]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $True)]
         [string]
-        $SystemDomain
+        $NewUserPrincipalName,
+        [Parameter(Mandatory = $true)] [pscredential]
+        $AAD_Credential,
+        [Parameter(Mandatory = $true)] [pscredential]
+        $Exchange_Credential        
     )
-
-    $domainCount = $null
-    $domainCount = Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore
-
-    if ($domainCount) {
-        # if (!((Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore).count -le 0)) {
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online already connected"
+    
+    begin {
+    
+        $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+    
     }
-    else {
-        Connect-MsolService -Credential $AAD_Credential >> $null
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online not available. Initiating connection"
+    
+    process {
+    
+        # Connect to exchange online
+        Get-PSSession | Remove-PSSession
+        Connect-OnlineExchange -AAD_Credential $AAD_Credential
+
+        # Get the ExchangeGuid of the new mailbox - store this into a variable
+
+        do {
+            $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for mailbox - $NewUserPrincipalName (retry in 60 seconds)"
+            $ExchangeGUID = $null
+            $ExchangeGUID = (  (Get-Mailbox $NewUserPrincipalName -ErrorAction Ignore).ExchangeGUID  ).Guid
+            Start-Sleep -Seconds 60
+        } until ($ExchangeGUID -notlike $null)
+
+        # Connect to exchange onprem
+        Get-PSSession | Remove-PSSession
+        Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
+    
+        # Set the remote mailbox of the new user to the stored ExchangeGuid
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Setting mailbox $NewUserPrincipalName to GUID: $ExchangeGuid"
+        Get-RemoteMailbox -Identity $NewUserPrincipalName | Set-RemoteMailbox -ExchangeGuid $ExchangeGuid
+
+        # Verify
+        Get-RemoteMailbox -Identity $NewUserPrincipalName | Select-Object Name, RecipientTypeDetails, ExchangeGUID
+        
+    }
+    
+    end {
     }
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7kgCRgQvm06vADZdi9Kudo2J
-# 4SCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuQwBhfOLOZwu3HxPWYpDYa+4
+# SNKgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +129,11 @@ function Connect-MSOnline {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQBxxpualaYQSoHvf47g8mkcAvVYwDQYJKoZI
-# hvcNAQEBBQAEggEAHT4mgtwvKUqEHYbmUC+mrFO3Uhr0Y6cSQFkSVGRka350SKeJ
-# B3GfgHcoehgpiKUgQ+2ukXCjLoQKGcC7Mz1TCeDCvtpfPavffLWH0F2QQ5GGLQpT
-# vJi2lL2uuyOWtkpRtgf810HcTjn0CxKvychwtASDM7aYEEVqqHVVzhlnBDjJzd6A
-# Tl602ME8ehiLfBJf7ezHWd6rOrDWPhiiLBhwzh21lfhwuq9iOLxAbRjGsTGxDavF
-# +LiQMbzMe6HJvPbLEdovlMjpucmL/mUlZOEqxt1tUSefMhPVF74VWXhdGpBqtZBk
-# HR1sEzoj9QRQhDDvToNRjIkknLOykY1tqfY5XQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU+4iFjrMsGFcMK5ksuXpA8IawG1wwDQYJKoZI
+# hvcNAQEBBQAEggEAR8RltxXUF818LaxWc848mZwQJnBKDpi4Wpnv4OIsyUUIRSQ/
+# txylO5mJfrdl4pa02oWtMGlVOs7jlPKIF1uYz12dQVaXx5Yyr6U48w/7eYuyemZo
+# 2XZyXy9J3ZbcqwAcXiPstE3l7cK3EnX9VezcMqu1ouRRqooIvL6/F3ecFGNAtXzT
+# J1+bXBY2H32i6/B/HywKXjWOLaYr02crdDHlxsuAeiZX1zZli/hMu8JfC6Cm/GTw
+# xTP1KOHHCd8ZrG+S7T+uXJKFTaBodHGwsUZtEe894okPDAlLPewWbwbs/Np9G+nX
+# o6hs37tU2VON8/ViT4B3L/tbs0UDLWM4Ulpm1Q==
 # SIG # End signature block

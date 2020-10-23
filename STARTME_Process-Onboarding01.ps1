@@ -12,6 +12,8 @@
 [cmdletbinding(SupportsShouldProcess = $True)]
 [CmdletBinding()]
 param (
+  [Parameter(Mandatory = $false)] [switch]$Test,
+  [Parameter(Mandatory = $false)] [switch]$WithMailboxMigration
 )
   
 begin {  
@@ -33,8 +35,6 @@ begin {
   $CurrentPath = $null
   $global:CurrentPath = Split-Path -parent $PSCommandPath
   Set-Location $global:CurrentPath
-  # Import input files to work on
-  $Inputfiles = Get-ChildItem .\$InputFolder | Where-Object { $_.Name -like "*.csv" }
   # Import functions to work with
   $functions = Get-ChildItem .\$FunctionFolder
   foreach ($f in $functions) {
@@ -42,6 +42,16 @@ begin {
     if ($f -match ".ps1") {
       . .\$FunctionFolder\$f
     }
+  }
+  # Import input files to work on
+  if ($Test.Ispresent) {
+    $server = get-content ".\$ConfigFolder\infraserver.txt"
+    $inputfile = Get-FileName("\\$server\c$\Scripts\AD\OnBoarding\Input")
+    $Inputfiles = $null
+    $Inputfiles = Get-Item $inputfile
+  }
+  else {
+    $Inputfiles = Get-ChildItem .\$InputFolder | Where-Object { $_.Name -like "*.csv" }
   }
   # Create today folders
   $Today = Get-date -Format yyyyMMdd
@@ -59,8 +69,17 @@ process {
   Write-Host #separator line
   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - PHASE1 OF THE ONBOARDING PROCESS STARTED." -BackgroundColor Black
   # Load the recipient file
-  $recipientCSV = ".\" + $ConfigFolder + "\" + "recipients.csv"
+  
+  if ($Test.Ispresent) {
+    $recipientCSV = ".\" + $ConfigFolder + "\" + "test_recipients.csv"
+    $HRrecipientCSV = ".\" + $ConfigFolder + "\" + "test_recipients.csv"
+  }
+  else {
+    $recipientCSV = ".\" + $ConfigFolder + "\" + "recipients.csv"
+    $HRrecipientCSV = ".\" + $ConfigFolder + "\" + "hr_recipients.csv"
+  }
   $recipients = Import-Csv $recipientCSV
+  $HRrecipients = Import-Csv $HRrecipientCSV
   # Load each (.csv) files in the input folder.
   foreach ($I in $Inputfiles) {
     $CSVImport = Import-CSV $($I.Fullname)
@@ -85,7 +104,12 @@ process {
         $configCSV = ".\" + $ConfigFolder + "\" + "westcoast.csv"
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients
+        if ($WithMailboxMigration.IsPresent) {
+          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -WithMailboxMigration
+        }
+        else {
+          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients
+        }
         Write-Host
       }
       # Pipe, if the workdomain is XMA
@@ -94,7 +118,12 @@ process {
         $configCSV = ".\" + $ConfigFolder + "\" + "xma.csv"
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
-        Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients
+        if ($WithMailboxMigration.IsPresent) {
+          Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -WithMailboxMigration
+        }
+        else {
+          Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients
+        }
         Write-Host
       }
       # Pipe, if the domain is not within the expected values
@@ -131,8 +160,8 @@ end {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmw6pbdiZ+R0K/KeFXNx9i8/L
-# XJygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfNm/P+R666ekVkikAUPBfBAC
+# sC6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -199,11 +228,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5ZOPMFubnGKwQ7W97ufwvEIs1CMwDQYJKoZI
-# hvcNAQEBBQAEggEAUilSUTZC2LOY/FKvXlACTL9xNdtKXL+pBAPZG0WhU5SYfCta
-# p4lvbJP+ioe6gO/qCthM/jfTIO5RkWs56usafwOGcl+NO14UT0VmHn/h5Xym98yg
-# urMSZA0j3J2xNaUf+D0CLU95HZYZHElcS8tW30rhWT2x+p0mqrOFoDMjUiAFe65v
-# 3J4Y2punzar2o8SrLJ+1h+WopJmPJmsf51KnzuShzWZSmRw/lP2b91ZI+N4SBKUA
-# 6Z98yvvUH3SAWb82Jonc+Ku7iacgrSELYsC83Z8lZ3amRltDI1i9Gjz6OiitZMP6
-# 1AbOGQ4vdW+0ABa+onXZVNYM0gOHsjsb4nNUjg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5Z5eg6LgJJ/l83PcJN8fUKNLceMwDQYJKoZI
+# hvcNAQEBBQAEggEAKvbXB+pUyZCMpUvGndVh+JczcUVOJKlnFtW5tJPRfJXAL5/r
+# vFjVEc3e7NhJx4k5aMSa8N2TuLJFhK8GJ8RvYPwGsBWVnbal7abQSeUcWygf7IYS
+# NSMy8GqI8ZlQEHNCnteR9YyXZtU07O3u9FOYVw5DVdwhvxV53jzuDNJlcHtQH22l
+# Pbhq5nwiuzIf/2c3h9a9BszslKJcHuAZiTXkghLJl6FYebyt51WgjBdYvWs0hyxv
+# YZ0YMu6bmfVXdUGvRJ4Eg2qKENV7d/PpHSTro4WQYwy4PwjkWcuLUgW5smSsaFBN
+# ILGuy+DXp6xnPWfvbJRfJzrsgyOYLR3bQcBrtA==
 # SIG # End signature block

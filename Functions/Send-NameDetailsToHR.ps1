@@ -1,31 +1,81 @@
-function Connect-MSOnline {
+
+function Send-NameDetailsToHR {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
-        [PSCredential]
-        $AAD_Credential,
-        [string]
-        $SystemDomain
+        [Parameter(Mandatory = $true)] [string]
+        $Manager,
+        $NewPassword,
+        $NewSAMAccountName,
+        $NewDisplayName,
+        $SystemDomain,
+        $SmtpServer,
+        $ReportSender,
+        $DC,
+        $ComputerUsagePolicy,
+        [Parameter(Mandatory = $false)] [string]
+        $MFAGuide,
+        [Parameter(Mandatory = $true)] [PSCredential]
+        $AD_Credential,
+        [Parameter(Mandatory = $false)] [switch]
+        $WestCoast,
+        [Parameter(Mandatory = $false)] [switch]
+        $XMA
+
+
     )
 
-    $domainCount = $null
-    $domainCount = Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore
+    $TextEncoding = [System.Text.Encoding]::UTF8
+    $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the email."
 
-    if ($domainCount) {
-        # if (!((Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore).count -le 0)) {
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online already connected"
+    #Find manager's email address
+    $MangerEmail = (Get-ADUser $Manager -Properties EmailAddress -Server $DC -Credential $AD_Credential).EmailAddress
+    $MangerDisplayName = (Get-ADUser $Manager -Properties DisplayName -Server $DC -Credential $AD_Credential).DisplayName
+
+    #Construct Password Email Body
+    $EmailBody =
+    "
+            <font face= ""Century Gothic"">
+            Dear $MangerDisplayName,
+            <p> We have created the following user: <span style=`"color:blue`">" + " $NewDisplayName " + "</span> <br>
+
+            <p> Please provide the following details for this user for his/her first login: <br>
+
+            <ul style=""list-style-type:disc"">
+            <li> <p> SAM Account (login) name: <span style=`"color:blue`">" + " $NewSAMAccountName " + "</span>  </li>
+            <li> <p> Initial password: <span style=`"color:red`">" + " $NewPassword " + "</span>  </li>
+            <li> <p> (please ensure to keep this information confidential; <br>
+                     the user will also need to change this password during the first login to company systems; <br>
+                     the new password should be known only by the user and should not be shared!) </li>
+            </li>
+            </ul>
+
+            <p> As this information is not stored by IT, please ensure to keep this email! In case of any issues please contact the <a href='https://westcoast.atlassian.net/'>Service Desk</a> ! <br>
+
+            <p> Please also find the computer usage policy <a href='$ComputerUsagePolicy'>here</a> ! <br>
+
+            <p> Thank you. <br>
+            <p>Regards, <br>
+            Westcoast Group IT
+            </P>
+            </font>
+        "
+
+    #Send email
+    if ($WestCoast.IsPresent) {
+        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  -Attachments $MFAGuide # -ErrorAction SilentlyContinue
     }
-    else {
-        Connect-MsolService -Credential $AAD_Credential >> $null
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online not available. Initiating connection"
+    elseif ($XMA.IsPresent) {
+        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding -Attachments $MFAGuide #-ErrorAction SilentlyContinue
     }
+
+
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7kgCRgQvm06vADZdi9Kudo2J
-# 4SCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJ5OSorh+cAi2ve2Y4eI42KM7
+# hhigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +142,11 @@ function Connect-MSOnline {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQBxxpualaYQSoHvf47g8mkcAvVYwDQYJKoZI
-# hvcNAQEBBQAEggEAHT4mgtwvKUqEHYbmUC+mrFO3Uhr0Y6cSQFkSVGRka350SKeJ
-# B3GfgHcoehgpiKUgQ+2ukXCjLoQKGcC7Mz1TCeDCvtpfPavffLWH0F2QQ5GGLQpT
-# vJi2lL2uuyOWtkpRtgf810HcTjn0CxKvychwtASDM7aYEEVqqHVVzhlnBDjJzd6A
-# Tl602ME8ehiLfBJf7ezHWd6rOrDWPhiiLBhwzh21lfhwuq9iOLxAbRjGsTGxDavF
-# +LiQMbzMe6HJvPbLEdovlMjpucmL/mUlZOEqxt1tUSefMhPVF74VWXhdGpBqtZBk
-# HR1sEzoj9QRQhDDvToNRjIkknLOykY1tqfY5XQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUv0OVbsEJvIjOy3yjmO6Jc9OV0+4wDQYJKoZI
+# hvcNAQEBBQAEggEA9LVvP0ZRT7eaXCZyU4DnLp6GQtpRXaDDtLzzDuLWLcT4F4dc
+# RLUuy1kNhAc2owDK6NulhSd6ng5igIYOkr8ZrPnlBVLMq2oSqvfY9B/OtfffCEYx
+# Ea5J33QwfNZka0hGNwSS69IniHRv7h7gjzcQsVC49rE45sHAggAi26R9SNghVU2J
+# NISaz4C55YX8mVH7qQnLEVVDk7Wibu+hkHGBbpNSwliEiCXcOC937gYmgv1zVo9Y
+# xbalmA8dzx9ng2WzDfiQTQca8i4BneQBuIGXrtsdxQ4VK/9Y/dDaYGoFAEjD5uFw
+# NJBOpXg4RZHNSF0TNn61X+o6Dbe+jhECoXXfWA==
 # SIG # End signature block

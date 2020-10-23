@@ -1,31 +1,50 @@
-function Connect-MSOnline {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [PSCredential]
-        $AAD_Credential,
-        [string]
-        $SystemDomain
-    )
+function Create-OnlineMailboxWithMigration {
+        [CmdletBinding()]
+        param (
+                [Parameter(Mandatory = $true)] [string]
+                $NewRemoteRoutingAddress,
+                $NewSAMAccountName,
+                $NewUserPrincipalName,
+                $EOTargetDomain,
+                [Parameter(Mandatory = $true)] [pscredential]
+                $Exchange_Credential
 
-    $domainCount = $null
-    $domainCount = Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore
+        )
 
-    if ($domainCount) {
-        # if (!((Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore).count -le 0)) {
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online already connected"
-    }
-    else {
-        Connect-MsolService -Credential $AAD_Credential >> $null
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online not available. Initiating connection"
-    }
+        Get-PSSession | Remove-PSSession
+        Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
+
+        # create the mailbox
+        Enable-Mailbox -Identity $NewSAMAccountName -Verbose
+
+        # migrate the mailbox
+        #$timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - [$NewUserPrincipalName] - starting mailbox migration"
+        New-MoveRequest -Identity $NewUserPrincipalName -remote -RemoteHostName $HybridServer -TargetDeliveryDomain $EOTargetDomain `
+                -RemoteCredential $Exchange_Credential -AcceptLargeDataLoss -BadItemLimit 500 -LargeItemLimit 100 -BatchName "$NewSAMAccountName Mailbox Move to O365"`
+                -Verbose
+
+        # Wait for the migration
+        do {
+                #Get the status of the mailbox move to completion
+                $moveStatistics = Get-MoveRequest | Where-Object { $_.alias -eq "$NewUserPrincipalName" } | Get-MoveRequestStatistics | Format-List
+                $moveStatistics
+                Start-Sleep -Seconds 60
+                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for the mailbox migration of [$NewUserPrincipalName]." 
+        } until ( ($moveStatistics.StatusDetail -like "Completed*") -or ($moveStatistics.StatusDetail -like "Failed") )
+
+        # [void](Enable-RemoteMailbox -Identity $NewSAMAccountName -RemoteRoutingAddress $NewRemoteRoutingAddress)
+        # if ($UserDomain -ne $Systemdomain) {
+        #         Set-RemoteMailbox  -Identity $NewSAMAccountName -EmailAddressPolicyEnabled $false
+        # }
+
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Online mailbox created for [$NewUserPrincipalName]. Ensure the user is licensed in order for the user to access it." -ForegroundColor Yellow
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7kgCRgQvm06vADZdi9Kudo2J
-# 4SCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUXR3Sv3m/tbCcEH2fNebBXEW9
+# uBugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +111,11 @@ function Connect-MSOnline {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQBxxpualaYQSoHvf47g8mkcAvVYwDQYJKoZI
-# hvcNAQEBBQAEggEAHT4mgtwvKUqEHYbmUC+mrFO3Uhr0Y6cSQFkSVGRka350SKeJ
-# B3GfgHcoehgpiKUgQ+2ukXCjLoQKGcC7Mz1TCeDCvtpfPavffLWH0F2QQ5GGLQpT
-# vJi2lL2uuyOWtkpRtgf810HcTjn0CxKvychwtASDM7aYEEVqqHVVzhlnBDjJzd6A
-# Tl602ME8ehiLfBJf7ezHWd6rOrDWPhiiLBhwzh21lfhwuq9iOLxAbRjGsTGxDavF
-# +LiQMbzMe6HJvPbLEdovlMjpucmL/mUlZOEqxt1tUSefMhPVF74VWXhdGpBqtZBk
-# HR1sEzoj9QRQhDDvToNRjIkknLOykY1tqfY5XQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU+X6fufJRLpV1xtgqdNC0E0mU11IwDQYJKoZI
+# hvcNAQEBBQAEggEAN+GNvhxWUEghdVThohOLYkvG6cJJeGuzrwrDmGCfDLDE3vGW
+# LfnYEenawsF5fk/EcZNWuzE7UlVqupW3GFo/YjC4+BAXw3J9eE8R0l2gULGQz2da
+# 1n9jE0ETznDQhfWaWO1tQGe244rSMrxrDq69HMYrhFTcWR1tTMgizc9vV2G/RNmY
+# mlq9/3sk8qIjrkX5FCZk3GK78Q+PcQ0zk5BbkdqtCR53T6FDyrTLG++XTw0HOWvk
+# px2vBK+GDs6+/z4AUdNsvnhgRh82+TEP3rq1PNPa6ifrQpUNOTkCSGQlnWBqS42/
+# +sZwe6Clct+hsy6LWyG4K5Lm4iy0Pn/R6wNq+w==
 # SIG # End signature block

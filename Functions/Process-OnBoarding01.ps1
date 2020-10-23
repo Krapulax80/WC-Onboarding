@@ -12,7 +12,9 @@ function Process-OnBoarding01 {
     [Parameter(Mandatory = $true)] [string]$Manager,
     [Parameter(Mandatory = $true)] [object]$config,
     [Parameter(Mandatory = $true)] [object]$recipients,
-    [Parameter(Mandatory = $false)] [switch]$NoJBA
+    [Parameter(Mandatory = $true)] [object]$HRrecipients,
+    [Parameter(Mandatory = $false)] [switch]$NoJBA,
+    [Parameter(Mandatory = $false)] [switch]$WithMailboxMigration    
   )
 
   <#
@@ -112,8 +114,8 @@ function Process-OnBoarding01 {
   }
 
   # Create new password for the NEW user account
-  Add-Type -AssemblyName System.Web
-  $NewPassword = [System.Web.Security.Membership]::GeneratePassword(10, 2)
+  #Add-Type -AssemblyName System.Web
+  $NewPassword = Generate-Password
 
   # Check if the SAM Account Name  already exists. If it does, create a unique one
   if (! (Get-ADUser -Filter { SAMAccountName -eq $NewSAMAccountName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) ) {
@@ -122,6 +124,7 @@ function Process-OnBoarding01 {
   else {
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Yellow
     Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
+    $sendHREmail = "YES"
     $NewSAMAccountName = $global:NewSAMAccountName
   }
 
@@ -137,6 +140,7 @@ function Process-OnBoarding01 {
   else {
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Yellow
     Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
+    $sendHREmail = "YES"
     $NewUserPrincipalName = $global:NewUserPrincipalName
   }
 
@@ -231,7 +235,12 @@ function Process-OnBoarding01 {
 
   # If the template user was Office365 user
   if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match "onmicrosoft.com" ) {
-    Create-OnlineMailbox -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
+    if ($WithMailboxMigration.Ispresent) {
+      Create-OnlineMailboxWithMigration -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential -EOTargetDomain $EOTargetDomain
+    }
+    else {
+      Create-OnlineMailbox -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
+    }
     $Flag = "online"
   }
   else {
@@ -258,6 +267,7 @@ function Process-OnBoarding01 {
 
   #region Gather LICENSE LIST from the template user
   $licenseassigned = $null = $licenseunasigned
+
   #Only do this, if the template has license
   if (Get-MsolUser -UserPrincipalName $TemplateUser.UserPrincipalName -ErrorAction SilentlyContinue) {
     #Get licenses of the Template account (some are excluded, as they are assigned from AD groups)
@@ -361,6 +371,12 @@ function Process-OnBoarding01 {
   }
   #endregion
 
+  #region SYNC EXCHANGE GUID
+  if ($Flag -match "online") {
+    Sync-ExchangeGuid  -NewUserPrincipalName $NewUserPrincipalName -AAD_Credential $AAD_Credential -Exchange_Credential $Exchange_Credential
+  }
+  #endregion
+
   #region SYNC
   Get-ADSync -DC $DC -AD_Credential $AD_Credential
   Start-Sleep 30 # allow AD sync to finish
@@ -437,13 +453,19 @@ function Process-OnBoarding01 {
 
   }
   #endregion
+
+  # Email to HR if the naming has additional numbers in it
+  if ($sendHREmail = "YES") {
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  user details of [$NewSAMAccountName] to HR"
+    #Send-NameDetailsToHR -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
+  }
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYJ4pzVg3qKaYSKEJu7BSq4oC
-# c5WgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuZhc6RdGE3x3upo1UeHvLRUP
+# naigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -510,11 +532,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU1NA0OXg+sTmr8xR3Dr+V22RicAcwDQYJKoZI
-# hvcNAQEBBQAEggEAp+dZ+DHjLPoNThd3RFiIOrDfOYSj11vRiN/HnEolbGxMgXDO
-# 9v6O5QsMkpS+J/TibAOUnYFxq8CVl6H3FPSSBmVzyYJ8XXUiEJ/9pGYFoJmpFv80
-# anae+VxedFY796wS00ifeOQUu/XdPCF3CfwD2dyLK5tXteD0w+wDQsfT5qg8qPCq
-# 89So3IDj3xv5nXmqGU5qBBmhjWPdiJemPmboHhUR0nNLJFxX5t4QlD5K329rLMHm
-# svqx8Em2AF6AFoMdhbdus4r2eA86mqt+E3+0jO3nvA/PNg0vXi80txkIRv9hlj0z
-# rH1ozMRSC9t437Af5GwOWz741mZzJKiWG0Zv9g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUO5mBcu+KQdeviEj+aTmcylrJI+0wDQYJKoZI
+# hvcNAQEBBQAEggEAU0oTggsUoQPm5ZlfcPc4ckk/I1FRsdZzC1Q1kC4Y2L9V7FXx
+# pOS+aRP99zWx3Yq1kbsl75DWcd6W8VdPj0AyIW9yKjY35voo+5zmwku/G3w8i9y5
+# eMwMRTllYiR/vQ6dURTseSYB4235N7+USblPEHhRyM8YSy/hf8tC9V0rYqL/ne33
+# cpnGLO+SSdPIbDZcpwiTAzo5xidZyfpUT1mhHWpdeO/z6s5B+PYt/xWse8tAbN7q
+# rftzz4uqWGzjxtleReaMPjPAIj+76VPS68Egzpn5+AlQqjazz8gUjT+6YmE1YZTg
+# Ra1O5Eh6z5g1d8ijLAgLK6BeRE23bCKiucJZ6w==
 # SIG # End signature block

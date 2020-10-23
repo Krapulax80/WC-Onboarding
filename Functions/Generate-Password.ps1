@@ -1,31 +1,31 @@
-function Connect-MSOnline {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [PSCredential]
-        $AAD_Credential,
-        [string]
-        $SystemDomain
-    )
-
-    $domainCount = $null
-    $domainCount = Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore
-
-    if ($domainCount) {
-        # if (!((Get-MsolDomain -DomainName  $SystemDomain -ErrorAction Ignore).count -le 0)) {
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online already connected"
+function Generate-Password {
+    function Get-RandomCharacters ($length, $characters) {
+        $random = 1..$length | ForEach-Object { Get-Random -Maximum $characters.Length }
+        $private:ofs = ""
+        return [string]$characters[$random]
     }
-    else {
-        Connect-MsolService -Credential $AAD_Credential >> $null
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Verbose "[$timer] - MS Online not available. Initiating connection"
+
+    function Scramble-String ([string]$inputString) {
+        $characterArray = $inputString.ToCharArray()
+        $scrambledStringArray = $characterArray | Get-Random -Count $characterArray.Length
+        $outputString = -join $scrambledStringArray
+        return $outputString
     }
+
+    $password = Get-RandomCharacters -length 2 -characters 'ABCDEFGHJKLMNOPQRSTUVWXYZ'
+    $password += Get-RandomCharacters -length 2 -characters 'abcdefghjiklmnopqrstuvwxyz'
+    $password += Get-RandomCharacters -length 3 -characters '1234567890'
+    $password += Get-RandomCharacters -length 2 -characters 'abcdefghjiklmnopqrstuvwxyz'
+    $password += Get-RandomCharacters -length 2 -characters '!@#$%-&?/' #'!$@-%' 
+
+    return $password
+
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7kgCRgQvm06vADZdi9Kudo2J
-# 4SCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWH6iq7WZKymPzOFnxXTA3ipa
+# TlegggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +92,11 @@ function Connect-MSOnline {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQBxxpualaYQSoHvf47g8mkcAvVYwDQYJKoZI
-# hvcNAQEBBQAEggEAHT4mgtwvKUqEHYbmUC+mrFO3Uhr0Y6cSQFkSVGRka350SKeJ
-# B3GfgHcoehgpiKUgQ+2ukXCjLoQKGcC7Mz1TCeDCvtpfPavffLWH0F2QQ5GGLQpT
-# vJi2lL2uuyOWtkpRtgf810HcTjn0CxKvychwtASDM7aYEEVqqHVVzhlnBDjJzd6A
-# Tl602ME8ehiLfBJf7ezHWd6rOrDWPhiiLBhwzh21lfhwuq9iOLxAbRjGsTGxDavF
-# +LiQMbzMe6HJvPbLEdovlMjpucmL/mUlZOEqxt1tUSefMhPVF74VWXhdGpBqtZBk
-# HR1sEzoj9QRQhDDvToNRjIkknLOykY1tqfY5XQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUmq51URbYQB7F3uPSP6V6fDiIPj4wDQYJKoZI
+# hvcNAQEBBQAEggEA6r5f0AwQWF7lfSV9S21GBTPH/727R8VuSLAYBCfvopKk2pOT
+# 2bxdveP9C2/X8mO7t8h79airHrwf6OOCHWPwJTLbfLM3MppvtGoJR2Z0nnKtKpvc
+# sst5SF1fl4UwFRGdDOivLiuD1gCW7/wp2FNN5H6NwbQuRd0o8AR7mDG6bBr4cAzU
+# 74yUJLTtGt075Trz3JRBT2ddCfTwu17B+DhUThNCswHXnkQ7mkkPtaAEYFUxM6Jc
+# mSXDfPor0QA4Nq7nW1pB+p3xD8+bJFIHUxYzTWVsJHpLLSvG/VUrb0Dx0HTJj5BY
+# +wVG7ApKk+TDHVSCW3dS9EjmyLI8pfHQAzU9Rg==
 # SIG # End signature block
