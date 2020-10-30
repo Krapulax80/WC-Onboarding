@@ -14,7 +14,8 @@ function Process-OnBoarding01 {
     [Parameter(Mandatory = $true)] [object]$recipients,
     [Parameter(Mandatory = $true)] [object]$HRrecipients,
     [Parameter(Mandatory = $false)] [switch]$NoJBA,
-    [Parameter(Mandatory = $false)] [switch]$WithMailboxMigration    
+    [Parameter(Mandatory = $false)] [switch]$WithMailboxMigration,
+    [Parameter(Mandatory = $false)] [string] $MigrationCSV
   )
 
   <#
@@ -236,7 +237,7 @@ function Process-OnBoarding01 {
   # If the template user was Office365 user
   if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match "onmicrosoft.com" ) {
     if ($WithMailboxMigration.Ispresent) {
-      Create-OnlineMailboxWithMigration -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential -EOTargetDomain $EOTargetDomain
+      Create-OnlineMailboxWithMigration -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -EOTargetDomain $EOTargetDomain -HybridServer $HybridServer -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential -InfraServer  $($config.InfraServer)
     }
     else {
       Create-OnlineMailbox -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
@@ -464,8 +465,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuZhc6RdGE3x3upo1UeHvLRUP
-# naigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUK1tIID/9pr6jRKMj4WM2V4rq
+# L66gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -532,11 +533,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUO5mBcu+KQdeviEj+aTmcylrJI+0wDQYJKoZI
-# hvcNAQEBBQAEggEAU0oTggsUoQPm5ZlfcPc4ckk/I1FRsdZzC1Q1kC4Y2L9V7FXx
-# pOS+aRP99zWx3Yq1kbsl75DWcd6W8VdPj0AyIW9yKjY35voo+5zmwku/G3w8i9y5
-# eMwMRTllYiR/vQ6dURTseSYB4235N7+USblPEHhRyM8YSy/hf8tC9V0rYqL/ne33
-# cpnGLO+SSdPIbDZcpwiTAzo5xidZyfpUT1mhHWpdeO/z6s5B+PYt/xWse8tAbN7q
-# rftzz4uqWGzjxtleReaMPjPAIj+76VPS68Egzpn5+AlQqjazz8gUjT+6YmE1YZTg
-# Ra1O5Eh6z5g1d8ijLAgLK6BeRE23bCKiucJZ6w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU36J9WRjwl+4mVWK8XZqEOYxFYN0wDQYJKoZI
+# hvcNAQEBBQAEggEACokYFl3Z4LWsVEDmWtazJwGp0RdEFtuc+CygvgZkA86kgvYw
+# t8KdiLtu4ETjEr8ADbJV4fpSm2CVJGqhM408vHmz0rhK44AZtHcWY/GoSUyBzALI
+# 7bucgZxcRnYSQmI92UwxGSDjdQYVhdhVT8f9QR6y5IGci/RME+H1ZfDzGRC8nt2F
+# huLdNGGudHfKvMk9gicHpmdDf80YR8MhNe0mestfqUeVilmYfO5TVqJWj7I4e7Am
+# soivzVCQzUL4XiDSLLL8bNmAJXtOPP94OW0tdv+2sFs83Wq1BRBm8v8ljY1b+909
+# TN4onANTaLRUcPmJlj1vhgGhijYv7dopM9FMKQ==
 # SIG # End signature block

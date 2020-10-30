@@ -2,35 +2,78 @@ function Create-OnlineMailboxWithMigration {
         [CmdletBinding()]
         param (
                 [Parameter(Mandatory = $true)] [string]
-                $NewRemoteRoutingAddress,
+                #$NewRemoteRoutingAddress,
                 $NewSAMAccountName,
                 $NewUserPrincipalName,
                 $EOTargetDomain,
+                $HybridServer,
+                $InfraServer,
+                #[Parameter(Mandatory = $true)] [object]$config,
+                #[Parameter(Mandatory = $true)] [string] $MigrationCSV,                
                 [Parameter(Mandatory = $true)] [pscredential]
-                $Exchange_Credential
+                $Exchange_Credential,
+                $AAD_Credential
+                
 
         )
 
+        # Generating Migration batch file
+        $MigrationCSV = "\\" + $InfraServer + "\c$\Scripts\AD\ONBoarding\Logs\" + (Get-Date -format yyyyMMdd) + "\" + "MigrationFile.csv"
+        $output = $null
+        $output = @{
+                MailboxType  = $null
+                EmailAddress = (Get-Aduser $NewSAMAccountName -Properties * ).UserPrincipalName
+        }
+        Remove-item -Path $MigrationCSV -Force -ErrorAction Ignore
+        WRite-Host "Saving user migration details to file [$MigrationCSV]"
+        [pscustomobject]$output | Export-csv -path $MigrationCSV -NoTypeInformation
+
+        # Connect to on-prem
         Get-PSSession | Remove-PSSession
         Connect-OnPremExchange -Exchange_Credential $Exchange_Credential
 
-        # create the mailbox
-        Enable-Mailbox -Identity $NewSAMAccountName -Verbose
+        # create the mailbox on-prem
+        Enable-Mailbox -Identity $NewSAMAccountName #-Verbose
+
+        # Connect to exchange online
+        Get-PSSession | Remove-PSSession
+        Connect-OnlineExchange -AAD_Credential $AAD_Credential
 
         # migrate the mailbox
-        #$timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - [$NewUserPrincipalName] - starting mailbox migration"
-        New-MoveRequest -Identity $NewUserPrincipalName -remote -RemoteHostName $HybridServer -TargetDeliveryDomain $EOTargetDomain `
-                -RemoteCredential $Exchange_Credential -AcceptLargeDataLoss -BadItemLimit 500 -LargeItemLimit 100 -BatchName "$NewSAMAccountName Mailbox Move to O365"`
-                -Verbose
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Creating migration endpoint"
+        $EndPoint = "MigrationEP-NewStarter"
+        #Remove-MigrationEndpoint -Identity $EndPoint -Confirm:$false -ErrorAction SilentlyContinue
+        # if ((Get-MigrationEndpoint) -notmatch $EndPoint) {
+        #         New-MigrationEndpoint -Name $EndPoint -ExchangeRemoteMove -RemoteServer $HybridServer -Credentials $Exchange_Credential  
+        # }        
 
-        # Wait for the migration
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - [$NewUserPrincipalName] - starting mailbox migration"
+        #$convSAM = $NewSAMAccountName -replace ".", "_"
+        $batchname = "NewStarterMigration"
+        New-MigrationBatch -Name $batchname -SourceEndpoint $EndPoint -TargetDeliveryDomain $EOTargetDomain -CSVData ([System.IO.File]::ReadAllBytes("$($MigrationCSV)")) #-Force
+        Start-MigrationBatch $batchname
+
+        # Wait for the migration to sync
         do {
-                #Get the status of the mailbox move to completion
-                $moveStatistics = Get-MoveRequest | Where-Object { $_.alias -eq "$NewUserPrincipalName" } | Get-MoveRequestStatistics | Format-List
-                $moveStatistics
+                $checkBatchName = $null 
+                $checkBatchName = "MigrationService:" + $batchname
+                Write-Host "Gathering move statistics"
+                $statistics = Get-MoveRequest -BatchName $checkBatchName | Get-MoveRequestStatistics
+                $statistics
                 Start-Sleep -Seconds 60
-                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for the mailbox migration of [$NewUserPrincipalName]." 
-        } until ( ($moveStatistics.StatusDetail -like "Completed*") -or ($moveStatistics.StatusDetail -like "Failed") )
+                #Get the status of the mailbox move to completion
+
+        } until (       $statistics.Statusdetail.Value -match "Synced"   )
+
+        # Complet the migration
+        Complete-MigrationBatch -Identity $batchname -Confirm:$False
+
+        # Wait for completion
+        do {
+                Write-Host "Waiting for the move completion"
+                Start-Sleep -Seconds 60
+                
+        } while (       ((Get-MigrationBatch $batchname).status.value) -match "Completing")
 
         # [void](Enable-RemoteMailbox -Identity $NewSAMAccountName -RemoteRoutingAddress $NewRemoteRoutingAddress)
         # if ($UserDomain -ne $Systemdomain) {
@@ -43,8 +86,8 @@ function Create-OnlineMailboxWithMigration {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUXR3Sv3m/tbCcEH2fNebBXEW9
-# uBugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU0O8+Ia3X4jD4iGpPyKSAtjHQ
+# g7qgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -111,11 +154,11 @@ function Create-OnlineMailboxWithMigration {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU+X6fufJRLpV1xtgqdNC0E0mU11IwDQYJKoZI
-# hvcNAQEBBQAEggEAN+GNvhxWUEghdVThohOLYkvG6cJJeGuzrwrDmGCfDLDE3vGW
-# LfnYEenawsF5fk/EcZNWuzE7UlVqupW3GFo/YjC4+BAXw3J9eE8R0l2gULGQz2da
-# 1n9jE0ETznDQhfWaWO1tQGe244rSMrxrDq69HMYrhFTcWR1tTMgizc9vV2G/RNmY
-# mlq9/3sk8qIjrkX5FCZk3GK78Q+PcQ0zk5BbkdqtCR53T6FDyrTLG++XTw0HOWvk
-# px2vBK+GDs6+/z4AUdNsvnhgRh82+TEP3rq1PNPa6ifrQpUNOTkCSGQlnWBqS42/
-# +sZwe6Clct+hsy6LWyG4K5Lm4iy0Pn/R6wNq+w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUQdP4zFSDC4VtfUhzhRF01qmuuVkwDQYJKoZI
+# hvcNAQEBBQAEggEAO8jHqaqlWkYSpXZaglJLjDSc0s7efAPkteQgvpP9KuPG6xCK
+# ToI7HDIxegsKaWUkroV1Qbf6JYfx+nqNtQNfbAEt/3/ZVQI017+ah73E8xOmGM60
+# aUSd69aauGe9rCBW38U5xOi9blWlGyDPTUSkQvQZCmwAdpq+5kAC5fu95FZVmkMl
+# 3wo0nRs9jvzYxI1JHkksGXpunuwoAV43KM7Ldeuj6uG9AkMCJRmEe4pwXR7hmKmd
+# oLCGoPCVfOTp0GefWDDYZZeG1txJsA3N5rYPzo87YMf7J1poTeapCYYnLfk9ogE5
+# 3Gc0fYrUU+ocgDGRY5BPAWhUEQDlQoew+iKXFw==
 # SIG # End signature block

@@ -61,6 +61,7 @@ begin {
   $TranscriptFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
   $ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
   Start-Transcript -Path $TranscriptFile
+  $MigrationCSV = "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Logs\$Today\Migrationfile.csv"
 }
   
 process {
@@ -105,7 +106,7 @@ process {
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
         if ($WithMailboxMigration.IsPresent) {
-          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -WithMailboxMigration
+          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -MigrationCSV $MigrationCSV -WithMailboxMigration
         }
         else {
           Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients
@@ -119,7 +120,7 @@ process {
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
         if ($WithMailboxMigration.IsPresent) {
-          Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -WithMailboxMigration
+          Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -MigrationCSV $MigrationCSV -WithMailboxMigration
         }
         else {
           Process-OnBoarding01 -XMA -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients
@@ -160,8 +161,8 @@ end {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfNm/P+R666ekVkikAUPBfBAC
-# sC6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpsL8pdhXNK0r6n5NhJEUQWU7
+# 4MOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -228,11 +229,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU5Z5eg6LgJJ/l83PcJN8fUKNLceMwDQYJKoZI
-# hvcNAQEBBQAEggEAKvbXB+pUyZCMpUvGndVh+JczcUVOJKlnFtW5tJPRfJXAL5/r
-# vFjVEc3e7NhJx4k5aMSa8N2TuLJFhK8GJ8RvYPwGsBWVnbal7abQSeUcWygf7IYS
-# NSMy8GqI8ZlQEHNCnteR9YyXZtU07O3u9FOYVw5DVdwhvxV53jzuDNJlcHtQH22l
-# Pbhq5nwiuzIf/2c3h9a9BszslKJcHuAZiTXkghLJl6FYebyt51WgjBdYvWs0hyxv
-# YZ0YMu6bmfVXdUGvRJ4Eg2qKENV7d/PpHSTro4WQYwy4PwjkWcuLUgW5smSsaFBN
-# ILGuy+DXp6xnPWfvbJRfJzrsgyOYLR3bQcBrtA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUPXjDAYdAwimyx4GvFedQgK4y7ecwDQYJKoZI
+# hvcNAQEBBQAEggEArWeB3RTbgg5CuBY+xl2VhDbC+ef+wwMqm2obElezJYp+v+ul
+# hdtHnYDm3K+Saa1SREPKHQIh55jghbb4vUxPSZcdHPUP794OHCBF4tLAvjx+R1ZJ
+# QqfOLCCcNgfGll8ByopjJJTgdAcbhezJ+v/5/wuFkV7xSGrnz9MXfh4TDceEY97W
+# m3Ndr3eLM3yt70KZuWB+TowMrNPz7m4wb7c54DseQYJTRc3mCp8BTT6Zs8kUcqZK
+# LWcIh18b4tuJnH2RnsQ4Y/ohGTrCZFG16F3CGMEEzEK2dRH9nQEbwiemjxxHPLp8
+# yV2mScj5StVpEEotbC43LA6i017ZA5jDzfSwgg==
 # SIG # End signature block
