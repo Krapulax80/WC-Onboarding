@@ -130,9 +130,9 @@ function Process-OnBoarding01 {
   }
 
   # Derivative names created from the SAM Account Name (these should make these guranteed unique, however we will double check this just in case)
-  $NewUserPrincipalName = $NewSAMAccountName + "@" + $UserDomain
-  $NewRemoteRoutingAddress = $NewSAMAccountName + "@" + $EOTargetDomain
-  $NewDisplayName = $NewSAMAccountName -replace "\.", " "
+  $NewUserPrincipalName = ($FirstName + "." + $LastName) + "@" + $UserDomain
+  $NewRemoteRoutingAddress = ($FirstName + "." + $LastName) + "@" + $EOTargetDomain
+  $NewDisplayName = ($FirstName + " " + $LastName)
 
   # Check if the UPN already exists. If it does, create a unique one
   if (!(Get-ADUser -Filter { UserPrincipalName -eq $NewUserPrincipalName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )) {
@@ -465,8 +465,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUK1tIID/9pr6jRKMj4WM2V4rq
-# L66gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOOHt5HAME7mtv8lBMHaa3Zi1
+# zqOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -533,11 +533,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU36J9WRjwl+4mVWK8XZqEOYxFYN0wDQYJKoZI
-# hvcNAQEBBQAEggEACokYFl3Z4LWsVEDmWtazJwGp0RdEFtuc+CygvgZkA86kgvYw
-# t8KdiLtu4ETjEr8ADbJV4fpSm2CVJGqhM408vHmz0rhK44AZtHcWY/GoSUyBzALI
-# 7bucgZxcRnYSQmI92UwxGSDjdQYVhdhVT8f9QR6y5IGci/RME+H1ZfDzGRC8nt2F
-# huLdNGGudHfKvMk9gicHpmdDf80YR8MhNe0mestfqUeVilmYfO5TVqJWj7I4e7Am
-# soivzVCQzUL4XiDSLLL8bNmAJXtOPP94OW0tdv+2sFs83Wq1BRBm8v8ljY1b+909
-# TN4onANTaLRUcPmJlj1vhgGhijYv7dopM9FMKQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUujnx0YBf61g6q//9LKvMhB/kXY4wDQYJKoZI
+# hvcNAQEBBQAEggEAak3PAppGXv95utXfi9Gs/gyi7A5Ul7P+VMPi+1fYfM+bZaAB
+# BAGv4nueUlLlvzL4TWJ1WHu5BqAGkcq11ivD6j9w6zm0V4V16hofedv6y5tYcl/i
+# /zkjKXbHQozX33XsPjgMg48zgl7VNVvn5Wfbg8cPGqiKXp9F6UZTEj+BCYRaZ2jV
+# FNyaI6LckWZ7bTe4b6JLk3CeCeMdp/NZbNeAH+CuTKn8V1+nGaGI2BvsSbJg6NHy
+# lqRngoJ71uy+Svkr6dzkUUal34Cdhb/hUYNTH7ayrQhyO+B8vnUCQmQrrRkPIA1K
+# r/v9GQ2rOBgMJhjbFrXfm4hXv24IanB8aacddA==
 # SIG # End signature block
