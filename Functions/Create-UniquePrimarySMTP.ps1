@@ -1,23 +1,23 @@
-function global:Create-UniqueSMTP {
-    [CmdletBinding()]
+function Create-UniquePrimarySMTP {
+  [CmdletBinding()]
   param (
-      [Parameter(Mandatory=$true)] [string] $SMTP
+    [Parameter(Mandatory = $true)] [string] $SMTP
   )
 
-  		$x = 1
+  $x = 1
 		do {
-			$secondarySMTP = $global:secondarySMTP = $null # zeroize the SMTP
-      $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0,1) + $x + "@" + $UserDomain #add the number into the secndary SMTP
-      $x++
-		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value."
-    $global:secondarySMTP = $secondarySMTP
+    $NewRemoteRoutingAddress = $null # zeroize the SMTP
+    $NewRemoteRoutingAddress = $FirstName + '.' + $LastName + $x + '@' + $UserDomain # add number to the secondary SMTP
+    $x++
+		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $NewRemoteRoutingAddress } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+  $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP validation is OK. $NewRemoteRoutingAddress is a usable value."
+  return $NewRemoteRoutingAddress
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsx8uydw5ZW9+Q+zvQrUUJg7w
-# Q76gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUyNd9HdFvcllhcz6i/B1tQW1n
+# eZigggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -84,11 +84,11 @@ function global:Create-UniqueSMTP {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUk38W65cTvotKbPLobNJ5U340V+owDQYJKoZI
-# hvcNAQEBBQAEggEAC5pYfhLlXNfEa+o6lkTckekp9Ki67tvBjV/0X6zkfQojhMeD
-# yAEoMJYuWyK8W37p8VD+8/SAXFLY8chv50+PRbGV1wLJXdW7tPVK1MRzSds2KXL1
-# yIn2gp28CclLPmrg3a6olTickFFu7dpldu798RXDWGKnEcArcC3UtFWePhdSS6q1
-# fk73enWMX8O+PqFuljPbUrdQdkYjSB5COLZLsN26+I6GEh/hZgqvfko2VIArpRke
-# osLEX9lKbXQbuacPShk2xtwd4a3yE6ESPAqSPcr6DYfBfbg1D0gczway5ecxkT9a
-# EKScIol7Jbx/6DDNLhJirZZyD8CxoWOuafNRag==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUDCrm8WpnEszbZ8cMblJ0Vc89D94wDQYJKoZI
+# hvcNAQEBBQAEggEArgEdGvVZbEDLJa814sNKgBQRs3gRcuDH52TQx/OZMbGjDuH7
+# dhdlZritYZrA/TKyQgL7ut71P/TzF2SuFFmM6gf2boAG6NCIFF1KIhpi6ApgRyT4
+# gzNcRgbm/hAZRGDXejHjv/gx1aV3hjQVe7dPahuZgb1qQIeuavcvA5OpldssjnU/
+# /VVJgCtio5PMgP/m/ROXN7xusDS2/J867jNGBmTRp0lB5QvJWkqXHTuXSl63GasA
+# o+xWyRMFhT6c3c75eZD8m2PhFvyvO1nT5BnE6pG3ke1xjsX6LkoHDO7OxQ+4AE4Y
+# 2ce1kpV6Il9E2z0dTcjmv/KCIvs5b7LC+PGhsA==
 # SIG # End signature block

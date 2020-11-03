@@ -4,6 +4,8 @@ function Generate-UserExchangeReport {
     [Parameter(Mandatory = $true)] [string]
     $NewSAMAccountName,
     [Parameter(Mandatory = $true)] [string]
+    $NewUserPrincipalName,    
+    [Parameter(Mandatory = $true)] [string]
     $Flag,
     $SystemDomain,
     [Parameter(Mandatory = $true)] [pscredential]
@@ -32,12 +34,17 @@ function Generate-UserExchangeReport {
     else {
       $delay = 120
     }
-    [void] ($FreshMailbox = Get-mailbox $NewSAMAccountName -ErrorAction SilentlyContinue | Select-Object  *)
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for the mailbox of [$NewSAMAccountName] to be available. Retry in $delay second!" -ForegroundColor Yellow
+    if (-not $FreshMailbox) {
+      [void] ($FreshMailbox = Get-mailbox $NewSAMAccountName -ErrorAction SilentlyContinue | Select-Object  *)
+    }
+    if (-not $FreshMailbox) {
+      [void] ($FreshMailbox = Get-mailbox $NewUserPrincipalName -ErrorAction SilentlyContinue | Select-Object  *)
+    }
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Waiting for the mailbox of [$NewSAMAccountName / $NewUserPrincipalName] to be available. Retry in $delay second!" -ForegroundColor Yellow
     Start-Sleep $delay
   }
   until ($FreshMailbox)
-  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Found mailbox of [$NewSAMAccountName]. Continuing"
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Found mailbox of [$NewSAMAccountName / $NewUserPrincipalName]. Continuing"
 
   # Create report object
   $global:UserExchangeReport = $null
@@ -74,8 +81,8 @@ function Generate-UserExchangeReport {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUSIdznTCaeBSKu2KhZg1FHT9Q
-# etCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULRl2j5ZoQiUUhuK05MP+ZiS+
+# GKugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -142,11 +149,11 @@ function Generate-UserExchangeReport {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUNCHvMXylCEzi/6zwIgMETKGvAZAwDQYJKoZI
-# hvcNAQEBBQAEggEA1ZVI8qXhWPAHRPlwA3+3/sBQyXpTi0sQlg0E5cwNFBdtiwIc
-# ooebwHWrV3f1z5rmLZhKrMbbL4aZUBE2zlQoRL+R6OKg1ZwYM+ncfASqqfnzC337
-# IMVSdL2A6oMYBH9vvZqwGF3ROrvKI41PTv5ufg52S67Ug76HwTtNujj00291AcXL
-# 9EdgM8kW71tLv9UQfaqc9Q97POPsuAwsSCfXiLifoPsz9F6CXY3ZrY/6TCslWMVA
-# kYRkb07eDMhKKhK+4wMhOMSenBSYlNIARQigfz0E5Hd4qm2l5BSv1xjxNPKiEGtC
-# cx37fOGnXQR9Z1tJuchpQramAszOE/UZ3Sp4Vw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUR0aRdV91mWM0GPzJrVyv+B+kbBcwDQYJKoZI
+# hvcNAQEBBQAEggEAWPI+lMhEEkW9j8B+xsTVtgjdqjLkS392dcYu2kaxFibLj/NO
+# ESHKdZrDr7LpB62X/ziWU4scj5ymkNbL33EiHErXNN/4ZORBb0taByyrkWdGYXG8
+# n/01knJE+NoRJEejj71tNoSbuw3v5y6GDkLQEyoUNLCQHWyHIgQZSiLVKEVoCIY9
+# MA4hfdkK5q3Rc5bqpyc99AhjNExZLAcMhkIyndHmVtbj58qjPJHF/5fVGmCVWIB0
+# w/ZzmgpGd7c4dkLxmYZAXTkVSFf+T7x4C0c1OyM6yXrvjWbpFYGJyA5vSiVmC9qx
+# u4FAcgZAXS4IRCW09aEI+aRuB7VKfHg1TBxXJQ==
 # SIG # End signature block

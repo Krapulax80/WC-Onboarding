@@ -148,21 +148,30 @@ process {
 }
   
 end {
+
+  Write-Host
+  Write-Host "Saving transcript to $TranscriptFile"
+  Write-Host "Errors will be stored in $ErrorFile"
+  Write-Host
+
   # Transcript STOP
-  #Stop-Transcript
+  Stop-Transcript
+
   #Error logging
   if ($Error) { $Error | Out-File $ErrorFile }
   else { "[INFO] NO ERRORS DURING SCRIPT RUN" | Out-File $ErrorFile } # also send errors to a file
+
   #TODO: Check error logging
   #FIXME: Prevent error buildup
+
   # And cleanup the variables
-  Variable-Cleanup -ErrorAction Ignore
+  #Variable-Cleanup -ErrorAction Ignore
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpsL8pdhXNK0r6n5NhJEUQWU7
-# 4MOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsmn05un+8BQ3/A4KFGVpHizN
+# yxygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -229,11 +238,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUPXjDAYdAwimyx4GvFedQgK4y7ecwDQYJKoZI
-# hvcNAQEBBQAEggEArWeB3RTbgg5CuBY+xl2VhDbC+ef+wwMqm2obElezJYp+v+ul
-# hdtHnYDm3K+Saa1SREPKHQIh55jghbb4vUxPSZcdHPUP794OHCBF4tLAvjx+R1ZJ
-# QqfOLCCcNgfGll8ByopjJJTgdAcbhezJ+v/5/wuFkV7xSGrnz9MXfh4TDceEY97W
-# m3Ndr3eLM3yt70KZuWB+TowMrNPz7m4wb7c54DseQYJTRc3mCp8BTT6Zs8kUcqZK
-# LWcIh18b4tuJnH2RnsQ4Y/ohGTrCZFG16F3CGMEEzEK2dRH9nQEbwiemjxxHPLp8
-# yV2mScj5StVpEEotbC43LA6i017ZA5jDzfSwgg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUP4K0cJ0bcCr2dxvPnzgrHb9SfIcwDQYJKoZI
+# hvcNAQEBBQAEggEADJ4sE31GVTi0Z+CxXVAdePPnFGAmpZ5nkJ7wm4fdJeLlb2kO
+# PWr7NP3U9ZnARva5885Wxxc5Fu5Vcme0AmV7THX3tSO+GIHHdmioqD8zdTkruEUA
+# nWAjsK3SZsnmbvpiH+Wi7aSvbOjuh6tNlbSHkkAKcayG2qdveZcg+jmzBKgq36G1
+# wB2TzCtiuc+OR1iMUQcirXtz6wZC9X2gaK7QwmzHl7SFNqnPlC1TvHcnocm0khf/
+# WdPPP2G1P5CcFVFWVdslAoKLh4JaZDKkIUA7ZxgQsapZ4Wx5n+KaRfjk8Y43KicA
+# o1rrNuk9+8xOy5A/Q07yAIFRPiBmv+20vfnRjQ==
 # SIG # End signature block

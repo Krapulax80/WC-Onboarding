@@ -1,8 +1,8 @@
 function Process-OnBoarding01 {
   [CmdletBinding()]
   param(## Domain selector
-    [Parameter(Mandatory = $true , ParameterSetName = "WestCoast")] [switch]$Westcoast,
-    [Parameter(Mandatory = $true , ParameterSetName = "XMA")] [switch]$XMA,
+    [Parameter(Mandatory = $true , ParameterSetName = 'WestCoast')] [switch]$Westcoast,
+    [Parameter(Mandatory = $true , ParameterSetName = 'XMA')] [switch]$XMA,
     [Parameter(Mandatory = $true)] [string]$FirstName,
     [Parameter(Mandatory = $true)] [string]$LastName,
     [Parameter(Mandatory = $true)] [string]$EmployeeID,
@@ -34,16 +34,16 @@ function Process-OnBoarding01 {
   # Variables based on the WC/XMA config file
   $SystemDomain = $config.SystemDomain
   $DomainNetBIOS = $config.DomainNetBIOS
-  $AADSyncServer = $config.AADSyncServer ; $AADSyncServer = $AADSyncServer + "." + $SystemDomain
-  $ExchangeServer = $config.ExchangeServer ; $ExchangeServer = $ExchangeServer + "." + $SystemDomain
-  $HybridServer = $config.HybridServer ; $HybridServer = $HybridServer + "." + $SystemDomain
-  $OnpremisesMRSProxyURL = $config.OnpremisesMRSProxyURL + "." + $SystemDomain
+  $AADSyncServer = $config.AADSyncServer ; $AADSyncServer = $AADSyncServer + '.' + $SystemDomain
+  $ExchangeServer = $config.ExchangeServer ; $ExchangeServer = $ExchangeServer + '.' + $SystemDomain
+  $HybridServer = $config.HybridServer ; $HybridServer = $HybridServer + '.' + $SystemDomain
+  $OnpremisesMRSProxyURL = $config.OnpremisesMRSProxyURL + '.' + $SystemDomain
   $EOTargetDomain = $config.EOTargetDomain
-  $PeopleFileServer = $config.PeopleFileServer ; $PeopleFileServer = $PeopleFileServer + "." + $SystemDomain
-  $ProfileFileServer = $config.ProfileFileServer ; $ProfileFileServer = $ProfileFileServer + "." + $SystemDomain
-  $RDSDiskFileServer = $config.RDSDiskFileServer ; $RDSDiskFileServer = $RDSDiskFileServer + "." + $SystemDomain
+  $PeopleFileServer = $config.PeopleFileServer ; $PeopleFileServer = $PeopleFileServer + '.' + $SystemDomain
+  $ProfileFileServer = $config.ProfileFileServer ; $ProfileFileServer = $ProfileFileServer + '.' + $SystemDomain
+  $RDSDiskFileServer = $config.RDSDiskFileServer ; $RDSDiskFileServer = $RDSDiskFileServer + '.' + $SystemDomain
   $StarterOU = $config.StarterOU
-  $DFSHost = $config.DFSHost ; $DFSHost = $DFSHost + "." + $SystemDomain
+  $DFSHost = $config.DFSHost ; $DFSHost = $DFSHost + '.' + $SystemDomain
   $SmtpServer = $config.SMTPServer
 
   $ComputerUsagePolicy = $config.ComputerUsagePolicy
@@ -51,7 +51,7 @@ function Process-OnBoarding01 {
     $MFAGuide = $config.MFAGuide
   }
 
-  $ReportSender = "newstarter" + "@" + $SystemDomain
+  $ReportSender = 'newstarter' + '@' + $SystemDomain
 
   #region WESTCOAST
   if ($Westcoast.IsPresent) {
@@ -61,7 +61,7 @@ function Process-OnBoarding01 {
     Create-Credential -WestCoast -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
     # Domain Controller for WC (I prefer to use the PDC emulator for simplicity)
     #$DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property InfrastructureMaster).InfrastructureMaster
+    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential | Select-Object -ExpandProperty RootDomain | Get-ADDomain | Select-Object -Property InfrastructureMaster).InfrastructureMaster
   }
   #endregion
   #region XMA
@@ -71,12 +71,12 @@ function Process-OnBoarding01 {
     Create-Credential -XMA -AAD -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
     Create-Credential -XMA -Exchange -CredFolder "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Credentials\" -AD_Admin $($config.AD_Admin) -AAD_Admin $($config.AAD_Admin) -Exchange_Admin $($config.Exchange_Admin)
     # Domain Controller for XMA
-    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential |  Select-Object -ExpandProperty RootDomain |  Get-ADDomain |  Select-Object -Property PDCEmulator).PDCEmulator
+    $DC = (Get-ADForest -Identity $SystemDomain -Credential $AD_Credential | Select-Object -ExpandProperty RootDomain | Get-ADDomain | Select-Object -Property PDCEmulator).PDCEmulator
   }
   #endregion
   #region (INVALID WORK DOMAIN DEFINED)
   else {
-    Write-Host -ForeGroundColor Red "Bad domain."; Break
+    Write-Host -ForegroundColor Red 'Bad domain.'; Break
   }
   #endregion
 
@@ -95,7 +95,9 @@ function Process-OnBoarding01 {
   if (Get-ADUser -Filter { SAMAccountName -eq $TemplateName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue) {
     $TemplateUser = Get-ADUser $TemplateName -Properties * -Server $DC -Credential $AD_Credential
   }
-  else { $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - User $TemplateName not found." -ForegroundColor Red }
+  else {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - User $TemplateName not found." -ForegroundColor Red 
+  }
 
   # Construct parent OU of the TEMPLATE user account
   $TemplateAccountOU = ($TemplateUser | Select-Object @{ n = 'Path'; e = { $_.DistinguishedName -replace "CN=$($_.cn),", '' } }).path
@@ -104,11 +106,11 @@ function Process-OnBoarding01 {
   $UsageLocation = $TemplateUser.extensionAttribute6 # Country code
 
   # Declare the USER DOMAIN
-  $UserDomain = ($TemplateUser.UserPrincipalName).Split("\@")[1]
+  $UserDomain = ($TemplateUser.UserPrincipalName).Split('\@')[1]
 
   # Generate various names for the NEW user account
-  $NewUserPrincipalName = $FirstName + "." + $LastName + "@" + $UserDomain
-  $NewSAMAccountName = $FirstName + "." + $LastName
+  $NewUserPrincipalName = $FirstName + '.' + $LastName + '@' + $UserDomain
+  $NewSAMAccountName = $FirstName + '.' + $LastName
   if ($NewSAMAccountName.Length -gt 20) {
     # Truncate pre-2000 name to 20 characters, if longer, to prevent errors
     $NewSAMAccountName = $NewSAMAccountName.substring(0, 20)
@@ -123,37 +125,37 @@ function Process-OnBoarding01 {
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SAM account [$NewSAMAccountName] is unique."
   }
   else {
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForeGroundColor Yellow
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SAM account [$NewSAMAccountName] is NOT unique. Generating unique SAM Name!" -ForegroundColor Yellow
     Create-UniqueSAMName -NewSAMAccountName $NewSAMAccountName
-    $sendHREmail = "YES"
+    $sendHREmail = 'YES'
     $NewSAMAccountName = $global:NewSAMAccountName
   }
 
   # Derivative names created from the SAM Account Name (these should make these guranteed unique, however we will double check this just in case)
-  $NewUserPrincipalName = ($FirstName + "." + $LastName) + "@" + $UserDomain
-  $NewRemoteRoutingAddress = ($FirstName + "." + $LastName) + "@" + $EOTargetDomain
-  $NewDisplayName = ($FirstName + " " + $LastName)
+  $NewUserPrincipalName = ($FirstName + '.' + $LastName) + '@' + $UserDomain
+  $NewRemoteRoutingAddress = ($FirstName + '.' + $LastName) + '@' + $EOTargetDomain
+  $NewDisplayName = ($FirstName + ' ' + $LastName)
 
   # Check if the UPN already exists. If it does, create a unique one
   if (!(Get-ADUser -Filter { UserPrincipalName -eq $NewUserPrincipalName } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )) {
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is unique."
   }
   else {
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForeGroundColor Yellow
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - UPN  [$NewUserPrincipalName] is NOT unique. Generating unique UPN!" -ForegroundColor Yellow
     Create-UniqueUPN -NewUserPrincipalName $NewUserPrincipalName
-    $sendHREmail = "YES"
+    $sendHREmail = 'YES'
     $NewUserPrincipalName = $global:NewUserPrincipalName
   }
 
   # Check if Employee ID already exists. If it does, create a unique one
-  if (($EmployeeID.gettype()).Name -notlike "String") {
+  if (($EmployeeID.gettype()).Name -notlike 'String') {
     $EmployeeID = [string]$EmployeeID # convert the $EmployeeID into string
   }
   if (!(Get-ADUser -Filter { EmployeeID -eq $EmployeeID } -Properties * -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue )) {
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - EmployeeID  [$EmployeeID] is unique."
   }
   else {
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForeGroundColor Yellow
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - EmployeeID [$EmployeeID] is NOT unique. Generating unique EmployeeID!" -ForegroundColor Yellow
     Create-UniqueEmployeeID -EmployeeID $EmployeeID
     $EmployeeID = $global:EmployeeID
   }
@@ -218,15 +220,25 @@ function Process-OnBoarding01 {
   #region Construct mailbox's PARAMETERS
 
   # Construct the secondary SMTP ADDRESS
-  $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0, 1) + "@" + $UserDomain
+  $secondarySMTP = 'smtp:' + $FirstName + $LastName.substring(0, 1) + '@' + $UserDomain
+  $primarySMTP = 'smtp:' + $NewRemoteRoutingAddress
+
+  # Check if the primary SMTP ALREADY EXISTS. If it does, create a unique one
+  if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $primarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - PRIMARY SMTP (routing address) [$primarySMTP / $NewRemoteRoutingAddress] is unique."
+  }
+  else {
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - PRIMARY SMTP (routing address) [$primarySMTP / $NewRemoteRoutingAddress] is NOT unique. Generating unique value!" -ForegroundColor Yellow
+    $NewRemoteRoutingAddress = Create-UniquePrimarySMTP -SMTP $NewRemoteRoutingAddress
+  }  
 
   # Check if the SECONDARY SMTP ALREADY EXISTS. If it does, create a unique one
   if (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue)) {
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP [$secondarySMTP] is unique."
   }
   else {
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForeGroundColor Yellow
-    Create-UniqueSMTP -SMTP $secondarySMTP
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP [$secondarySMTP] is NOT unique. Generating unique secondary SMTP!" -ForegroundColor Yellow
+    Create-UniqueSecondarySMTP -SMTP $secondarySMTP
     $secondarySMTP = $global:secondarySMTP
   }
 
@@ -235,19 +247,19 @@ function Process-OnBoarding01 {
   #region Create the NEW MAILBOX
 
   # If the template user was Office365 user
-  if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match "onmicrosoft.com" ) {
+  if ((Get-ADUser -Identity $TemplateUser -Properties targetAddress -Server $DC -Credential $AD_Credential).TargetAddress -match 'onmicrosoft.com' ) {
     if ($WithMailboxMigration.Ispresent) {
-      Create-OnlineMailboxWithMigration -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -EOTargetDomain $EOTargetDomain -HybridServer $HybridServer -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential -InfraServer  $($config.InfraServer)
+      Create-OnlineMailboxWithMigration -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -EOTargetDomain $EOTargetDomain -HybridServer $HybridServer -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential -InfraServer $($config.InfraServer)
     }
     else {
       Create-OnlineMailbox -NewRemoteRoutingAddress $NewRemoteRoutingAddress -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
     }
-    $Flag = "online"
+    $Flag = 'online'
   }
   else {
     # If the template was on-prem user
     Create-OnPremMailbox -EOTargetDomain $EOTargetDomain -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -Exchange_Credential $Exchange_Credential
-    $Flag = "onprem"
+    $Flag = 'onprem'
   }
   #endregion 
 
@@ -280,10 +292,10 @@ function Process-OnBoarding01 {
   do {
     $MSOLACCPresent = $null
     # Delay between each check. Increased for XMA to avoid spam.
-    if ($SystemDomain -match "xma.co.uk") {
+    if ($SystemDomain -match 'xma.co.uk') {
       $delay = 180
     }
-    elseif ($SystemDomain -match "westcoast.co.uk") {
+    elseif ($SystemDomain -match 'westcoast.co.uk') {
       $delay = 120
     }
     else {
@@ -350,31 +362,31 @@ function Process-OnBoarding01 {
   if ($UserDomain -ne $Systemdomain) {
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Non-UK user detected. Modifying SMTP addresses."
     #Create old (ToRemove) SMTP and new (ToAdd) SMTP
-    $NewPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $UserDomain
-    $OldPrimarySMTP = "SMTP:" + $NewSAMAccountName + "@" + $SystemDomain
-    $NewSecondarySMTP = $OldPrimarySMTP -replace "SMTP:", "smtp:"
+    $NewPrimarySMTP = 'SMTP:' + $NewSAMAccountName + '@' + $UserDomain
+    $OldPrimarySMTP = 'SMTP:' + $NewSAMAccountName + '@' + $SystemDomain
+    $NewSecondarySMTP = $OldPrimarySMTP -replace 'SMTP:', 'smtp:'
     #Update primary SMTP if needed
-    Set-ADUser $NewSAMAccountName -remove @{ProxyAddresses = $OldPrimarySMTP } -Server $DC -Credential $AD_Credential
-    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewPrimarySMTP } -Server $DC -Credential $AD_Credential
-    Set-ADUser $NewSAMAccountName -add @{ProxyAddresses = $NewSecondarySMTP } -Server $DC -Credential $AD_Credential
+    Set-ADUser $NewSAMAccountName -Remove @{ProxyAddresses = $OldPrimarySMTP } -Server $DC -Credential $AD_Credential
+    Set-ADUser $NewSAMAccountName -Add @{ProxyAddresses = $NewPrimarySMTP } -Server $DC -Credential $AD_Credential
+    Set-ADUser $NewSAMAccountName -Add @{ProxyAddresses = $NewSecondarySMTP } -Server $DC -Credential $AD_Credential
     # Update mail address if needed
-    Set-ADUser -Identity $NewSAMAccountName -Replace @{mail = ($NewSAMAccountName + "@" + $UserDomain) } -Server $DC -Credential $AD_Credential
-    Set-ADUser -Identity $NewSAMAccountName -EmailAddress ($NewSAMAccountName + "@" + $UserDomain) -Server $DC -Credential $AD_Credential
+    Set-ADUser -Identity $NewSAMAccountName -Replace @{mail = ($NewSAMAccountName + '@' + $UserDomain) } -Server $DC -Credential $AD_Credential
+    Set-ADUser -Identity $NewSAMAccountName -EmailAddress ($NewSAMAccountName + '@' + $UserDomain) -Server $DC -Credential $AD_Credential
 
     Write-Host #lazy line break
-    Write-Host "___________________________________________________"
+    Write-Host '___________________________________________________'
     Write-Host #lazy line break
-    Write-Host "Final mailbox parameters:" -ForegroundColor Cyan
+    Write-Host 'Final mailbox parameters:' -ForegroundColor Cyan
     Start-Sleep -Seconds 5
     Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential | Select-Object Name, UserPrincipalName, mail, EmailAddress, proxyaddresses | Format-List
-    Write-Host "___________________________________________________"
+    Write-Host '___________________________________________________'
     Write-Host #lazy line break
   }
   #endregion
 
   #region SYNC EXCHANGE GUID
-  if ($Flag -match "online") {
-    Sync-ExchangeGuid  -NewUserPrincipalName $NewUserPrincipalName -AAD_Credential $AAD_Credential -Exchange_Credential $Exchange_Credential
+  if ($Flag -match 'online') {
+    Sync-ExchangeGuid -NewUserPrincipalName $NewUserPrincipalName -AAD_Credential $AAD_Credential -Exchange_Credential $Exchange_Credential
   }
   #endregion
 
@@ -392,7 +404,7 @@ function Process-OnBoarding01 {
   <# Here we create the report object, and at the same time display this for the user who is running the script.#>
   Write-Host # separator line
   #Exchange
-  Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -SystemDomain $SystemDomain -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential
+  Generate-UserExchangeReport -NewSAMAccountName $NewSAMAccountName -Flag $Flag -SystemDomain $SystemDomain -Exchange_Credential $Exchange_Credential -AAD_Credential $AAD_Credential -NewUserPrincipalName $NewUserPrincipalName
   #AD
   Generate-UserADReport -NewSAMAccountName $NewSAMAccountName -DC $DC -AD_Credential $AD_Credential -AAD_Credential $AAD_Credential -NewPassword $NewPassword
   #DFS
@@ -406,20 +418,20 @@ function Process-OnBoarding01 {
   # Report to CSV
   <# Here we save each report to a separate file#>
   #AD
-  $UserADReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" + ($NewSAMAccountName -replace "\.", "_") + "_AD_report.csv"
+  $UserADReportCSV = '.\' + $OutputFolder + '\' + $Today + '\' + ($NewSAMAccountName -replace '\.', '_') + '_AD_report.csv'
 
   $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving AD report to [$UserADReportCSV]"
 
   $global:UserADReportConverted | ConvertFrom-Csv | Export-Csv $UserADReportCSV -Force -NoTypeInformation
   #Exchange
-  $UserExchangeReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" + ($NewSAMAccountName -replace "\.", "_") + "_Exchange_report.csv"
+  $UserExchangeReportCSV = '.\' + $OutputFolder + '\' + $Today + '\' + ($NewSAMAccountName -replace '\.', '_') + '_Exchange_report.csv'
 
   $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving EXCHANGE report to [$UserExchangeReportCSV]"
 
   $global:UserExchangeReportConverted | ConvertFrom-Csv | Export-Csv $UserExchangeReportCSV -Force -NoTypeInformation
   #DFS
   if ($Westcoast.IsPresent) {
-    $UserDFSReportCSV = ".\" + $OutputFolder + "\" + $Today + "\" + ($NewSAMAccountName -replace "\.", "_") + "_DFS_report.csv"
+    $UserDFSReportCSV = '.\' + $OutputFolder + '\' + $Today + '\' + ($NewSAMAccountName -replace '\.', '_') + '_DFS_report.csv'
 
     $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Saving DFS report to [$UserDFSReportCSV]"
 
@@ -445,6 +457,12 @@ function Process-OnBoarding01 {
 
     Send-SummaryToRecipients -recipients $recipients -NewDisplayName $NewDisplayName -SmtpServer $SmtpServer -ReportSender $ReportSender -ADReportCSV $UserADReportCSV -ExchangeReportCSV $UserExchangeReportCSV -DFSReportCSV $UserDFSReportCSV -ADReport $global:UserADReport #-DFSReport $global:UserDFSReport -ExchangeReport $global:UserExchangeReport
 
+    # Email to HR if the naming has additional numbers in it
+    # if ($sendHREmail = "YES") {
+    #   $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  user details of [$NewSAMAccountName] to HR"
+    #   Send-NameDetailsToHR -WestCoast -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
+    # }
+
   }
   elseif ($XMA.Ispresent) {
 
@@ -452,21 +470,22 @@ function Process-OnBoarding01 {
 
     Send-SummaryToRecipients -recipients $recipients -NewDisplayName $NewDisplayName -SmtpServer $SmtpServer -ReportSender $ReportSender -ADReportCSV $UserADReportCSV -ExchangeReport $UserExchangeReportCSV -ADReport $global:UserADReport #-ExchangeReport $global:UserExchangeReport -DFSReport $UserDFSReportCSV -DFSReport $global:UserDFSReport  #TODO: Not valid for XMA currently
 
+    # # Email to HR if the naming has additional numbers in it
+    # if ($sendHREmail = "YES") {
+    #   $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  user details of [$NewSAMAccountName] to HR"
+    #   Send-NameDetailsToHR -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
+    # }
+
   }
   #endregion
 
-  # Email to HR if the naming has additional numbers in it
-  if ($sendHREmail = "YES") {
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sending  user details of [$NewSAMAccountName] to HR"
-    #Send-NameDetailsToHR -XMA -Manager $Manager -NewPassword $NewPassword -NewSAMAccountName $NewSAMAccountName -NewDisplayName $NewDisplayName -SystemDomain $SystemDomain -SmtpServer $SmtpServer -ReportSender $ReportSender -DC $DC -AD_Credential $AD_Credential -ComputerUsagePolicy $ComputerUsagePolicy -MFAGuide $MFAGuide
-  }
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOOHt5HAME7mtv8lBMHaa3Zi1
-# zqOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULji7jAmgd+LbqNU93t9VMQLN
+# RVagggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -533,11 +552,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUujnx0YBf61g6q//9LKvMhB/kXY4wDQYJKoZI
-# hvcNAQEBBQAEggEAak3PAppGXv95utXfi9Gs/gyi7A5Ul7P+VMPi+1fYfM+bZaAB
-# BAGv4nueUlLlvzL4TWJ1WHu5BqAGkcq11ivD6j9w6zm0V4V16hofedv6y5tYcl/i
-# /zkjKXbHQozX33XsPjgMg48zgl7VNVvn5Wfbg8cPGqiKXp9F6UZTEj+BCYRaZ2jV
-# FNyaI6LckWZ7bTe4b6JLk3CeCeMdp/NZbNeAH+CuTKn8V1+nGaGI2BvsSbJg6NHy
-# lqRngoJ71uy+Svkr6dzkUUal34Cdhb/hUYNTH7ayrQhyO+B8vnUCQmQrrRkPIA1K
-# r/v9GQ2rOBgMJhjbFrXfm4hXv24IanB8aacddA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUsrRpkIxXFcnG2ye+vrey2rkxYYswDQYJKoZI
+# hvcNAQEBBQAEggEA5rr0fxqEon1Syh5FV6i4249IcMAUsE11uxRTCjYE1C5KrB+a
+# 4GoJDNr0D21XDZE7KrWiO4DDAWU+WDtOmjBeI2/VNMxM5dhaeWgpjvx4ztxNzwWf
+# iYVCXMOv/DLvU+/uaMV3kiLB94OmPNDKeupLg4cDvsFtK9EoZQfIxqrENStpylMJ
+# nGQK9h/ZJcJoeUyRJfFyCBcjyvkMizTfXR3OreqYziPEt+MGHHauDj0YUP8sAC5U
+# xUUfCZ1SF5Z4DF7RzF3TgzseDGc+Q6GX8NtuahnQvmj+BjdNW933xAfhhx+fdISi
+# S2wlVgB8mBgjWe4fpUoXkoojyFlr1I+tVrRzxA==
 # SIG # End signature block

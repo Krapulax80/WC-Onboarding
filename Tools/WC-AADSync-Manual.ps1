@@ -1,81 +1,13 @@
-
-function Send-NameDetailsToHR {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)] [string]
-        $Manager,
-        $NewPassword,
-        $NewSAMAccountName,
-        $NewDisplayName,
-        $SystemDomain,
-        $SmtpServer,
-        $ReportSender,
-        $DC,
-        $ComputerUsagePolicy,
-        [Parameter(Mandatory = $false)] [string]
-        $MFAGuide,
-        [Parameter(Mandatory = $true)] [PSCredential]
-        $AD_Credential,
-        [Parameter(Mandatory = $false)] [switch]
-        $WestCoast,
-        [Parameter(Mandatory = $false)] [switch]
-        $XMA
-
-
-    )
-
-    $TextEncoding = [System.Text.Encoding]::UTF8
-    $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the email."
-
-    #Find manager's email address
-    $MangerEmail = (Get-ADUser $Manager -Properties EmailAddress -Server $DC -Credential $AD_Credential).EmailAddress
-    $MangerDisplayName = (Get-ADUser $Manager -Properties DisplayName -Server $DC -Credential $AD_Credential).DisplayName
-
-    #Construct Password Email Body
-    $EmailBody =
-    "
-            <font face= ""Century Gothic"">
-            Dear $MangerDisplayName,
-            <p> We have created the following user: <span style=`"color:blue`">" + " $NewDisplayName " + "</span> <br>
-
-            <p> Please provide the following details for this user for his/her first login: <br>
-
-            <ul style=""list-style-type:disc"">
-            <li> <p> SAM Account (login) name: <span style=`"color:blue`">" + " $NewSAMAccountName " + "</span>  </li>
-            <li> <p> Initial password: <span style=`"color:red`">" + " $NewPassword " + "</span>  </li>
-            <li> <p> (please ensure to keep this information confidential; <br>
-            the user will also need to change this password during the first login to company systems; <br>
-            the new password should be known only by the user and should not be shared!) </li>
-            </li>
-            </ul>
-
-            <p> As this information is not stored by IT, please ensure to keep this email! In case of any issues please contact the <a href='https://westcoast.atlassian.net/'>Service Desk</a> ! <br>
-
-            <p> Please also find the computer usage policy <a href='$ComputerUsagePolicy'>here</a> ! <br>
-
-            <p> Thank you. <br>
-            <p>Regards, <br>
-            Westcoast Group IT
-            </P>
-            </font>
-        "
-
-    #Send email
-    if ($WestCoast.IsPresent) {
-        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  -Attachments $MFAGuide # -ErrorAction SilentlyContinue
-    }
-    elseif ($XMA.IsPresent) {
-        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding -Attachments $MFAGuide #-ErrorAction SilentlyContinue
-    }
-
-
-}
-
+﻿$pso = New-PSSessionOption -ProxyAccessType NoProxyServer
+(Invoke-Command -ComputerName "BNWAZURESYNC01.westcoast.co.uk" -SessionOption $pso -ScriptBlock {
+                Import-Module "C:\Program Files\Microsoft Azure AD Sync\Bin\ADSync\ADSync.psd1" #Import the AAD Sync module
+                Start-ADSyncSyncCycle -PolicyType Delta #Start Delta - chagnes only - sync
+                } -ErrorAction Stop)
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvEmFuVNmgEglAcrN29slDBdr
-# 7uygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZyw0VX0XdHf1AIAiN+1rZFJa
+# N6CgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -142,11 +74,11 @@ function Send-NameDetailsToHR {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUSEgX67xcalmY1j4vJk+0gv5xAIswDQYJKoZI
-# hvcNAQEBBQAEggEAnUclazcsrXXAHAD46/jCKGe0wh2ZX2wYAz9NGrWuD+wR4gng
-# BB+Z5KluZ7iG+F+K5ScNLfJB8roM6WzjsPwCGnUiiwWxcLfFmMxbKo+zNpSWlxGX
-# uX7BaW85ZU1EKu9GBVgwAmzwc4xnkN34zkVP86S975Ct8JBLHE87HVDHLVYyuU8M
-# anT1dFvHL5/s+Bkku134dV9K07Q/s0HwyiPtkxqiPwWo78ywvDaVJ8nU3wT8hoXG
-# sBlz/UvhDNAuqvskuzr0atyk8gBBrCTVC7zb3LxhSUef8V7cs5xXVVeuO8GXJzIc
-# 9xxRgtuBVjr6zGT6JRiEU/IsY8jty1hGVCnd9A==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUTVOdvFkkQM/CzkQLPk52hPoh88EwDQYJKoZI
+# hvcNAQEBBQAEggEAkOI5KUHaLLd5zrQJ6SuqvU605DJnegfAVK+9S4wyjskNEeiF
+# uZ6qT+9KMVJXeaiLc7SKW6B+CjRMZHmbECMMzW1DZDrWLr2Y4vVz2NcKjtQwrqpj
+# d7Ebh0aScCi879uIbgmWx9f3tYWYW17U8M9xlBm3A3uCUmwOJq+qqy4VQ/9NGG8v
+# AB5QyaRZB3trLeNKTYkosb21TLv+yEE5pyKEpgU9iv7KfnOSCPk6A3UcsqFrHeDN
+# oBE5bbJfcJtGYdILXC2xpuZdr2edMjLZm+rngjPLfl/U7U6BENalV9cyxFWZ5VCR
+# 8/StpysExmxdEDqP8uL4iqV2oefpeb8oQXC1yw==
 # SIG # End signature block

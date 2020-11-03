@@ -1,81 +1,23 @@
-
-function Send-NameDetailsToHR {
+function global:Create-UniqueSecondarySMTP {
     [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)] [string]
-        $Manager,
-        $NewPassword,
-        $NewSAMAccountName,
-        $NewDisplayName,
-        $SystemDomain,
-        $SmtpServer,
-        $ReportSender,
-        $DC,
-        $ComputerUsagePolicy,
-        [Parameter(Mandatory = $false)] [string]
-        $MFAGuide,
-        [Parameter(Mandatory = $true)] [PSCredential]
-        $AD_Credential,
-        [Parameter(Mandatory = $false)] [switch]
-        $WestCoast,
-        [Parameter(Mandatory = $false)] [switch]
-        $XMA
+  param (
+      [Parameter(Mandatory=$true)] [string] $SMTP
+  )
 
-
-    )
-
-    $TextEncoding = [System.Text.Encoding]::UTF8
-    $EmailSubject = "Please find password for $NewDisplayName ($SystemDomain) in the email."
-
-    #Find manager's email address
-    $MangerEmail = (Get-ADUser $Manager -Properties EmailAddress -Server $DC -Credential $AD_Credential).EmailAddress
-    $MangerDisplayName = (Get-ADUser $Manager -Properties DisplayName -Server $DC -Credential $AD_Credential).DisplayName
-
-    #Construct Password Email Body
-    $EmailBody =
-    "
-            <font face= ""Century Gothic"">
-            Dear $MangerDisplayName,
-            <p> We have created the following user: <span style=`"color:blue`">" + " $NewDisplayName " + "</span> <br>
-
-            <p> Please provide the following details for this user for his/her first login: <br>
-
-            <ul style=""list-style-type:disc"">
-            <li> <p> SAM Account (login) name: <span style=`"color:blue`">" + " $NewSAMAccountName " + "</span>  </li>
-            <li> <p> Initial password: <span style=`"color:red`">" + " $NewPassword " + "</span>  </li>
-            <li> <p> (please ensure to keep this information confidential; <br>
-            the user will also need to change this password during the first login to company systems; <br>
-            the new password should be known only by the user and should not be shared!) </li>
-            </li>
-            </ul>
-
-            <p> As this information is not stored by IT, please ensure to keep this email! In case of any issues please contact the <a href='https://westcoast.atlassian.net/'>Service Desk</a> ! <br>
-
-            <p> Please also find the computer usage policy <a href='$ComputerUsagePolicy'>here</a> ! <br>
-
-            <p> Thank you. <br>
-            <p>Regards, <br>
-            Westcoast Group IT
-            </P>
-            </font>
-        "
-
-    #Send email
-    if ($WestCoast.IsPresent) {
-        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding  -Attachments $MFAGuide # -ErrorAction SilentlyContinue
-    }
-    elseif ($XMA.IsPresent) {
-        Send-Mailmessage -smtpServer $SmtpServer -from $ReportSender -to $MangerEmail -subject $EmailSubject -body $EmailBody -bodyasHTML -priority High -Encoding $TextEncoding -Attachments $MFAGuide #-ErrorAction SilentlyContinue
-    }
-
-
+  		$x = 1
+		do {
+			$secondarySMTP = $global:secondarySMTP = $null # zeroize the SMTP
+      $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0,1) + $x + "@" + $UserDomain #add the number into the secndary SMTP
+      $x++
+		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value."
+    $global:secondarySMTP = $secondarySMTP
 }
-
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvEmFuVNmgEglAcrN29slDBdr
-# 7uygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU2fes2oL3UMg4/CWf3urqQqeP
+# 492gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -142,11 +84,11 @@ function Send-NameDetailsToHR {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUSEgX67xcalmY1j4vJk+0gv5xAIswDQYJKoZI
-# hvcNAQEBBQAEggEAnUclazcsrXXAHAD46/jCKGe0wh2ZX2wYAz9NGrWuD+wR4gng
-# BB+Z5KluZ7iG+F+K5ScNLfJB8roM6WzjsPwCGnUiiwWxcLfFmMxbKo+zNpSWlxGX
-# uX7BaW85ZU1EKu9GBVgwAmzwc4xnkN34zkVP86S975Ct8JBLHE87HVDHLVYyuU8M
-# anT1dFvHL5/s+Bkku134dV9K07Q/s0HwyiPtkxqiPwWo78ywvDaVJ8nU3wT8hoXG
-# sBlz/UvhDNAuqvskuzr0atyk8gBBrCTVC7zb3LxhSUef8V7cs5xXVVeuO8GXJzIc
-# 9xxRgtuBVjr6zGT6JRiEU/IsY8jty1hGVCnd9A==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUH0Lsl38jeNqrv6WuLxfu4qMq/XowDQYJKoZI
+# hvcNAQEBBQAEggEAh9mKFyY+T511COWzD6NuLvz38UtHzNjbcd5XgsBf5q9SY2R6
+# cfVGiDYSSOdXUrIrXlWgUFcUpBS6V4gMkGU8tGkqValh4OIX8OVJhORGGr4R1X2q
+# t3Wz2t7CdSqKWAsop2B/6FyvUOzazEA7FYCsKstrxwaZGh7luRgbDm6ooptZeycC
+# Z+58i3jUwHvYaw3YQ+vRG2aUUo1CsNh8YC1FmrR7htKXctTXmxm6a7njqG26dAfA
+# t3UGNV3PL/WoX5ywAD5gdRHXSzp81VADXs68JhAuKoPiM/Vzh+3GADYld1g3DFiH
+# R9Mk4DPRWZj5du9azAIKDVvyzvV/MWC8ZUnG2w==
 # SIG # End signature block
