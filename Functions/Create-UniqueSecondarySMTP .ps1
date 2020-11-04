@@ -1,23 +1,23 @@
 function global:Create-UniqueSecondarySMTP {
-    [CmdletBinding()]
+  [CmdletBinding()]
   param (
-      [Parameter(Mandatory=$true)] [string] $SMTP
+    [Parameter(Mandatory = $true)] [string] $SMTP
   )
 
-  		$x = 1
+  $x = 1
 		do {
-			$secondarySMTP = $global:secondarySMTP = $null # zeroize the SMTP
-      $secondarySMTP = "smtp:" + $FirstName + $LastName.substring(0,1) + $x + "@" + $UserDomain #add the number into the secndary SMTP
-      $x++
-		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value."
-    $global:secondarySMTP = $secondarySMTP
+    $secondarySMTP = $global:secondarySMTP = $null # zeroize the SMTP
+    $secondarySMTP = 'smtp:' + $FirstName + $LastName.substring(0,1) + $x + '@' + $UserDomain #add the number into the secndary SMTP
+    $x++
+		} until (!(Get-ADObject -Properties proxyAddresses -Filter { proxyAddresses -EQ $secondarySMTP } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+  $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - SMTP validation is OK. $secondarySMTP is a usable value."
+  return $secondarySMTP
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU2fes2oL3UMg4/CWf3urqQqeP
-# 492gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUD/TbPF51IlvfoyHY8X0bG4iP
+# 8J6gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -84,11 +84,11 @@ function global:Create-UniqueSecondarySMTP {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUH0Lsl38jeNqrv6WuLxfu4qMq/XowDQYJKoZI
-# hvcNAQEBBQAEggEAh9mKFyY+T511COWzD6NuLvz38UtHzNjbcd5XgsBf5q9SY2R6
-# cfVGiDYSSOdXUrIrXlWgUFcUpBS6V4gMkGU8tGkqValh4OIX8OVJhORGGr4R1X2q
-# t3Wz2t7CdSqKWAsop2B/6FyvUOzazEA7FYCsKstrxwaZGh7luRgbDm6ooptZeycC
-# Z+58i3jUwHvYaw3YQ+vRG2aUUo1CsNh8YC1FmrR7htKXctTXmxm6a7njqG26dAfA
-# t3UGNV3PL/WoX5ywAD5gdRHXSzp81VADXs68JhAuKoPiM/Vzh+3GADYld1g3DFiH
-# R9Mk4DPRWZj5du9azAIKDVvyzvV/MWC8ZUnG2w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUiIeroQpQsCsg/ESYpI3vH9MeAuMwDQYJKoZI
+# hvcNAQEBBQAEggEAexIBWrylC46IcdS2EbBEmMv67P4c9I4fM9WlQk7j45ikDwYv
+# 3PQKvSml3z54Pfpmy7Mn5fjmhJcmAydD92HklI57hmfKcy5pWm0wbp+G3UqlIfMq
+# eZB7rZjBqv6Kdv51dRC+iF1r4SHSlrE1mkQr3E9T4ligZTrIPFsDpLR73zFw4BeQ
+# xlg7fE4r+c1kFQnirUiUfiQkzTKT0/QV3cC980EHMvlvk+WHDafaJ2mp2lG6epyD
+# BMgqjka4LaJfd+ae9rP9pWrYCyCl3Uc4Sa4kFcAhZcAcwwynUtkd2R9jSS+sioCi
+# ImSeqKmAVD+Sl4OTT7ToRjkbTAUdVioFCbyctw==
 # SIG # End signature block

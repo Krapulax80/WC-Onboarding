@@ -47,8 +47,8 @@ function Generate-UserExchangeReport {
   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Found mailbox of [$NewSAMAccountName / $NewUserPrincipalName]. Continuing"
 
   # Create report object
-  $global:UserExchangeReport = $null
-  $global:UserExchangeReport = @()
+  $UserExchangeReport = $null
+  $UserExchangeReport = @()
   $Obj = $null ; $Obj = New-Object -TypeName PSObject
 
 
@@ -69,20 +69,23 @@ function Generate-UserExchangeReport {
   $FreshAccount = $FreshMailbox = $null
 
   # Generate CSV report
-  $global:UserExchangeReport += $Obj
-  $global:UserExchangeReportConverted =
-  $global:UserExchangeReport |
+  $UserExchangeReport += $Obj
+
+  $UserExchangeReportConverted =
+  $UserExchangeReport |
   Get-Member -MemberType NoteProperty |
   Select-Object @{name = 'Name'; expression = { $_.name } },
-  @{name = 'Value'; expression = { ($($global:UserExchangeReport)).($_.name) } } |
+  @{name = 'Value'; expression = { ($($UserExchangeReport)).($_.name) } } |
   ConvertTo-Csv
+
+  return $UserExchangeReportConverted
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQULRl2j5ZoQiUUhuK05MP+ZiS+
-# GKugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzcis7Q9Wi6Dgx/H27jC89bF4
+# z6SgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -149,11 +152,11 @@ function Generate-UserExchangeReport {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUR0aRdV91mWM0GPzJrVyv+B+kbBcwDQYJKoZI
-# hvcNAQEBBQAEggEAWPI+lMhEEkW9j8B+xsTVtgjdqjLkS392dcYu2kaxFibLj/NO
-# ESHKdZrDr7LpB62X/ziWU4scj5ymkNbL33EiHErXNN/4ZORBb0taByyrkWdGYXG8
-# n/01knJE+NoRJEejj71tNoSbuw3v5y6GDkLQEyoUNLCQHWyHIgQZSiLVKEVoCIY9
-# MA4hfdkK5q3Rc5bqpyc99AhjNExZLAcMhkIyndHmVtbj58qjPJHF/5fVGmCVWIB0
-# w/ZzmgpGd7c4dkLxmYZAXTkVSFf+T7x4C0c1OyM6yXrvjWbpFYGJyA5vSiVmC9qx
-# u4FAcgZAXS4IRCW09aEI+aRuB7VKfHg1TBxXJQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCUPEwUdWCcXZBy1X0OZayWxtKcAwDQYJKoZI
+# hvcNAQEBBQAEggEAHpPUTo4gA23uWbBW6OhE7PfFFWFIzYIpmYi7kyMEwrOqYRBq
+# /pA+EGju2sij+TumV7v9uVLbfUfB3UyX7eldU4FrAHylFvB7bKrdVIhKewIDfX7s
+# fYBmeiu8kpBqcbfcUcUBRYL90qCQlbsBDpHdZg7bPkmmkFJcj77Gy9GZ9AOPFblh
+# uSg+hb+N4dcDihjYA+PXr8snx2xGMFM65vQBZ6/adP+J0td2Gbd59kz/uXyOm4IR
+# atbG7mf/wq61Uf1nUX4DTPkDahxCFNlhjBBlhCYwsNAo377LzfWKAs7aH12P2AQz
+# kRMqh8xVkARCM8Fa7nk7C4Kox4wSObFT3QAe6A==
 # SIG # End signature block

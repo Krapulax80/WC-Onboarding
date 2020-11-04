@@ -1,69 +1,94 @@
- function Generate-UserADReport {
-     [CmdletBinding()]
-     param (
-         [Parameter(Mandatory=$true)] [string]
-         $NewSAMAccountName,
-         [Parameter(Mandatory=$true)] [string]
-         $DC,
-         $NewPassword,
-         [Parameter(Mandatory=$true)] [pscredential]
-         $AD_Credential,
-          [Parameter(Mandatory=$true)] [pscredential]
-         $AAD_Credential
-     )
+function Generate-UserADReport {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory = $true)] [string]
+    $NewSAMAccountName,
+    [Parameter(Mandatory = $true)] [string]
+    $DC,
+    $NewPassword,
+    [Parameter(Mandatory = $true)] [pscredential]
+    $AD_Credential,
+    [Parameter(Mandatory = $true)] [pscredential]
+    $AAD_Credential
+  )
 
-    #region USER REPORT
-      # Gather user report
-        $FreshAccount = Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential
-        Write-Host # separator line
-        If ($FreshAccount.extensionAttribute10 -eq 1) {$JBA = "YES"} elseif ($FreshAccount.extensionAttribute10 -eq 0) { $JBA = "NO"} else {$JBA = "N/A"}
-        If ($FreshAccount.extensionAttribute11 -eq 0) {$Contract = "Full Time"} elseif ($FreshAccount.extensionAttribute11 -eq 1) { $Contract = "Part Time"} elseif ($FreshAccount.extensionAttribute11 -eq 2) {$Contract = "Temp"} elseif ($FreshAccount.extensionAttribute11 -eq 3) {$Contract = "External"} else {$Contract = "N/A"}
+  #region USER REPORT
+  # Gather user report
+  $FreshAccount = Get-ADUser $NewSAMAccountName -Properties * -Server $DC -Credential $AD_Credential
+  Write-Host # separator line
+  If ($FreshAccount.extensionAttribute10 -eq 1) {
+    $JBA = 'YES'
+  }
+  elseif ($FreshAccount.extensionAttribute10 -eq 0) {
+    $JBA = 'NO'
+  }
+  else {
+    $JBA = 'N/A'
+  }
+  If ($FreshAccount.extensionAttribute11 -eq 0) {
+    $Contract = 'Full Time'
+  }
+  elseif ($FreshAccount.extensionAttribute11 -eq 1) {
+    $Contract = 'Part Time'
+  }
+  elseif ($FreshAccount.extensionAttribute11 -eq 2) {
+    $Contract = 'Temp'
+  }
+  elseif ($FreshAccount.extensionAttribute11 -eq 3) {
+    $Contract = 'External'
+  }
+  else {
+    $Contract = 'N/A'
+  }
 
-      # Create report object
-      $global:UserADReport = $null
-      $global:UserADReport = @()
-      $Obj = $null ; $Obj = New-Object -TypeName PSObject
+  # Create report object
+  $UserADReport = $null
+  $UserADReport = @()
+  $Obj = $null ; $Obj = New-Object -TypeName PSObject
 
-      # Display/store report
-        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - (SUMMARY - ACTIVE DIRECTORY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
-        Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)" ; $Obj | Add-Member -MemberType NoteProperty -Name SAMAccountName -Value $($FreshAccount.SAMAccountName)
-        # Write-Host "Password            : $NewPassword"; $Obj | Add-Member -MemberType NoteProperty -Name Password -Value $NewPassword
-        #TODO: COMPLETED - Send the password to the new starter's manager instead of the service desk (request from Janet)
-        Write-Host "UserPrincipalName     : $($FreshAccount.UserPrincipalName)" ; $Obj | Add-Member -MemberType NoteProperty -Name UserPrincipalName -Value $($FreshAccount.UserPrincipalName)
-        Write-Host "First Name            : $($FreshAccount.GivenName)" ; $Obj | Add-Member -MemberType NoteProperty -Name FirstName -Value $($FreshAccount.GivenName)
-        Write-Host "Last Name             : $($FreshAccount.SurName)" ; $Obj | Add-Member -MemberType NoteProperty -Name LastName -Value $($FreshAccount.SurName)
-        Write-Host "Template used         : $($TemplateUser.DisplayName)" ; $Obj | Add-Member -MemberType NoteProperty -Name TemplateUsed -Value $($TemplateUser.DisplayName)
-        Write-Host "EmployeeID            : $($FreshAccount.EmployeeID)" ; $Obj | Add-Member -MemberType NoteProperty -Name EmployeeID -Value $($FreshAccount.EmployeeID)
-        Write-Host "Job Title             : $($FreshAccount.Title)" ; $Obj | Add-Member -MemberType NoteProperty -Name JobTitle -Value $($FreshAccount.Title)
-        Write-Host "Department            : $($FreshAccount.Department)" ; $Obj | Add-Member -MemberType NoteProperty -Name Department -Value $($FreshAccount.Department)
-        Write-Host "Company               : $($FreshAccount.Company)" ; $Obj | Add-Member -MemberType NoteProperty -Name Company -Value $($FreshAccount.Company)
-        Write-Host "Office                : $($FreshAccount.Office)" ; $Obj | Add-Member -MemberType NoteProperty -Name Office -Value $($FreshAccount.Office)
-        Write-Host "Manager               : $($FreshAccount.Manager)" ; $Obj | Add-Member -MemberType NoteProperty -Name Manager -Value $($FreshAccount.Manager)
-        Write-Host "Holiday entitlement   : $($FreshAccount.extensionAttribute15)" ; $Obj | Add-Member -MemberType NoteProperty -Name HolidayEntitlement -Value $($FreshAccount.extensionAttribute15)
-        Write-Host "Start Date            : $($FreshAccount.extensionAttribute13)" ; $Obj | Add-Member -MemberType NoteProperty -Name StartDate -Value $($FreshAccount.extensionAttribute13)
-        Write-Host "End Date              : $($FresAccount.AccountExpirationDate)" ; $Obj | Add-Member -MemberType NoteProperty -Name EndDate -Value $($FresAccount.AccountExpirationDate)
-        Write-Host "Contract type         : $Contract" ; $Obj | Add-Member -MemberType NoteProperty -Name ContractType -Value $Contract
-        Write-Host "JBA Access            : $JBA" ; $Obj | Add-Member -MemberType NoteProperty -Name JBAAccess -Value $JBA
-        Write-Host "User domain           : $UserDomain"  ; $Obj | Add-Member -MemberType NoteProperty -Name UserDomain -Value $UserDomain
-        Write-Host "Company Code          : $($FreshAccount.extensionAttribute5)" ; $Obj | Add-Member -MemberType NoteProperty -Name CompanyCode -Value $($FreshAccount.extensionAttribute5)
-        Write-Host "Country Code          : $($FreshAccount.extensionAttribute6)" ; $Obj | Add-Member -MemberType NoteProperty -Name CountryCode -Value $($FreshAccount.extensionAttribute6)
-        Write-Host "Short Company Code    : $($FreshAccount.extensionAttribute7)" ; $Obj | Add-Member -MemberType NoteProperty -Name ShortCompanyCode -Value $($FreshAccount.extensionAttribute7)
+  # Display/store report
+  $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - (SUMMARY - ACTIVE DIRECTORY) Created user [$($FreshAccount.DisplayName)]:" -ForegroundColor Magenta
+  Write-Host "SAMAccountName      : $($FreshAccount.SAMAccountName)" ; $Obj | Add-Member -MemberType NoteProperty -Name SAMAccountName -Value $($FreshAccount.SAMAccountName)
+  # Write-Host "Password            : $NewPassword"; $Obj | Add-Member -MemberType NoteProperty -Name Password -Value $NewPassword
+  #TODO: COMPLETED - Send the password to the new starter's manager instead of the service desk (request from Janet)
+  Write-Host "UserPrincipalName     : $($FreshAccount.UserPrincipalName)" ; $Obj | Add-Member -MemberType NoteProperty -Name UserPrincipalName -Value $($FreshAccount.UserPrincipalName)
+  Write-Host "First Name            : $($FreshAccount.GivenName)" ; $Obj | Add-Member -MemberType NoteProperty -Name FirstName -Value $($FreshAccount.GivenName)
+  Write-Host "Last Name             : $($FreshAccount.SurName)" ; $Obj | Add-Member -MemberType NoteProperty -Name LastName -Value $($FreshAccount.SurName)
+  Write-Host "Template used         : $($TemplateUser.DisplayName)" ; $Obj | Add-Member -MemberType NoteProperty -Name TemplateUsed -Value $($TemplateUser.DisplayName)
+  Write-Host "EmployeeID            : $($FreshAccount.EmployeeID)" ; $Obj | Add-Member -MemberType NoteProperty -Name EmployeeID -Value $($FreshAccount.EmployeeID)
+  Write-Host "Job Title             : $($FreshAccount.Title)" ; $Obj | Add-Member -MemberType NoteProperty -Name JobTitle -Value $($FreshAccount.Title)
+  Write-Host "Department            : $($FreshAccount.Department)" ; $Obj | Add-Member -MemberType NoteProperty -Name Department -Value $($FreshAccount.Department)
+  Write-Host "Company               : $($FreshAccount.Company)" ; $Obj | Add-Member -MemberType NoteProperty -Name Company -Value $($FreshAccount.Company)
+  Write-Host "Office                : $($FreshAccount.Office)" ; $Obj | Add-Member -MemberType NoteProperty -Name Office -Value $($FreshAccount.Office)
+  Write-Host "Manager               : $($FreshAccount.Manager)" ; $Obj | Add-Member -MemberType NoteProperty -Name Manager -Value $($FreshAccount.Manager)
+  Write-Host "Holiday entitlement   : $($FreshAccount.extensionAttribute15)" ; $Obj | Add-Member -MemberType NoteProperty -Name HolidayEntitlement -Value $($FreshAccount.extensionAttribute15)
+  Write-Host "Start Date            : $($FreshAccount.extensionAttribute13)" ; $Obj | Add-Member -MemberType NoteProperty -Name StartDate -Value $($FreshAccount.extensionAttribute13)
+  Write-Host "End Date              : $($FresAccount.AccountExpirationDate)" ; $Obj | Add-Member -MemberType NoteProperty -Name EndDate -Value $($FresAccount.AccountExpirationDate)
+  Write-Host "Contract type         : $Contract" ; $Obj | Add-Member -MemberType NoteProperty -Name ContractType -Value $Contract
+  Write-Host "JBA Access            : $JBA" ; $Obj | Add-Member -MemberType NoteProperty -Name JBAAccess -Value $JBA
+  Write-Host "User domain           : $UserDomain"  ; $Obj | Add-Member -MemberType NoteProperty -Name UserDomain -Value $UserDomain
+  Write-Host "Company Code          : $($FreshAccount.extensionAttribute5)" ; $Obj | Add-Member -MemberType NoteProperty -Name CompanyCode -Value $($FreshAccount.extensionAttribute5)
+  Write-Host "Country Code          : $($FreshAccount.extensionAttribute6)" ; $Obj | Add-Member -MemberType NoteProperty -Name CountryCode -Value $($FreshAccount.extensionAttribute6)
+  Write-Host "Short Company Code    : $($FreshAccount.extensionAttribute7)" ; $Obj | Add-Member -MemberType NoteProperty -Name ShortCompanyCode -Value $($FreshAccount.extensionAttribute7)
 
-      # Generate CSV report
-      $global:UserADReport += $Obj
-      $global:UserADReportConverted =
-        $global:UserADReport |
-        Get-Member -MemberType NoteProperty |
-        Select-Object @{name='Name';expression={$_.name}},
-                      @{name='Value';expression={($($global:UserADReport)).($_.name)}} |
-        ConvertTo-Csv
-            }
+  # Generate CSV report
+  $UserADReport += $Obj
+
+  $UserADReportConverted =
+  $UserADReport |
+    Get-Member -MemberType NoteProperty |
+    Select-Object @{name = 'Name';expression = { $_.name } },
+    @{name = 'Value';expression = { ($($UserADReport)).($_.name) } } |
+    ConvertTo-Csv
+}
+            
+return $UserADReportConverted
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZFgL3qauUGin1rVJRPNrMsEZ
-# YSGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUr1zBhTie5aj7TCq6qO8TMHtq
+# 7FqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -130,11 +155,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUweiWCcWmqREn4r3Pw19l3y9BwXYwDQYJKoZI
-# hvcNAQEBBQAEggEAIErcjiQSbQonB0cXahClIkXKFzUwD41y5enby6RBQnnAOuZP
-# 0XNQKcqpAV6bukJc5lzmBTgJd1VXZLczJsjc8dQRdkQdwsvhskwZ38rK7SIP0tUQ
-# NQKLDezgc439c9eORDzz8cHkqanLe6fBEJtNlfE1CrhHAnlhfk0y+262e+W+EQwj
-# rPtGyACs2fOGjm331AVZsypwlyI7p18DqR19dlzGzPPKgnpL5sUwotoZ4zkw6n80
-# CNNPlRO28u8A5BD4Vh+FwUw3OdJFf9HNs9u2OsWg2m3LrKkkLFUarIlklbRw1dm2
-# st+/D9XC3BTz0ekBx+ENc76lVHBN5LUlZAQBQA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUD9gieQDcfmt0SG0+ZmAM0KHiXjwwDQYJKoZI
+# hvcNAQEBBQAEggEAAwrACjRBYF4o8RZSvYpdscwyfH14XVJbqKOvKAewhH/5plNi
+# eNA4YZX73NIKYODIxDFNTGsu+pIFo8Iy0WVjYdub7O1zhu4Qi00ubzlRVZRxaVdA
+# peOQT7y3H6D3ETVNJsWp86MTymuTvmAFAmjLseeXc4ezRURfDTTZ7Vx53j5wk7Ah
+# 0clhoyrtLDFYcFvT/h6vkTl9PYcf5AW406BxKCqBW/6YNzPMJSymJu4+yn9GrA4+
+# TWqImdhmzaOP6p7XxoCU36M1rvFr16pl2IDKBPyld1yGdicZNnRZ13I+AlCdQDRi
+# gsZOBeClSiR8YB64BckcDh6epHzm6bqw6XadHg==
 # SIG # End signature block

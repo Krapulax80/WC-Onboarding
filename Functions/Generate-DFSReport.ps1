@@ -11,8 +11,8 @@ $PPLDFS  = (Get-DFSNFolder -Path $PeopleDFS).Path
 $PROFDFS = (Get-DFSNFolder -Path $ProfileDFS).Path
 
       # Create report object
-        $global:UserDFSReport = $null
-        $global:UserDFSReport = @()
+        $UserDFSReport = $null
+        $UserDFSReport = @()
         $Obj = $null ; $Obj = New-Object -TypeName PSObject
 
 # Display Report
@@ -22,21 +22,24 @@ Write-Host  "People DFS for [$NewSAMAccountName]             : $PPLDFS" ; $Obj |
 Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj | Add-Member -MemberType NoteProperty -Name "ProfileDFSPath" -Value $PROFDFS
 
       # Generate CSV report
-        $global:UserDFSReport += $Obj
-        $global:UserDFSReportConverted =
-          $global:UserDFSReport |
+        $UserDFSReport += $Obj
+
+        $UserDFSReportConverted =
+          $UserDFSReport |
           Get-Member -MemberType NoteProperty |
           Select-Object @{name='Name';expression={$_.name}},
-                        @{name='Value';expression={($($global:UserDFSReport)).($_.name)}} |
+                        @{name='Value';expression={($($UserDFSReport)).($_.name)}} |
           ConvertTo-Csv
+
+          return $UserDFSReportConverted
 
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUXEuTLazV6hS6sStjKje2e9Tl
-# 5MqgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU/xLMk51snTRHehzUNsCys0LA
+# 7D+gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -103,11 +106,11 @@ Write-Host  "Profile DFS for [$NewSAMAccountName]            : $PROFDFS" ; $Obj 
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU/8f3CpWU5zS+mjPfQvnOJ6OSD/EwDQYJKoZI
-# hvcNAQEBBQAEggEAFtZv3e+msSmux6r7FNA7dsSkZyuAz8zVPlmtfzgPZXOgVcUe
-# WCAeAtcSystVFJ6TvLGp51mTxxJhJ3uzSwvPnpecoDI90Gf8a/gUbKvFjOSTkEpe
-# VuoZJxfCD1DMltgQb4J1FZJpQALcFwfINFvgRn7Jzsi8zG/PUs2KwZYJ/cOtW0iQ
-# tHXSiudLZVw5FtA4PKjRXTfYa9VQdeo++vrtefRdKFZqbxNdkjXltLNeRk7r4n3d
-# ryWcaosHCHtZEHrYhtfKTmL4ePKsm5KoECWcArOPpkPUCKt13aakO+FZz883L1yA
-# xHn9SeEszY/9gAcMgqMJj2/WahOLJ9zDXWMo8Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUGYM9d4bcRFQxRzwMmLB7D8HxYyIwDQYJKoZI
+# hvcNAQEBBQAEggEAixQ42hdikHsFmaIW+m8dcL36hNeK+tm9DUr9IXnUAo5850Gv
+# CoKCVnzgN4x8pTDoqLCxTLUoEl416fQDFNy7vxOaM3CHBdZwsRoqYYJiASga+3UT
+# oSAJFs28hgx8vZgHdpwI41z5L49zAS1l35Yh2t13HjTMCN4EEWKu6BCQ3lF0coqI
+# 3TM5Tmg8LEVBaGuxkY0S/i6CN1haSDHrsf6sj2FW1O7pfkthKqRnVp6waAyVx/rW
+# yfyUCL3CMmAYARBwZgocaSw0xZt04DYglZ3r0rFpGAgG7EveN1FK+5aN5UJF7NdS
+# G+tlRSdr9aT9uluREre1ILLOOoLllmHF75UTJw==
 # SIG # End signature block

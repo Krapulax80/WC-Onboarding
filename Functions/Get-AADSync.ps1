@@ -1,56 +1,58 @@
-    function Get-AADSync {
-     [CmdletBinding()]
-  param (
-      [Parameter()]
-      [PSCredential]
-      $AD_Credential
-  )
+function Get-AADSync {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [PSCredential]
+        $AD_Credential
+    )
 
-        # START
-        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Starting AAD syncronisation."
-        $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
+    # START
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Starting AAD syncronisation."
+    $pso = New-PSSessionOption -ProxyAccessType NoProxyServer
 
 
-        #Reusable sync function
-        # (only changes)
-        function DeltaSync {
-                [void](Invoke-Command -ComputerName $AADSyncServer -Credential $AD_Credential  -SessionOption $pso -ScriptBlock {
-                Import-Module "C:\Program Files\Microsoft Azure AD Sync\Bin\ADSync\ADSync.psd1" #Import the AAD Sync module
+    #Reusable sync function
+    # (only changes)
+    function DeltaSync {
+        [void](Invoke-Command -ComputerName $AADSyncServer -Credential $AD_Credential -SessionOption $pso -ScriptBlock {
+                Import-Module 'C:\Program Files\Microsoft Azure AD Sync\Bin\ADSync\ADSync.psd1' #Import the AAD Sync module
                 Start-ADSyncSyncCycle -PolicyType Delta #Start Delta - chagnes only - sync
-                } -ErrorAction Stop)
-        }
-
-        #Attempt counter
-        $count = 0
-
-        # Attempts.
-        do{
-            try{
-                DeltaSync
-                $success = $true
-                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Syncing AD to AAD"
-            }
-            catch{
-                # Each failure (usually fail is the result of an ongoing sync) increases the coutner.
-                $attempt = ($count+1)
-                $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sync attempt [$attempt] failed. Next attempt in 30 seconds" -ForegroundColor Yellow
-                $success = $false
-                Start-sleep -Seconds 30
-            }
-            $count++
-
-            # The sync will finish if either of these conditions met:
-            # - succesfull sync
-            # - 5 failures (no point trying at that time, as that means there are major sync issues)
-            }until($count -eq 5 -or $success)
-                # After 5 failed sync attempt the script quits. This should not happen!
-                if(-not($success)){exit}
+            } -ErrorAction Stop)
     }
+
+    #Attempt counter
+    $count = 0
+
+    # Attempts.
+    do {
+        try {
+            DeltaSync
+            $success = $true
+            $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Syncing AD to AAD"
+        }
+        catch {
+            # Each failure (usually fail is the result of an ongoing sync) increases the coutner.
+            $attempt = ($count + 1)
+            $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Sync attempt [$attempt] failed. Next attempt in 30 seconds" -ForegroundColor Yellow
+            $success = $false
+            Start-Sleep -Seconds 30
+        }
+        $count++
+
+        # The sync will finish if either of these conditions met:
+        # - succesfull sync
+        # - 5 failures (no point trying at that time, as that means there are major sync issues)
+    }until($count -eq 5 -or $success)
+    # After 5 failed sync attempt the script quits. This should not happen!
+    if (-not($success)) {
+        exit
+    }
+}
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU4g35/Ho7GUEOXpCYp7hHZ7fT
-# raCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUmbUwEF/i7QNYAg0XgrKVnfoQ
+# ZNugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -117,11 +119,11 @@
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUeo4rfgQJULov0tdOhYHkYmCHpT8wDQYJKoZI
-# hvcNAQEBBQAEggEAG5daLlrKK5Q9zIQ3armXvInrJ1Uxnc2dYNl1KdXHHdE0pODQ
-# qVlyTHYbUAqL89eY30BvKW404PxyD9qpLPjkk6q29rn0BkwsIgBaLT/O3NK1prTd
-# PgwaMup8fF2g511dGZPpamfbNdO5b80lN6kicZmOWvJadFxMbemyN4r9qhsEUv2Y
-# 1Om+M959EzAYcMiITND9Mn211jDFg8fqTqY1buwoo3bWXox0kpLBUYoyL0XiLP7I
-# K2mh92pvTU9xCjWrLMy9WmKD1rD1OvOYlevCP51/nFMpbHpKP1f2E+vLDFHWxu85
-# 1SsNz4MgEf2RG8ec0PkXmeKQkASyZuvAtDIf6w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUvphQCIoyc/fJJ0DYm4UxdNzuozEwDQYJKoZI
+# hvcNAQEBBQAEggEACruGwERKhvG4t6ThbPCbAw/OGyQEpbLLeuOIluAZQGmX5i8c
+# GQmdfuVrveC8DiSCdw+kBwY2AIlpnVu8op6ORUp34A/BYoq0kQ4zUF5/qb2/jENl
+# ymHMJe46EYPcCp3PIVDV2yFWvx3tfGKoOM7J0pb8pIzQ/xb2GJ55KC34USEUP1Ih
+# 5eNzVb2UwP+UEOMrVE6l0bSwLgnWY7sq6S70ShpRTlVd+D99/+8qB3ONg0JVGfZN
+# u2MoKaLERd//dSFbDbQXoT25kPJXQpzP51gixO1xBUbPyXaSlNVhrl8qlyAWVkMu
+# En84x+DL9CUA4x2U8IRRlRzYg2+5EqHvYlkY3g==
 # SIG # End signature block

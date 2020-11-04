@@ -1,27 +1,27 @@
 function Create-UniqueUPN {
-    [CmdletBinding()]
+  [CmdletBinding()]
   param (
-      [Parameter(Mandatory=$true)] [string] $NewUserPrincipalName
+    [Parameter(Mandatory = $true)] [string] $NewUserPrincipalName
   )
 
   $x = 0
-  do{
+  do {
     $x++
     #Construct  new UPN
-    $NewUserPrincipalName = $NewUserPrincipalName -replace "@","$($x)@"
+    $NewUserPrincipalName = $NewUserPrincipalName -replace '@',"$($x)@"
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - New UPN is generated: [$NewUserPrincipalName]"
 
-  } until (!(Get-ADUser -Filter {UserPrincipalName -eq $NewUserPrincipalName} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+  } until (!(Get-ADUser -Filter { UserPrincipalName -eq $NewUserPrincipalName } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - [$NewUserPrincipalName] is an unique UPN. Continuing."
 
   #Output
-  $global:NewUserPrincipalName = $NewUserPrincipalName
+  return $NewUserPrincipalName
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUiaR+rmgU8VRl5jL/cz2EfLzV
-# 43ygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7hEw94edZWXQ8wOrZJBA0Tza
+# WEOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -88,11 +88,11 @@ function Create-UniqueUPN {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUpRuZwNK3tG5VhaupASW3aWxwGjgwDQYJKoZI
-# hvcNAQEBBQAEggEAAzN0x4uv/ruRjkWRBTvzt5te0njYY9jfcc4OUxz9K8JouGGP
-# NHEKrTPAbAReBaRjx89V+wQoVxz/Xa4fN+zN1CT9orYjgOv+/YTKfZW5cIG033TS
-# UZb9WOLTyCINV5t2PUQmEuJZFrJubtTgl2TvVDEFuIVZSHa27LS/f2708hiFNfAQ
-# WR5+ixCzwlCmCFvCbSL0Ciblr6h/7fuRj6hV5k3JG0cxL42P8vmZ3Lm4Lo4AQCRt
-# sfn4i4S0ReVuyB6XBdFlhXUuX/BfvCXfkD8ii7Cv6uXG+oErxUy2agN23JBJdkC+
-# HVP3HcD9dBGn+y7L3Usl7XxlfuEVoKAQN8PCXg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUydkhC4+5a9KPn+M7B1jggUKnJ3owDQYJKoZI
+# hvcNAQEBBQAEggEAwl3U8y8vhDYTFYblzMZ0G2+eFk/wllX02C4XJiYTRNCPWx5o
+# XqPn1d07prDraYhmVJ+8rcwM2SKn4wHwXoxIVMhOjT+CuGgRPEKQ1mRSlocXQhiP
+# hN1okEBKkQBHXSe4Xt33tdU7OIq0dfn6bjFrMRS2ZCEToowp4Cy1cfUGZ4C+BI96
+# U+D8OYbRmU0oopNrucRzBUefx5Fx9OmhqHpf0TmcTshWbvtd6UrzQJjQ6X1yMrOA
+# sG+2pLIMuPeBtuzUdxxtdz/ftHeDzZd9UAugaqOmdW00jrKsm6iDkofUCh+gkDyK
+# ogAZY53oajAJAK6oJjYxLCbf3Ruhc2oEvGaAYg==
 # SIG # End signature block

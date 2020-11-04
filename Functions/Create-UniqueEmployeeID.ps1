@@ -1,27 +1,27 @@
 function Create-UniqueEmployeeID {
-    [CmdletBinding()]
+  [CmdletBinding()]
   param (
-      [Parameter(Mandatory=$true)] [string] $EmployeeID
+    [Parameter(Mandatory = $true)] [string] $EmployeeID
   )
 
   $x = 0
-  do{
+  do {
     $x++
     #Construct  new EmployeeID
     $EmployeeID = $EmployeeID + $x
     $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - New EmployeeID is generated: [$EmployeeID]"
 
-  } until (!(Get-ADUser -Filter {EmployeeID -eq $EmployeeID} -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
+  } until (!(Get-ADUser -Filter { EmployeeID -eq $EmployeeID } -Server $DC -Credential $AD_Credential -ErrorAction SilentlyContinue ))
   $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - [$EmployeeID] is a unique EmployeeID. Continuing."
 
   #Output
-  $global:EmployeeID = $EmployeeID
+  return $EmployeeID
 }
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUiLu5YysXwkkvkaTL1Syx39Wr
-# 68GgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUcDUpFcsWF25rkniRnG26O3lY
+# AEugggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -88,11 +88,11 @@ function Create-UniqueEmployeeID {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUtTFt4qNi1sr0DqPXsPURzRcEtLEwDQYJKoZI
-# hvcNAQEBBQAEggEA9KFd5DfjuMyRNcHS8uok9sZ9C/dTUlmI22P1AG93zZg0s9gC
-# B53bTQIenxf9rf2E0zIOJM8ypaD1XCWVr7/Q/NPq5yoZCzpKaVD5QQWHZ/jjWH++
-# +lJm6Nft/VPJ6hqR1+KF2rQqHvxpEcEi2dE2fQVlqc9860AS4euphlLlCjIWTJ91
-# jPM8NH4K0hJ/y8iLZJd1Raf3LlLlH+ivJWgc9v5ARLKPZllG+ZYNBAMEexfsWBw6
-# xNGgjEu5oeHI7nCj+NBLiereqVZC1gMQCLf8PwSbFuP5MK2VfFI49JEYN5QdECXB
-# maXhrqWOfSiWKkNW8njrZPlQgrhaW+kD9EYj5g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUcAWqhBVVOvOT1ZV9InHd6XLKTycwDQYJKoZI
+# hvcNAQEBBQAEggEAgPPZKLJj2q6NH4rNh621SG0grzVWuI3vdARUIqElSsWgLzA0
+# zDlL2AQXsaHH8egRx1pYBSLL90z1vynDH/0y8TCk68xT62Puv/6pxa7aSbprVQiw
+# 9gVuevdO6QLG2A23h14+ytaPstVy7M57iqz2PtkpF/7mUNBNoMQ6HHLB72vPrRh+
+# X1oDxojqVg0QuCja+HBytyh86k1KS8bLBByrPXoCidRbrHVL81Z1Sw+CGYQywuMf
+# jVFiUuMaDM7BawA2D3dy57PS1Lb1f1KcuPAevYrKXHDupTnn4D0m35Hj2C5DQ446
+# 8Z1vNlbvkvjkKoGlj+r5pJ/LZObIJkMiAMp4lQ==
 # SIG # End signature block

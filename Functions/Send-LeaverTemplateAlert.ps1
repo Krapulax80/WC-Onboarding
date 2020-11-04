@@ -1,65 +1,58 @@
-function  Get-MSOLUserLicensed {
-  [CmdletBinding()]
-  param (
-    [Parameter(Mandatory = $true)] [string]
-    $LicenseSKU,
-    $NewSAMAccountName,
-    $NewUserPrincipalName,
-    $DC,
-    [Parameter(Mandatory = $true)] [pscredential]
-    $AD_Credential
-  )
 
-  try {
-    # First attempt using a group for licensing
-    # E3 phone users
-    if ($LicenseSKU -match 'MCOEV') {
-      Add-ADGroupMember 'LICENSE-Office_365_E3_Phone' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }  
-    # E3 users without phones
-    elseif ($LicenseSKU -match 'ENTERPRISEPACK') {
-      Add-ADGroupMember 'LICENSE-Office_365_E3' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }                
-    # F1 users
-    elseif ($LicenseSKU -match 'DESKLESSPACK') {
-      Add-ADGroupMember 'LICENSE-Office_365_F1' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+function Send-LeaverTemplateAlert {
+    [CmdletBinding()]
+    param (
+
+        [Parameter(Mandatory = $true)] [string]
+
+        $NewDisplayName,
+        $SystemDomain,
+        $SmtpServer,
+        $ReportSender,
+
+        [Parameter(Mandatory = $true)] [Object]
+        $recipients,
+        $TemplateUser
+
+    )
+
+    $TextEncoding = [System.Text.Encoding]::UTF8
+    $EmailSubject = "ALERT - User cration failure - $NewDisplayName ($SystemDomain)"
+
+    #Construct Password Email Body
+    $EmailBody =
+    "
+            <font face= ""Century Gothic"">
+            Hello,
+
+            <p> We have attempted to create this user: <span style=`"color:red`">" + " $NewDisplayName " + "</span> <br>
+
+            <p> But the provided template user <br> <span style=`"color:blue`">" + " $($Templateuser.DisplayName) <br> ($($Templateuser.DistinguishedName)) " + '</span> <br> has been already processed as a leaver! <br>
+
+            <p> The new user account has NOT been created. Please re-enter details for this account, and select a non-processed leaver account !<br>
+
+            <p> Thank you. <br>
+            <p>Regards, <br>
+            Westcoast Group IT
+            </P>
+            </font>
+        '
+
+    #Send email
+    foreach ($line in $recipients) {
+
+        $recipient = $line.recipient
+
+        Send-MailMessage -SmtpServer $SmtpServer -From $ReportSender -To $recipient -Subject $EmailSubject -Body $EmailBody -BodyAsHtml -Priority High -Encoding $TextEncoding  #-Attachments $MFAGuide # -ErrorAction SilentlyContinue
     }
-    # visio users
-    elseif ($LicenseSKU -match 'VISIOCLIENT') {
-      Add-ADGroupMember 'LICENSE-Visio_Online_Plan_2' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # project online users
-    elseif ($LicenseSKU -match 'PROJECTPROFESSIONAL') {
-      Add-ADGroupMember 'LICENSE-Project_Online_Professional' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }
-    # power BI users
-    elseif ($LicenseSKU -match 'POWER_BI_PRO') {
-      Add-ADGroupMember 'LICENSE-Power_BI_Pro' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # E5 users
-    elseif ($LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
-      Add-ADGroupMember 'LICENSE-Office_365_E5' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # every other SKU 
-    else {
-      # If the license has no group, add it directly
-      Set-MsolUserLicense -UserPrincipalName $NewUserPrincipalName -AddLicenses $LicenseSKU #-ErrorAction Stop
-    }
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", '] to user account [', "$NewUserPrincipalName",'] account ', 'succeeded' -Color White,Yellow,White,Yellow,White,Green
-    $licenseassigned += ' [' + $LicenseSKU + '] '
-  }
-  catch {
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", '] to user account [', "$NewUserPrincipalName",'] account ', 'failed. ','(Do you have enough licenses...?)' -Color White,Yellow,White,Yellow,White,Red,White;
-    $licenseunasigned += ' [' + $LicenseSKU + '] '
-    Continue
-  }
+
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJsIXYNI8CG2z+Vuq0YcDvAqS
-# qvCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUq/lvOgDkJmdIfHjJSYL2KsoV
+# BgGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -126,11 +119,11 @@ function  Get-MSOLUserLicensed {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQURz/sZwWNXEtpTXVhkJ6QMNDttb4wDQYJKoZI
-# hvcNAQEBBQAEggEAHPBZh8xnGX5dlzAiCfETzqeyGpLNKWmNRs5V19P9njOXDh+L
-# 8DQ54tKV+/FDOysW4ibuU2aUDiw+aG0P/8N0YAscfAGo28ZLd20kI26GTcdi/wKJ
-# 1MrgPj57AtRJo4tlhPHKHGhc5b4k5cfXW8ZVU49KBQjgITei25TrE/wv1ZrmbFZ/
-# MTHmzMx6bK7aPlFfAwX6CDZC/eTN9sRmS4/79G0VV0lnp4v/4aWWjeWcJGgjucz9
-# kAJ0lrAaG2DRQGu9SsNqTE220DIB5O6ldgV4cLo7EhNKs5dDSEpHGOPO5wNkzg+C
-# Lhejjl5+kSHj7nMs/ikKFqSwTeF7cZCwTU3Jmw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUCRqGHZHk7UfL3qMKwLO2fn02Q64wDQYJKoZI
+# hvcNAQEBBQAEggEA7lBfikH9l8AGtcEViV8p+Y+od6Y5xs2uZI5VtlWZKi42g+WA
+# viT8mhh6YqdSok3FmaQkIfwHYaswnfp56uFw6RPG+afVOFjxJFhcKP/gq66/2sCN
+# l9LziIDMca1J7mDl2DVG8nyHwfm97XMQ51jm7xG2j1J9JNlAo8n24C84pie87/kW
+# uuhynRtAwpJYkwIw445MrxiwjQUxEl8tg5qD4XQHwnv+Z/k1JLK9Znk8iAdSpliE
+# GBtnOz2dQb9UT1RardgVfuk8+gK9OjoPKiarcXuQeG3H7kwlLbw6StAl5O82EO96
+# 3BmLg2nV9V8ZkcztkH8wu+Sob9e2jOI05d5pzw==
 # SIG # End signature block
