@@ -12,33 +12,49 @@ function  Get-MSOLUserLicensed {
 
   try {
     # First attempt using a group for licensing
-    # E3 phone users
-    if ($LicenseSKU -match 'MCOEV') {
-      Add-ADGroupMember 'LICENSE-Office_365_E3_Phone' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # E3 phone
+    if ($LicenseSKU -match 'MCOEV' -and $LicenseSKU -match 'ENTERPRISEPACK') {
+      Add-ADGroupMember 'LICENSE-Office_365_E3_w_PHONE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
     }  
-    # E3 users without phones
+    # E3 phone conf
+    elseif ($LicenseSKU -match 'MCOMEETADV' -and $LicenseSKU -match 'ENTERPRISEPACK') {
+      Add-ADGroupMember 'LICENSE-Office_365_E3_w_CONFERENCE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    }      
+    # E5 phone conf
+    elseif ($LicenseSKU -match 'MCOMEETADV' -and $LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
+      Add-ADGroupMember 'LICENSE-Office_365_E5_w_CONFERENCE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    }  
+    # E5 users
+    elseif ($LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
+      Add-ADGroupMember 'LICENSE-Office_365_E5' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    } 
+    # E3 users 
     elseif ($LicenseSKU -match 'ENTERPRISEPACK') {
       Add-ADGroupMember 'LICENSE-Office_365_E3' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
     }                
     # F1 users
     elseif ($LicenseSKU -match 'DESKLESSPACK') {
-      Add-ADGroupMember 'LICENSE-Office_365_F1' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+      Add-ADGroupMember 'LICENSE-Office_365_F3_F1' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
     }
+    # ATP addon
+    elseif ($LicenseSKU -match 'ATP_ENTERPRISE') {
+      Add-ADGroupMember 'LICENSE-Office_365_ATP_addon' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    } 
     # visio users
     elseif ($LicenseSKU -match 'VISIOCLIENT') {
-      Add-ADGroupMember 'LICENSE-Visio_Online_Plan_2' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+      Add-ADGroupMember 'LICENSE-APP_VisioOnline' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
     } 
-    # project online users
+    # project pro users
     elseif ($LicenseSKU -match 'PROJECTPROFESSIONAL') {
-      Add-ADGroupMember 'LICENSE-Project_Online_Professional' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+      Add-ADGroupMember 'LICENSE-APP_ProjectOnline_PROF' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
     }
     # power BI users
     elseif ($LicenseSKU -match 'POWER_BI_PRO') {
-      Add-ADGroupMember 'LICENSE-Power_BI_Pro' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+      Add-ADGroupMember 'LICENSE-APP_PowerBI_PRO' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
     } 
-    # E5 users
-    elseif ($LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
-      Add-ADGroupMember 'LICENSE-Office_365_E5' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # project premium users
+    elseif ($LicenseSKU -match 'PROJECTPREMIUM') {
+      Add-ADGroupMember 'LICENSE-APP_ProjectOnline_PREM' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
     } 
     # every other SKU 
     else {
@@ -58,8 +74,8 @@ function  Get-MSOLUserLicensed {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJsIXYNI8CG2z+Vuq0YcDvAqS
-# qvCgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVwX0MA56hpqEX9a+RSlTGV9C
+# HQWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -126,11 +142,11 @@ function  Get-MSOLUserLicensed {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQURz/sZwWNXEtpTXVhkJ6QMNDttb4wDQYJKoZI
-# hvcNAQEBBQAEggEAHPBZh8xnGX5dlzAiCfETzqeyGpLNKWmNRs5V19P9njOXDh+L
-# 8DQ54tKV+/FDOysW4ibuU2aUDiw+aG0P/8N0YAscfAGo28ZLd20kI26GTcdi/wKJ
-# 1MrgPj57AtRJo4tlhPHKHGhc5b4k5cfXW8ZVU49KBQjgITei25TrE/wv1ZrmbFZ/
-# MTHmzMx6bK7aPlFfAwX6CDZC/eTN9sRmS4/79G0VV0lnp4v/4aWWjeWcJGgjucz9
-# kAJ0lrAaG2DRQGu9SsNqTE220DIB5O6ldgV4cLo7EhNKs5dDSEpHGOPO5wNkzg+C
-# Lhejjl5+kSHj7nMs/ikKFqSwTeF7cZCwTU3Jmw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU26AkK+dA0zGrvldn99YkdHK4kbIwDQYJKoZI
+# hvcNAQEBBQAEggEAFQMqFkBfktzbZJ4fvY/9MdMOJ9vuWny1NeZabAo3Sve0A/aE
+# QXQYWyd78/1VpAZMpiw4sIN73kndWfAPNIiSRayMcsBCveGjJr0ghZ1gx36Cy3tx
+# KnXHwo3DU598Ve3dq1dOx1HvkB3Krgpw3dCAXRqQ9JVTVK7ifnQ42h3cGgl8iPgW
+# OkkfczkoQIlvEBfDj/o9LblY/UFGZ4b2pBuCpjoyjZVfoefjgWhTjhtd8jEJuim7
+# Zg6UwwugnccYYiL3FzqwDQZMjfFGgKD5UtdUkqBsdzfov3gVvlCdMB6Welj+GCIB
+# /70xcMfHPHTpwkdkKQNAuuCLZ3n2PHBRbUI/Rw==
 # SIG # End signature block
