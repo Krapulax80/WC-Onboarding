@@ -364,17 +364,32 @@ function Process-OnBoarding01 {
 
       }
       until($MSOLACCPresent)
+      Start-Sleep -Seconds $delay
       $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Host "[$timer] - Account [$NewUserPrincipalName] is present in Microsoft Online - continuing execution"
     
       # set the new user to the GB usage location (tenants are in GB even for IE/FR users)
-      [void] (Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation)
+      [void] (Set-MsolUser -UserPrincipalName $NewUserPrincipalName -UsageLocation $UsageLocation -ErrorAction Continue)
 
-      # if the template was licensed, license the user for each of those licenses
-      if ($LicenseSKUs) {
-        foreach ($LicenseSKU in $LicenseSKUs) {
-          Get-MSOLUserLicensed -LicenseSKU $LicenseSKU -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
-        }
+      # if the template was licensed...
+      # ...license with F1 if the template had F1 license
+      if (($LicenseSKUs) -and ($LicenseSKUs -match 'DESKLESSPACK') ) {
+        Add-ADGroupMember 'LICENSE-Office_365_F3_F1' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding licenses [",'Office F1 (DESKLESPACK) and ATP', '] to user account [', "$NewUserPrincipalName",'] account ', 'succeeded' -Color White,Yellow,White,Yellow,White,Green
       }
+      # ... or give E3 with any other template that was licenses
+      elseif ($LicenseSKUs) {
+        Add-ADGroupMember 'LICENSE-Office_365_E3' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [",'Office E3 (ENTERPRISEPACK) and ATP', '] to user account [', "$NewUserPrincipalName",'] account ', 'succeeded' -Color White,Yellow,White,Yellow,White,Green        
+      } 
+      else {
+        $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - NOT adding licenses to user account [", "$NewUserPrincipalName",'] account ', 'as template was not licensed. ' -Color White,Yellow,White,Red
+      }
+
+      # foreach ($LicenseSKU in $LicenseSKUs) {
+      #   Get-MSOLUserLicensed -LicenseSKU $LicenseSKU -NewSAMAccountName $NewSAMAccountName -NewUserPrincipalName $NewUserPrincipalName -DC $DC -AD_Credential $AD_Credential
+      # }
+
+      # }
 
       #endregion
 
@@ -471,8 +486,8 @@ function Process-OnBoarding01 {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUs8gxzih078zlwkMjqmGealLu
-# M52gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjfR2DjahIX1U7Zh6ASLBSPEt
+# 1jSgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -539,11 +554,11 @@ function Process-OnBoarding01 {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUM5qWX2gyKetUDei0LXLjR0d7YzgwDQYJKoZI
-# hvcNAQEBBQAEggEAftiUCC410LoxIFJSrtQSnzRQCzzIfiFeXvWrAVXq+84KYOYL
-# 3q8Otc8uo1kk+jjXg2+GROfJ1UcmcYbDE3dLN9rakCk19i6dsVYAYk8KYsb622N6
-# dQXH1TWGrCzX2VDaaEBs78l/z8zUXfb5xZKDJjxsnp4G3GFd7QtXJ5sfDugBa9BM
-# li5CiRMfG5v1VVw50UvkGVdeQzArjIsfakvESJi9qvz8u4UUmg4Ac9Sw6y0Wzcu7
-# ztFGo0I7R9CDuTUJdgOHUlFwT6rwbaDJqWH4W9t5WNMvIpPC1lRHTwqvgTV+CIxf
-# OBrNwU/5l/5tb3wD7dv+Jh62q4+C17mVGVnQ/g==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUi7wKes5EXt8RHAtjjo0xNPDw8M8wDQYJKoZI
+# hvcNAQEBBQAEggEA3pe+7WorFHF1nw/pc1xOqEn5Px6UCneijq5l6CWhUSPi3aus
+# XfhrfWw0sTWp0J1lqAbvFz/5NKx5FKsmV6THyOxCfMKrt41s5tnfkT8Bhubc8yK8
+# M22P4Z0QtX2CR+wct2NZZdhfu+JnsKrhveq8QTRyj8ImCoK6dTDopCgAzf+CjNpH
+# hMF7JsSgLJXk0NMwAApO8jrqxvt5BrjTQamkwNkLNJEgzBK8U78IBC+pXpt4vBHI
+# lUuEXutdr6FoR8XOyyrWyqIPGI95g2lFHGEHV3e6Sdg1d1G4SjDNA8AVnQQlWhxi
+# Ix6O9/5H+8WLXs+eO30dH68KsrHJ6YBhxuKEHg==
 # SIG # End signature block

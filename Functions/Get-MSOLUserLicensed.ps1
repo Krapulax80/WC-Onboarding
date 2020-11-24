@@ -11,62 +11,77 @@ function  Get-MSOLUserLicensed {
   )
 
   try {
-    # First attempt using a group for licensing
-    # E3 phone
-    if ($LicenseSKU -match 'MCOEV' -and $LicenseSKU -match 'ENTERPRISEPACK') {
-      Add-ADGroupMember 'LICENSE-Office_365_E3_w_PHONE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }  
-    # E3 phone conf
-    elseif ($LicenseSKU -match 'MCOMEETADV' -and $LicenseSKU -match 'ENTERPRISEPACK') {
-      Add-ADGroupMember 'LICENSE-Office_365_E3_w_CONFERENCE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }      
-    # E5 phone conf
-    elseif ($LicenseSKU -match 'MCOMEETADV' -and $LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
-      Add-ADGroupMember 'LICENSE-Office_365_E5_w_CONFERENCE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }  
-    # E5 users
-    elseif ($LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
-      Add-ADGroupMember 'LICENSE-Office_365_E5' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # E3 users 
-    elseif ($LicenseSKU -match 'ENTERPRISEPACK') {
-      Add-ADGroupMember 'LICENSE-Office_365_E3' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }                
-    # F1 users
-    elseif ($LicenseSKU -match 'DESKLESSPACK') {
+    # IF the template had F1 license, add the new user to the F1 group
+    if ($LicenseSKU -match 'DESKLESSPACK') {
       Add-ADGroupMember 'LICENSE-Office_365_F3_F1' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding licenses [",'Office F1 (DESKLESPACK) and ATP', '] to user account [', "$NewUserPrincipalName",'] account ', 'succeeded' -Color White,Yellow,White,Yellow,White,Green
     }
-    # ATP addon
-    elseif ($LicenseSKU -match 'ATP_ENTERPRISE') {
-      Add-ADGroupMember 'LICENSE-Office_365_ATP_addon' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # visio users
-    elseif ($LicenseSKU -match 'VISIOCLIENT') {
-      Add-ADGroupMember 'LICENSE-APP_VisioOnline' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # project pro users
-    elseif ($LicenseSKU -match 'PROJECTPROFESSIONAL') {
-      Add-ADGroupMember 'LICENSE-APP_ProjectOnline_PROF' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    }
-    # power BI users
-    elseif ($LicenseSKU -match 'POWER_BI_PRO') {
-      Add-ADGroupMember 'LICENSE-APP_PowerBI_PRO' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # project premium users
-    elseif ($LicenseSKU -match 'PROJECTPREMIUM') {
-      Add-ADGroupMember 'LICENSE-APP_ProjectOnline_PREM' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
-    } 
-    # every other SKU 
+    # ELSE add the user to the E3 group
     else {
-      # If the license has no group, add it directly
-      Set-MsolUserLicense -UserPrincipalName $NewUserPrincipalName -AddLicenses $LicenseSKU #-ErrorAction Stop
+      Add-ADGroupMember 'LICENSE-Office_365_E3' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+      $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [",'Office E3 (ENTERPRISEPACK) and ATP', '] to user account [', "$NewUserPrincipalName",'] account ', 'succeeded' -Color White,Yellow,White,Yellow,White,Green
     }
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", '] to user account [', "$NewUserPrincipalName",'] account ', 'succeeded' -Color White,Yellow,White,Yellow,White,Green
-    $licenseassigned += ' [' + $LicenseSKU + '] '
+    # # First attempt using a group for licensing
+    # # E3 phone
+    # if ($LicenseSKU -match 'MCOEV' -and $LicenseSKU -match 'ENTERPRISEPACK') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_E3_w_PHONE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # }  
+    # # E3 phone conf
+    # elseif ($LicenseSKU -match 'MCOMEETADV' -and $LicenseSKU -match 'ENTERPRISEPACK') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_E3_w_CONFERENCE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # }      
+    # # E5 phone conf
+    # elseif ($LicenseSKU -match 'MCOMEETADV' -and $LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_E5_w_CONFERENCE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # }  
+    # # E5 users
+    # elseif ($LicenseSKU -match 'ENTERPRISEPREMIUM_NOPSTNCONF') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_E5' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # } 
+    # # E3 users 
+    # elseif ($LicenseSKU -match 'ENTERPRISEPACK') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_E3' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # }                
+    # # F1 users
+    # elseif ($LicenseSKU -match 'DESKLESSPACK') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_F3_F1' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # }
+    # #  Exchagne Online users
+    # elseif ($LicenseSKU -match 'EXCHANGESTANDARD') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_EXCH_ONLINE' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # }
+    # # ATP addon
+    # elseif ($LicenseSKU -match 'ATP_ENTERPRISE') {
+    #   Add-ADGroupMember 'LICENSE-Office_365_ATP_addon' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # } 
+    # # visio users
+    # elseif ($LicenseSKU -match 'VISIOCLIENT') {
+    #   Add-ADGroupMember 'LICENSE-APP_VisioOnline' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # } 
+    # # project pro users
+    # elseif ($LicenseSKU -match 'PROJECTPROFESSIONAL') {
+    #   Add-ADGroupMember 'LICENSE-APP_ProjectOnline_PROF' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # }
+    # # power BI users
+    # elseif ($LicenseSKU -match 'POWER_BI_PRO') {
+    #   Add-ADGroupMember 'LICENSE-APP_PowerBI_PRO' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # } 
+    # # project premium users
+    # elseif ($LicenseSKU -match 'PROJECTPREMIUM') {
+    #   Add-ADGroupMember 'LICENSE-APP_ProjectOnline_PREM' -Members $NewSAMAccountName -Server $DC -Credential $AD_Credential
+    # } 
+    # # every other SKU 
+    # else {
+    #   # If the license has no group, add it directly
+    #   Set-MsolUserLicense -UserPrincipalName $NewUserPrincipalName -AddLicenses $LicenseSKU #-ErrorAction Stop
+    # }
+    # $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", '] to user account [', "$NewUserPrincipalName",'] account ', 'succeeded' -Color White,Yellow,White,Yellow,White,Green
+    # $licenseassigned += ' [' + $LicenseSKU + '] '
   }
   catch {
-    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", '] to user account [', "$NewUserPrincipalName",'] account ', 'failed. ','(Do you have enough licenses...?)' -Color White,Yellow,White,Yellow,White,Red,White;
-    $licenseunasigned += ' [' + $LicenseSKU + '] '
+    $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color '[$timer] - Adding licenses to user account [', "$NewUserPrincipalName",'] account ', 'failed. ' -Color White,Yellow,White,Red;
+    # $timer = (Get-Date -Format yyy-MM-dd-HH:mm); Write-Color "[$timer] - Adding license [","$LicenseSKU", '] to user account [', "$NewUserPrincipalName",'] account ', 'failed. ','(Do you have enough licenses...?)' -Color White,Yellow,White,Yellow,White,Red,White;
+    # $licenseunasigned += ' [' + $LicenseSKU + '] '
     Continue
   }
 }
@@ -74,8 +89,8 @@ function  Get-MSOLUserLicensed {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVwX0MA56hpqEX9a+RSlTGV9C
-# HQWgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1sBvOSUDi4OUfvKTa0XD4Foy
+# afOgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -142,11 +157,11 @@ function  Get-MSOLUserLicensed {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU26AkK+dA0zGrvldn99YkdHK4kbIwDQYJKoZI
-# hvcNAQEBBQAEggEAFQMqFkBfktzbZJ4fvY/9MdMOJ9vuWny1NeZabAo3Sve0A/aE
-# QXQYWyd78/1VpAZMpiw4sIN73kndWfAPNIiSRayMcsBCveGjJr0ghZ1gx36Cy3tx
-# KnXHwo3DU598Ve3dq1dOx1HvkB3Krgpw3dCAXRqQ9JVTVK7ifnQ42h3cGgl8iPgW
-# OkkfczkoQIlvEBfDj/o9LblY/UFGZ4b2pBuCpjoyjZVfoefjgWhTjhtd8jEJuim7
-# Zg6UwwugnccYYiL3FzqwDQZMjfFGgKD5UtdUkqBsdzfov3gVvlCdMB6Welj+GCIB
-# /70xcMfHPHTpwkdkKQNAuuCLZ3n2PHBRbUI/Rw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU+9R7bUv8ntEd1RQwUpruR39zVbgwDQYJKoZI
+# hvcNAQEBBQAEggEAKKR087WAFOZbYR3z7b+WJ/RC4k0TCeuSfLRb0mLDaN/T0S83
+# Z5C4/65/YQHM8YOTGPsVsrnWROhbX9yEWnhCPYAS2cJ9z+dvq10AEWjdfaLDZLe1
+# Hsz3w5giDfqfoJt7fqjTKQzDfIv0QiIzBH78JaOw8pQuRYp4LUmrUYD0w8WFwJ/e
+# YyVHTuG4byapChFjqRKnuqFrSelPoj8HkZTTc6uYu2in0saglU3bL1D0LwJZThvn
+# LiffJ/Hb8CHLkuhQ7YKkHiL45DgzJNavosTRJIepa34uQ2l9P2AfJi6vQqcgZOOW
+# 2kQaB6CsPKq82z0UXOJ92A8wMhvNnZoi+4qHOQ==
 # SIG # End signature block

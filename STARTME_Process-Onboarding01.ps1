@@ -26,40 +26,40 @@ begin {
   Import-Module ActiveDirectory -Verbose:$false
   Import-Module ExchangeOnlineManagement -Verbose:$false
   # Collect work folders (names)
-  $FunctionFolder = "Functions"
-  $InputFolder = "Input"
-  $OutputFolder = "Output"
-  $ConfigFolder = "Config"
-  $LogFolder = "Logs"; #$LogFolder = "$global:CurrentPath\$LogFolder"
+  $FunctionFolder = 'Functions'
+  $InputFolder = 'Input'
+  $OutputFolder = 'Output'
+  $ConfigFolder = 'Config'
+  $LogFolder = 'Logs'; #$LogFolder = "$global:CurrentPath\$LogFolder"
   # Establish script location
   $CurrentPath = $null
-  $global:CurrentPath = Split-Path -parent $PSCommandPath
+  $global:CurrentPath = Split-Path -Parent $PSCommandPath
   Set-Location $global:CurrentPath
   # Import functions to work with
   $functions = Get-ChildItem .\$FunctionFolder
   foreach ($f in $functions) {
     #Write-Host -ForegroundColor Cyan "Importing function $f"
-    if ($f -match ".ps1") {
+    if ($f -match '.ps1') {
       . .\$FunctionFolder\$f
     }
   }
   # Import input files to work on
   if ($Test.Ispresent) {
-    $server = get-content ".\$ConfigFolder\infraserver.txt"
+    $server = Get-Content ".\$ConfigFolder\infraserver.txt"
     $inputfile = Get-FileName("\\$server\c$\Scripts\AD\OnBoarding\Input")
     $Inputfiles = $null
     $Inputfiles = Get-Item $inputfile
   }
   else {
-    $Inputfiles = Get-ChildItem .\$InputFolder | Where-Object { $_.Name -like "*.csv" }
+    $Inputfiles = Get-ChildItem .\$InputFolder | Where-Object { $_.Name -like '*.csv' }
   }
   # Create today folders
-  $Today = Get-date -Format yyyyMMdd
+  $Today = Get-Date -Format yyyyMMdd
   [void] (New-Item -Path $LogFolder -Name $Today -ItemType Directory -ErrorAction Ignore)
   [void] (New-Item -Path $outputFolder -Name $Today -ItemType Directory -ErrorAction Ignore)
   # Transcript START
-  $TranscriptFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
-  $ErrorFile = ".\" + $LogFolder + "\" + $Today + "\" + "OnboardingProcessing_ERRORS_" + (Get-Date -Format yyyy-MM-dd-hh-mm) + ".log"
+  $TranscriptFile = '.\' + $LogFolder + '\' + $Today + '\' + 'OnboardingProcessing_' + (Get-Date -Format yyyy-MM-dd-hh-mm) + '.log'
+  $ErrorFile = '.\' + $LogFolder + '\' + $Today + '\' + 'OnboardingProcessing_ERRORS_' + (Get-Date -Format yyyy-MM-dd-hh-mm) + '.log'
   Start-Transcript -Path $TranscriptFile
   $MigrationCSV = "\\$($config.InfraServer)\c$\Scripts\AD\ONBoarding\Logs\$Today\Migrationfile.csv"
 }
@@ -72,18 +72,18 @@ process {
   # Load the recipient file
   
   if ($Test.Ispresent) {
-    $recipientCSV = ".\" + $ConfigFolder + "\" + "test_recipients.csv"
-    $HRrecipientCSV = ".\" + $ConfigFolder + "\" + "test_recipients.csv"
+    $recipientCSV = '.\' + $ConfigFolder + '\' + 'test_recipients.csv'
+    $HRrecipientCSV = '.\' + $ConfigFolder + '\' + 'test_recipients.csv'
   }
   else {
-    $recipientCSV = ".\" + $ConfigFolder + "\" + "recipients.csv"
-    $HRrecipientCSV = ".\" + $ConfigFolder + "\" + "hr_recipients.csv"
+    $recipientCSV = '.\' + $ConfigFolder + '\' + 'recipients.csv'
+    $HRrecipientCSV = '.\' + $ConfigFolder + '\' + 'hr_recipients.csv'
   }
   $recipients = Import-Csv $recipientCSV
   $HRrecipients = Import-Csv $HRrecipientCSV
   # Load each (.csv) files in the input folder.
   foreach ($I in $Inputfiles) {
-    $CSVImport = Import-CSV $($I.Fullname)
+    $CSVImport = Import-Csv $($I.Fullname)
     # Process each line of the CSV
     foreach ($Line in $CSVImport) {
       # Construct variables from the line contents
@@ -100,23 +100,23 @@ process {
       $Manager = $Line.Manager
       # Run against each line
       # Pipe, if the workdomain is WestCoast
-      if ($Domain -match "WestCoast") {
+      if ($Domain -match 'WestCoast') {
         # Load the config file
-        $configCSV = ".\" + $ConfigFolder + "\" + "westcoast.csv"
+        $configCSV = '.\' + $ConfigFolder + '\' + 'westcoast.csv'
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
         if ($WithMailboxMigration.IsPresent) {
-          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -MigrationCSV $MigrationCSV -WithMailboxMigration
+          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients -MigrationCSV $MigrationCSV -WithMailboxMigration
         }
         else {
-          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder  $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients
+          Process-OnBoarding01 -WestCoast -FirstName $FirstName -LastName $LastName -EmployeeID $EmployeeID -Manager $Manager -TemplateName $TemplateName -OutputFolder $OutputFolder -Today $Today -config $config -recipients $recipients -HRrecipients $HRrecipients
         }
         Write-Host
       }
       # Pipe, if the workdomain is XMA
-      elseif ($Domain -match "XMA") {
+      elseif ($Domain -match 'XMA') {
         # Load the config file
-        $configCSV = ".\" + $ConfigFolder + "\" + "xma.csv"
+        $configCSV = '.\' + $ConfigFolder + '\' + 'xma.csv'
         $config = Import-Csv $configCSV
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);	Write-Host "[$timer] - Domain [$domain] is valid. OnBoarding user: [$FirstName $LastName] - please stand by" -ForegroundColor Yellow
         if ($WithMailboxMigration.IsPresent) {
@@ -135,11 +135,26 @@ process {
     }
     # Reporting
     Write-Host # separator line
-    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host  "[$timer] - Generating reports of the script run" -ForegroundColor Yellow
+    $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Generating reports of the script run" -ForegroundColor Yellow
     #Report on the input file
-    $InputReport = ".\" + $OutputFolder + "\" + $Today + "\" + ($I.Name -replace ".csv", "_PROCESSED.csv")
-    #Remove the input file, now we processed it.
-    Remove-Item $($I.Fullname) -Force -ErrorAction Ignore
+    $InputReport = '.\' + $OutputFolder + '\' + $Today + '\' + ($I.Name -replace '.csv', '_PROCESSED.csv')
+
+    #Try to remove the input file, now we processed it.
+    try {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Attempting to remove input file $($I.Fullname)"
+      Remove-Item $($I.Fullname) -Force -ErrorAction Stop
+    }
+    catch {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Attempted remove of input file $($I.Fullname) failed. Taking ownership and re-attempt it" -ForegroundColor Yellow
+      $_.Exception.Message
+      Set-Owner -Path $($I.Fullname) -Account $($env:UserDomain + '\Administrators')
+      Remove-Item $($I.Fullname) -Force -ErrorAction Ignore
+      Continue
+    } 
+    finally {
+      $timer = (Get-Date -Format yyyy-MM-dd-HH:mm); Write-Host "[$timer] - Ended working on input file $($I.Fullname)" -ForegroundColor Yellow
+    }
+
     $CSVImport | Export-Csv $InputReport -Force
     #Generate-InputReport -CSVImport $CSVImport; $global:InputReport | ConvertFrom-Csv | Export-Csv $InputReport -Force
     # Finally, discard the processed original input file
@@ -158,8 +173,12 @@ end {
   Stop-Transcript
 
   #Error logging
-  if ($Error) { $Error | Out-File $ErrorFile }
-  else { "[INFO] NO ERRORS DURING SCRIPT RUN" | Out-File $ErrorFile } # also send errors to a file
+  if ($Error) {
+    $Error | Out-File $ErrorFile 
+  }
+  else {
+    '[INFO] NO ERRORS DURING SCRIPT RUN' | Out-File $ErrorFile 
+  } # also send errors to a file
 
   #TODO: Check error logging
   #FIXME: Prevent error buildup
@@ -170,8 +189,8 @@ end {
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsmn05un+8BQ3/A4KFGVpHizN
-# yxygggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUj/6Tod/D/GRPRmAr86P6ixrd
+# BkGgggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -238,11 +257,11 @@ end {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUP4K0cJ0bcCr2dxvPnzgrHb9SfIcwDQYJKoZI
-# hvcNAQEBBQAEggEADJ4sE31GVTi0Z+CxXVAdePPnFGAmpZ5nkJ7wm4fdJeLlb2kO
-# PWr7NP3U9ZnARva5885Wxxc5Fu5Vcme0AmV7THX3tSO+GIHHdmioqD8zdTkruEUA
-# nWAjsK3SZsnmbvpiH+Wi7aSvbOjuh6tNlbSHkkAKcayG2qdveZcg+jmzBKgq36G1
-# wB2TzCtiuc+OR1iMUQcirXtz6wZC9X2gaK7QwmzHl7SFNqnPlC1TvHcnocm0khf/
-# WdPPP2G1P5CcFVFWVdslAoKLh4JaZDKkIUA7ZxgQsapZ4Wx5n+KaRfjk8Y43KicA
-# o1rrNuk9+8xOy5A/Q07yAIFRPiBmv+20vfnRjQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU6tRxvz67sc9vqUAfhDK1AuRSn/swDQYJKoZI
+# hvcNAQEBBQAEggEAgsajeIVvVLzUDy4Pd0dU1i/CfkguApNje9vlmnLWEWFsxxPU
+# fTFRsO7xELXyb5zEsJBMEduSE/rX7X7/37jlnrgLAXIY4b/rL+/DlB+kXJfWsB2h
+# yng8HH0BZw/hiVIL24ZhzSlJaj0JDRG0bwDGElkxHH6RVTI4iZFHjx9MbMwzo5/d
+# bU/gB0poD0R9O52CaLIIxB0nR9iXCsi0kYhk/kc8tlSvXETm2kb/38uZIWuUcAtr
+# RabLDZJlhWXKGOh5eljKV9rd9hhu58rf3mT2Cj94w3roxE9wKyRubyuN5OprssGk
+# VeOJVBhYKBhqVFVADNrCtwa+OlM3rRG+cpUn3A==
 # SIG # End signature block

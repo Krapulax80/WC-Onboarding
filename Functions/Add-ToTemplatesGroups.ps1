@@ -1,31 +1,33 @@
 function Add-ToTemplatesGroups {
-   [CmdletBinding()]
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)] [psobject]
+        [Parameter(Mandatory = $true)] [psobject]
         $TemplateUser,
-        [Parameter(Mandatory=$true)] [string]
+        [Parameter(Mandatory = $true)] [string]
         $NewSAMAccountName,
         $DC,
-        [Parameter(Mandatory=$true)] [pscredential]
+        [Parameter(Mandatory = $true)] [pscredential]
         $AD_Credential
     )
 
 
-     try {
+    try {
         $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] "
-        $TemplateUser.Memberof | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential}
-      }
-      catch {
-          $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
-      }
+        
+        # Add to all groups of the template, except the Office 365 licensing groups
+        $TemplateUser.Memberof | Where-Object { $_ -notmatch 'CN=LICENSE' } | ForEach-Object { Add-ADGroupMember $_ $NewSAMAccountName -Server $DC -Credential $AD_Credential }
+    }
+    catch {
+        $timer = (Get-Date -Format yyyy-MM-dd-HH:mm);  Write-Host "[$timer] - Failed to adding [$NewSAMAccountName] to the groups of [$($TemplateUser.SAMAccountName)] " -ForegroundColor Red
+    }
 
 }
 
 # SIG # Begin signature block
 # MIIOWAYJKoZIhvcNAQcCoIIOSTCCDkUCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUplwXqFsBGgbicH12z7gYott6
-# q7agggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzMVEOxVMnZKGVe8djJvJhCQ4
+# Nm2gggueMIIEnjCCA4agAwIBAgITTwAAAAb2JFytK6ojaAABAAAABjANBgkqhkiG
 # 9w0BAQsFADBiMQswCQYDVQQGEwJHQjEQMA4GA1UEBxMHUmVhZGluZzElMCMGA1UE
 # ChMcV2VzdGNvYXN0IChIb2xkaW5ncykgTGltaXRlZDEaMBgGA1UEAxMRV2VzdGNv
 # YXN0IFJvb3QgQ0EwHhcNMTgxMjA0MTIxNzAwWhcNMzgxMjA0MTE0NzA2WjBrMRIw
@@ -92,11 +94,11 @@ function Add-ToTemplatesGroups {
 # Ex1XZXN0Y29hc3QgSW50cmFuZXQgSXNzdWluZyBDQQITNAAD5nIcEC20ruoipwAB
 # AAPmcjAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU0ZFX6A39kQkLhrvFD0jPwVe3htQwDQYJKoZI
-# hvcNAQEBBQAEggEAT5xIw3893hT0c+f8Djo85/fdYbrCCdmBH/gheojYfwnczPNw
-# oUWPOTySDsVnV/wA6CoN6joP8XXLcoavC0m5QHh7RwN+SXRhhYyZBcq54wy4p2Tm
-# ZAaR71SXYmYMk/StT3UKEDUlc3XeId+KfqlAfcCnGK7prkmyF+MTnNodr9X+FwT+
-# xP8/j6WoC8Qh3J8COpSaINlbEkk5LJjoaJXDB8rhF6E9ZpecIhsXLDCO42cLe6z5
-# d5OspkZbj7mUZB6d8TtOUyXkQBFLVJMGdTgo8VMV5c37Tet8Kw1rhd6+j19CqIZx
-# hqUxNwlxvSH513X6+vDmQHPfx3yyuK+ZiOCS4w==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUvhm/tOHcl2LQveZjxDc1UwcUrlcwDQYJKoZI
+# hvcNAQEBBQAEggEAs0ogCMTlFkDY8WFELdxDWQIQk3BOK/6+4G5BF0oJKUWvoq3M
+# j4L1fP1KGq9jbCHt28D9l0QS+3eBfsPAzCgjAfCbo+7grrsOKDiRYzoMQZawLOGa
+# Ss5e7HzFbXSgkXlKz11gyROhBrQ+JVojLnXfKIq9ccaHT146hGAwLzVDdvCkBn97
+# cjPItcSK94OBZoCEJCdW1trp4D7Fyy4fRX82jXNxS1lJnSXoYWBYbSqFkU3+zkFY
+# vx/VOrNumBO3mZFNaUJxU8t9i8EBzWBbcvzwOlxL6UWzUJkSHakO/7rpdqMQ6ukK
+# R5eLyMZKK9812G9+9+CV0rbh5s6BZBjMBxh/fg==
 # SIG # End signature block
